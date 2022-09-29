@@ -1,19 +1,46 @@
 plugins {
+    id 'org.springframework.boot' version '2.7.3'
+    id 'io.spring.dependency-management' version '1.0.13.RELEASE'
+    id 'io.freefair.lombok' version '6.5.1'
     id 'java'
 }
-
-group 'com.shacomiro'
-version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
-dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+bootJar {
+    enabled = false
 }
 
-test {
-    useJUnitPlatform()
+allprojects {
+    group 'com.shacomiro'
+    version '1.0-SNAPSHOT'
 }
+
+subprojects {
+    sourceCompatibility = '11'
+
+    apply plugin: 'java'
+    apply plugin: 'java-library'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'io.freefair.lombok'
+
+    repositories {
+        mavenCentral()
+        maven {
+            url 'https://github.com/psiegman/mvn-repo/raw/master/releases'
+        }
+    }
+
+    dependencies {
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+}
+
