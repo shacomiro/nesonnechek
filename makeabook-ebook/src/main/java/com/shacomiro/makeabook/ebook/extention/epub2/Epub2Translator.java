@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-public class Epub2Generator {
+public class Epub2Translator {
 
     public Optional<InputStream> createEpub2(ByteArrayOutputStream baos, String encoding, String fileName) {
         try {
