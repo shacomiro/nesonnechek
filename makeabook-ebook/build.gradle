@@ -12,4 +12,5 @@ dependencies {
     }
     implementation 'com.j2html:j2html:1.6.0'
     implementation 'com.github.albfernandez:juniversalchardet:2.4.0'
+    implementation 'org.apache.directory.studio:org.apache.commons.lang:2.6'
 }
