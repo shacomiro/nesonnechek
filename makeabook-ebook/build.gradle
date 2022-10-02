@@ -11,4 +11,5 @@ dependencies {
         exclude group: 'org.slf4j'
     }
     implementation 'com.j2html:j2html:1.6.0'
+    implementation 'com.github.albfernandez:juniversalchardet:2.4.0'
 }
