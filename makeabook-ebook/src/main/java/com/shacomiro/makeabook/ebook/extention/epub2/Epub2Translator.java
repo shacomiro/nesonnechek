@@ -48,9 +48,9 @@ public class Epub2Translator {
                     metadata.addTitle(StringUtils.split(str, "*BT*")[0]);
                 }
 
-                if(StringUtils.contains(str, "*BW*")) {
+                if(StringUtils.contains(str, "*BA*")) {
                     isParagraph = false;
-                    metadata.addAuthor(new Author(StringUtils.split(str, "*BW*")[0]));
+                    metadata.addAuthor(new Author(StringUtils.split(str, "*BA*")[0]));
                 }
 
                 if(StringUtils.contains(str, "*ST*")) {
