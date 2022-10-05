@@ -1,12 +1,12 @@
 package com.shacomiro.makeabook.ebook.extention.epub2;
 
-import com.shacomiro.makeabook.ebook.extention.epub2.domain.Section;
-import nl.siegmann.epublib.domain.Author;
-import nl.siegmann.epublib.domain.Book;
-import nl.siegmann.epublib.domain.Metadata;
-import org.apache.commons.lang.StringUtils;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,89 +14,103 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang.StringUtils;
+
+import com.shacomiro.makeabook.ebook.extention.epub2.domain.Section;
+
+import nl.siegmann.epublib.domain.Author;
+import nl.siegmann.epublib.domain.Book;
+import nl.siegmann.epublib.domain.Metadata;
+
 public class Epub2Translator {
 
-    public Optional<InputStream> createEpub2(ByteArrayOutputStream baos, String encoding, String fileName) {
-        Book book = new Book();
-        List<Section> sectionList = new ArrayList<>();
+	public Optional<InputStream> createEpub2(ByteArrayOutputStream baos, String encoding, String fileName) {
+		Book book = new Book();
+		List<Section> sectionList = new ArrayList<>();
 
-        readStream(baos, encoding, book, sectionList);
-        for(Section section : sectionList) {
+		readStream(baos, encoding, book, sectionList);
 
-        }
+		for (Section section : sectionList) {
 
-        return null;
-    }
+		}
 
-    private void readStream(ByteArrayOutputStream baos, String encoding, Book book, List<Section> sectionList) {
-        Metadata metadata = book.getMetadata();
-        Section section = new Section();
-        List<String> paragraphList = new ArrayList<>();
-        boolean isNonSectionEbook = true;
+		return null;
+	}
 
-        try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(baos.toByteArray()), encoding));
+	private void readStream(ByteArrayOutputStream baos, String encoding, Book book, List<Section> sectionList) {
+		Metadata metadata = book.getMetadata();
+		Section section = new Section();
+		List<String> paragraphList = new ArrayList<>();
+		boolean isNonSectionEbook = true;
 
-            while(br.ready()) {
-                String str = br.readLine();
-                boolean isParagraph = true;
+		try {
+			BufferedReader br = new BufferedReader(
+					new InputStreamReader(new ByteArrayInputStream(baos.toByteArray()), encoding));
 
-                if(StringUtils.isEmpty(str)) continue;
+			while (br.ready()) {
+				String str = br.readLine();
+				boolean isParagraph = true;
 
-                if(StringUtils.contains(str, "*BT*")) {
-                    isParagraph = false;
-                    metadata.addTitle(StringUtils.split(str, "*BT*")[0]);
-                }
+				if (StringUtils.isEmpty(str)) {
+					continue;
+				}
 
-                if(StringUtils.contains(str, "*BA*")) {
-                    isParagraph = false;
-                    metadata.addAuthor(new Author(StringUtils.split(str, "*BA*")[0]));
-                }
+				if (StringUtils.contains(str, "*BT*")) {
+					isParagraph = false;
+					metadata.addTitle(StringUtils.split(str, "*BT*")[0]);
+				}
 
-                if(StringUtils.contains(str, "*ST*")) {
-                    isParagraph = false;
+				if (StringUtils.contains(str, "*BA*")) {
+					isParagraph = false;
+					metadata.addAuthor(new Author(StringUtils.split(str, "*BA*")[0]));
+				}
 
-                    if(isNonSectionEbook) {
-                        isNonSectionEbook = false;
-                    } else {
-                        updateSectionList(sectionList, section, paragraphList);
-                    }
+				if (StringUtils.contains(str, "*ST*")) {
+					isParagraph = false;
 
-                    paragraphList = new ArrayList<>();
-                    section = Section.builder().title(StringUtils.split(str, "*ST*")[0]).build();
-                }
+					if (isNonSectionEbook) {
+						isNonSectionEbook = false;
+					} else {
+						updateSectionList(sectionList, section, paragraphList);
+					}
 
-                if(isParagraph) {
-                    paragraphList.add(str);
-                }
-            }
-            updateSectionList(sectionList, section, paragraphList);
+					paragraphList = new ArrayList<>();
+					section = Section.builder()
+							.title(StringUtils.split(str, "*ST*")[0])
+							.build();
+				}
 
-            br.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+				if (isParagraph) {
+					paragraphList.add(str);
+				}
+			}
+			updateSectionList(sectionList, section, paragraphList);
 
-    private void updateSectionList(List<Section> sectionList, Section section, List<String> paragraphList) {
-        section.updateParagraphList(paragraphList);
-        sectionList.add(section);
-    }
+			br.close();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-    private Path getPath(String fileName) {
-        return Paths.get(File.separatorChar + "file", File.separatorChar + fileName);
-    }
+	private void updateSectionList(List<Section> sectionList, Section section, List<String> paragraphList) {
+		section.updateParagraphList(paragraphList);
+		sectionList.add(section);
+	}
 
-    public InputStream loadFileToInputStream(String fileName) {
-        return getClass().getResourceAsStream(getPath(fileName).toString());
-    }
+	private Path getPath(String fileName) {
+		return Paths.get(File.separatorChar + "file", File.separatorChar + fileName);
+	}
 
-    public void removeFile(String fileName) {
-        Path filePath = Paths.get(File.separatorChar + "file", File.separatorChar + fileName);
-        try {
-            Files.delete(filePath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+	public InputStream loadFileToInputStream(String fileName) {
+		return getClass().getResourceAsStream(getPath(fileName).toString());
+	}
+
+	public void removeFile(String fileName) {
+		Path filePath = Paths.get(File.separatorChar + "file", File.separatorChar + fileName);
+		try {
+			Files.delete(filePath);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }
