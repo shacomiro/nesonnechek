@@ -18,10 +18,10 @@ public class Epub2Translator {
 
     public Optional<InputStream> createEpub2(ByteArrayOutputStream baos, String encoding, String fileName) {
         Book book = new Book();
-        List<Section> sectionsList = new ArrayList<>();
+        List<Section> sectionList = new ArrayList<>();
 
-        readStream(baos, encoding, book, sectionsList);
-        for(Section section : sectionsList) {
+        readStream(baos, encoding, book, sectionList);
+        for(Section section : sectionList) {
 
         }
 
@@ -55,9 +55,12 @@ public class Epub2Translator {
 
                 if(StringUtils.contains(str, "*ST*")) {
                     isParagraph = false;
-                    isNonSectionEbook = false;
 
-                    updateSectionList(sectionList, section, paragraphList);
+                    if(isNonSectionEbook) {
+                        isNonSectionEbook = false;
+                    } else {
+                        updateSectionList(sectionList, section, paragraphList);
+                    }
 
                     paragraphList = new ArrayList<>();
                     section = Section.builder().title(StringUtils.split(str, "*ST*")[0]).build();
@@ -67,9 +70,8 @@ public class Epub2Translator {
                     paragraphList.add(str);
                 }
             }
-
             updateSectionList(sectionList, section, paragraphList);
-            if(!isNonSectionEbook) sectionList.remove(0);
+
             br.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
