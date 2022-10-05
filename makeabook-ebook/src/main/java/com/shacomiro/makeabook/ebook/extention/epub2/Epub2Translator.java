@@ -17,6 +17,7 @@ import java.util.Optional;
 import org.apache.commons.lang.StringUtils;
 
 import com.shacomiro.makeabook.ebook.extention.epub2.domain.Section;
+import com.shacomiro.makeabook.ebook.grammar.EbookGrammar;
 
 import nl.siegmann.epublib.domain.Author;
 import nl.siegmann.epublib.domain.Book;
@@ -55,17 +56,17 @@ public class Epub2Translator {
 					continue;
 				}
 
-				if (StringUtils.contains(str, "*BT*")) {
+				if (StringUtils.contains(str, EbookGrammar.BOOK_TITLE)) {
 					isParagraph = false;
-					metadata.addTitle(StringUtils.split(str, "*BT*")[0]);
+					metadata.addTitle(StringUtils.split(str, EbookGrammar.BOOK_TITLE)[0]);
 				}
 
-				if (StringUtils.contains(str, "*BA*")) {
+				if (StringUtils.contains(str, EbookGrammar.BOOK_AUTHOR)) {
 					isParagraph = false;
-					metadata.addAuthor(new Author(StringUtils.split(str, "*BA*")[0]));
+					metadata.addAuthor(new Author(StringUtils.split(str, EbookGrammar.BOOK_AUTHOR)[0]));
 				}
 
-				if (StringUtils.contains(str, "*ST*")) {
+				if (StringUtils.contains(str, EbookGrammar.SECTION_TITLE)) {
 					isParagraph = false;
 
 					if (isNonSectionEbook) {
@@ -76,7 +77,7 @@ public class Epub2Translator {
 
 					paragraphList = new ArrayList<>();
 					section = Section.builder()
-							.title(StringUtils.split(str, "*ST*")[0])
+							.title(StringUtils.split(str, EbookGrammar.SECTION_TITLE)[0])
 							.build();
 				}
 
