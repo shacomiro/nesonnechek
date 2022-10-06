@@ -1,14 +1,16 @@
 package com.shacomiro.makeabook.ebook;
 
-import com.shacomiro.makeabook.ebook.extention.epub2.Epub2Translator;
-
-import org.mozilla.universalchardet.UniversalDetector;
+import static com.shacomiro.makeabook.ebook.util.IOUtil.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
+
+import org.mozilla.universalchardet.UniversalDetector;
+
+import com.shacomiro.makeabook.ebook.extention.epub2.Epub2Translator;
 
 public class EbookManager {
 	Epub2Translator epub2Translator;
@@ -21,13 +23,6 @@ public class EbookManager {
 		ByteArrayOutputStream baos = getByteArrayOutputStream(inputStream);
 
 		return epub2Translator.createEpub2(baos, getEncoding(baos), fileName);
-	}
-
-	private ByteArrayOutputStream getByteArrayOutputStream(InputStream inputStream) throws IOException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		inputStream.transferTo(baos);
-
-		return baos;
 	}
 
 	private String getEncoding(ByteArrayOutputStream baos) throws IOException {
