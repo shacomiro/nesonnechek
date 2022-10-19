@@ -96,18 +96,18 @@ public class Epub2Translator {
 	}
 
 	private void writeXhtml(String sectionFilePath, String head, String body) throws IOException {
-		File Sectionfile = new File(sectionFilePath);
-		BufferedWriter SectionWriter = new BufferedWriter(new FileWriter(Sectionfile));
+		File sectionFile = new File(sectionFilePath);
+		BufferedWriter sectionWriter = new BufferedWriter(new FileWriter(sectionFile));
 
-		SectionWriter.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-		SectionWriter.write("\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"");
-		SectionWriter.write("\r\n\t\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
-		SectionWriter.write("\r\n");
-		SectionWriter.write("\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">");
-		SectionWriter.write(head);
-		SectionWriter.write(body);
-		SectionWriter.write("</html>");
+		sectionWriter.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+		sectionWriter.write("\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"");
+		sectionWriter.write("\r\n\t\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+		sectionWriter.write("\r\n");
+		sectionWriter.write("\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+		sectionWriter.write(head);
+		sectionWriter.write(body);
+		sectionWriter.write("</html>");
 
-		SectionWriter.close();
+		sectionWriter.close();
 	}
 }
