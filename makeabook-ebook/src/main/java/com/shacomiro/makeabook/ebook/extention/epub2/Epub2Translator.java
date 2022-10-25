@@ -64,7 +64,7 @@ public class Epub2Translator {
 		int sectionNum = 0;
 		for (Section section : sectionList) {
 			sectionNum++;
-			createSectionXhtml(section, dirPath, fileNameWithoutExtension, sectionNum);
+			createSectionXhtml(section, dirPath, sectionNum);
 		}
 
 		Book book = new Book();
@@ -94,9 +94,9 @@ public class Epub2Translator {
 		readStream(baos, encoding, sectionList, metainfo);
 	}
 
-	private void createSectionXhtml(Section section, String dirPath, String fileName, int sectionNum) throws
+	private void createSectionXhtml(Section section, String dirPath, int sectionNum) throws
 			IOException {
-		String sectionFileName = fileName + sectionNum + MediatypeService.XHTML.getDefaultExtension();
+		String sectionFileName = "chapter" + sectionNum + MediatypeService.XHTML.getDefaultExtension();
 		String sectionFilePath = dirPath + File.separatorChar + sectionFileName;
 
 		String head = String.valueOf(
