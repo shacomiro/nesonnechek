@@ -6,9 +6,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.shacomiro.makeabook.ebook.extention.epub2.domain.Section;
 import com.shacomiro.makeabook.ebook.grammar.EbookGrammar;
@@ -32,14 +34,14 @@ public class IOUtil {
 	}
 
 	public static void readStream(ByteArrayOutputStream baos, String encoding, List<Section> sectionList,
-			Map<String, String> metainfo) throws
-			IOException {
+			Map<String, String> metainfo) throws IOException {
 		Section section = new Section();
 		List<String> paragraphList = new ArrayList<>();
 		boolean isNonSectionEbook = true;
 
-		BufferedReader br = new BufferedReader(
-				new InputStreamReader(new ByteArrayInputStream(baos.toByteArray()), encoding));
+		ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+		InputStreamReader isr = new InputStreamReader(bais, encoding);
+		BufferedReader br = new BufferedReader(isr);
 
 		while (br.ready()) {
 			String str = br.readLine();
@@ -81,6 +83,8 @@ public class IOUtil {
 		updateSectionList(sectionList, section, paragraphList);
 
 		br.close();
+		isr.close();
+		bais.close();
 	}
 
 	private static void updateSectionList(List<Section> sectionList, Section section, List<String> paragraphList) {
@@ -100,15 +104,20 @@ public class IOUtil {
 		return new FileInputStream(getFilePath(dirName, fileName).toString());
 	}
 
-	public static void createDirectoryIfNotExists(String dirName) {
-		File file = getDirPath(dirName).toFile();
-
-		if (!file.exists()) {
-			file.mkdirs();
-		}
+	public static OutputStream loadFileToOutputStream(String dirName, String fileName) throws FileNotFoundException {
+		return new FileOutputStream(getFilePath(dirName, fileName).toString());
 	}
 
-	public static void deleteDirectoryIfExists(String dirName) {
+	public static void createDirectory(String dirName) throws IOException {
+		File file = getDirPath(dirName).toFile();
+
+		if (file.exists()) {
+			deleteDirectoryIfExists(dirName);
+		}
+		file.mkdirs();
+	}
+
+	public static void deleteDirectoryIfExists(String dirName) throws IOException {
 		File directory = new File(getDirPath(dirName).toString());
 
 		if (directory.exists()) {
@@ -116,13 +125,12 @@ public class IOUtil {
 
 			for (int i = 0; i < dirList.length; i++) {
 				if (dirList[i].isFile()) {
-					dirList[i].delete();
+					Files.delete(Path.of(dirList[i].getPath()));
 				} else {
 					deleteDirectoryIfExists(dirList[i].getPath());
 				}
-				dirList[i].delete();
 			}
-			directory.delete();
+			Files.delete(Path.of(directory.getPath()));
 		}
 	}
 

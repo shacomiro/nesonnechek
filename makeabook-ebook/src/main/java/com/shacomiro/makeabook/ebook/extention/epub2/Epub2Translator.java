@@ -10,11 +10,15 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+
+import org.apache.commons.io.FilenameUtils;
 
 import com.shacomiro.makeabook.ebook.extention.epub2.domain.Section;
 
@@ -32,13 +36,26 @@ public class Epub2Translator {
 	}
 
 	private static Resource getResource(String path, String href) throws IOException {
-		return new Resource(getResource(path), href);
+		InputStream is = getResource(path);
+		Resource resource = new Resource(is, href);
+		is.close();
+
+		return resource;
 	}
 
-	public Optional<InputStream> createEpub2(ByteArrayOutputStream baos, String encoding, String fileName) throws
+	private static Resource getResource(String dirName, String fileName, String href) throws IOException {
+		InputStream is = loadFileToInputStream(dirName, fileName);
+		Resource resource = new Resource(is, href);
+		is.close();
+
+		return resource;
+	}
+
+	public Path createEpub2(ByteArrayOutputStream baos, String encoding, String fileName) throws
 			IOException {
-		createDirectoryIfNotExists(fileName);
-		String dirPath = getDirPath(fileName).toString();
+		String fileNameWithoutExtension = FilenameUtils.removeExtension(fileName);
+		createDirectory(fileNameWithoutExtension);
+		String dirPath = getDirPath(fileNameWithoutExtension).toString();
 
 		List<Section> sectionList = new ArrayList<>();
 		Map<String, String> metainfo = new HashMap<>();
@@ -47,7 +64,7 @@ public class Epub2Translator {
 		int sectionNum = 0;
 		for (Section section : sectionList) {
 			sectionNum++;
-			createSectionXhtml(section, dirPath, fileName, sectionNum);
+			createSectionXhtml(section, dirPath, fileNameWithoutExtension, sectionNum);
 		}
 
 		Book book = new Book();
@@ -59,15 +76,17 @@ public class Epub2Translator {
 		String[] xhtmlFileNames = new File(dirPath).list();
 		for (int i = 0; i < xhtmlFileNames.length; i++) {
 			book.addSection(sectionList.get(i).getTitle(),
-					getResource(File.separatorChar + "file" + File.separatorChar + fileName + File.separatorChar
-							+ xhtmlFileNames[i], xhtmlFileNames[i]));
+					getResource(fileNameWithoutExtension, xhtmlFileNames[i], xhtmlFileNames[i]));
 		}
 
 		EpubWriter epubWriter = new EpubWriter();
 		String bookFileName = metainfo.get("Title") + MediatypeService.EPUB.getDefaultExtension();
-		epubWriter.write(book, new FileOutputStream(dirPath + File.separatorChar + bookFileName));
+		Path bookFilePath = Paths.get(dirPath, File.separatorChar + bookFileName).toAbsolutePath().normalize();
+		OutputStream os = new FileOutputStream(bookFilePath.toString());
+		epubWriter.write(book, os);
+		os.close();
 
-		return Optional.of(loadFileToInputStream(fileName, bookFileName));
+		return bookFilePath;
 	}
 
 	private void preProcess(ByteArrayOutputStream baos, String encoding, List<Section> sectionList,
@@ -97,17 +116,21 @@ public class Epub2Translator {
 
 	private void writeXhtml(String sectionFilePath, String head, String body) throws IOException {
 		File sectionFile = new File(sectionFilePath);
-		BufferedWriter sectionWriter = new BufferedWriter(new FileWriter(sectionFile));
 
-		sectionWriter.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-		sectionWriter.write("\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"");
-		sectionWriter.write("\r\n\t\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
-		sectionWriter.write("\r\n");
-		sectionWriter.write("\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">");
-		sectionWriter.write(head);
-		sectionWriter.write(body);
-		sectionWriter.write("</html>");
+		FileWriter fw = new FileWriter(sectionFile);
+		BufferedWriter bw = new BufferedWriter(fw);
 
-		sectionWriter.close();
+		bw.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+		bw.write("\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"");
+		bw.write("\r\n\t\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+		bw.write("\r\n");
+		bw.write("\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+		bw.write("\r\n");
+		bw.write(head);
+		bw.write(body);
+		bw.write("</html>");
+
+		bw.close();
+		fw.close();
 	}
 }
