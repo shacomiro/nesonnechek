@@ -26,6 +26,10 @@ import com.shacomiro.makeabook.ebook.grammar.EbookGrammar;
 public class IOUtil {
 	private static final String BASE_PATH = "./makeabook-ebook/src/main/resources/file";
 
+	private IOUtil() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	public static ByteArrayOutputStream getByteArrayOutputStream(InputStream inputStream) throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		inputStream.transferTo(baos);
