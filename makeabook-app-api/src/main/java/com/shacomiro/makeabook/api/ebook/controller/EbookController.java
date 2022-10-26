@@ -1,0 +1,52 @@
+package com.shacomiro.makeabook.api.ebook.controller;
+
+import java.io.IOException;
+
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.shacomiro.makeabook.api.ebook.error.NoFileException;
+import com.shacomiro.makeabook.api.ebook.service.EbookService;
+import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
+import com.shacomiro.makeabook.ebook.error.EmptyFileException;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@RestController
+@RequestMapping(path = "api/ebook")
+public class EbookController {
+	private final EbookService ebookService;
+
+	public EbookController(EbookService ebookService) {
+		this.ebookService = ebookService;
+	}
+
+	@PostMapping(path = "upload")
+	public ResponseEntity<?> uploadTextFile(MultipartFile file) {
+		try {
+			if (file == null) {
+				throw new NoFileException("no file uploaded");
+			}
+
+			ByteArrayResource resource = new ByteArrayResource(file.getBytes());
+			EpubFileInfo info = ebookService.createEpub2(resource, file.getOriginalFilename());
+
+			return ResponseEntity.ok()
+					.body(info);
+		} catch (EmptyFileException e) {
+			return ResponseEntity.ok()
+					.body("빈 파일입니다.");
+		} catch (NoFileException e) {
+			return ResponseEntity.ok()
+					.body("파일이 업로드되지 않았습니다.");
+		} catch (IOException e) {
+			return ResponseEntity.ok()
+					.body("파일 변환에 실패했습니다.");
+		}
+	}
+}
