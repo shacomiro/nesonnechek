@@ -13,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
 import com.shacomiro.makeabook.ebook.error.EmptyFileException;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -38,11 +39,11 @@ class EbookManagerTest {
 
 		//when
 		EbookManager ebookManager = new EbookManager();
-		Path path = ebookManager.translateTxtToEpub2(is, fileName);
+		EpubFileInfo info = ebookManager.translateTxtToEpub2(is, fileName);
 		is.close();
 
 		//then
-		Assertions.assertEquals(expectTestResultPath, path);
+		Assertions.assertEquals(expectTestResultPath, info.getFilePath());
 	}
 
 	@Test

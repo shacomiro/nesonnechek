@@ -14,6 +14,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Epub2TranslatorTest {
 	static final String testFilePath = "./makeabook-ebook/src/test/resources";
@@ -41,10 +43,10 @@ class Epub2TranslatorTest {
 
 		//when
 		Epub2Translator epub2Translator = new Epub2Translator();
-		Path path = epub2Translator.createEpub2(baos, "utf-8", fileName);
+		EpubFileInfo info = epub2Translator.createEpub2(baos, "utf-8", fileName);
 		baos.close();
 
 		//then
-		Assertions.assertEquals(expectTestResultPath, path);
+		Assertions.assertEquals(expectTestResultPath, info.getFilePath());
 	}
 }
