@@ -20,7 +20,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.shacomiro.makeabook.ebook.extention.epub2.domain.Section;
+import com.shacomiro.makeabook.ebook.domain.Section;
 import com.shacomiro.makeabook.ebook.grammar.EbookGrammar;
 
 public class IOUtil {

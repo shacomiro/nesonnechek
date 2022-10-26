@@ -20,7 +20,8 @@ import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
 
-import com.shacomiro.makeabook.ebook.extention.epub2.domain.Section;
+import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
+import com.shacomiro.makeabook.ebook.domain.Section;
 
 import nl.siegmann.epublib.domain.Author;
 import nl.siegmann.epublib.domain.Book;
@@ -51,7 +52,7 @@ public class Epub2Translator {
 		return resource;
 	}
 
-	public Path createEpub2(ByteArrayOutputStream baos, String encoding, String fileName) throws
+	public EpubFileInfo createEpub2(ByteArrayOutputStream baos, String encoding, String fileName) throws
 			IOException {
 		String fileNameWithoutExtension = FilenameUtils.removeExtension(fileName);
 		createDirectory(fileNameWithoutExtension);
@@ -86,7 +87,10 @@ public class Epub2Translator {
 		epubWriter.write(book, os);
 		os.close();
 
-		return bookFilePath;
+		return EpubFileInfo.builder()
+				.fileName(bookFileName)
+				.filePath(bookFilePath)
+				.build();
 	}
 
 	private void preProcess(ByteArrayOutputStream baos, String encoding, List<Section> sectionList,
