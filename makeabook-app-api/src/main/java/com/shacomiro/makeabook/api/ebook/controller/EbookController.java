@@ -1,9 +1,14 @@
 package com.shacomiro.makeabook.api.ebook.controller;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,5 +53,21 @@ public class EbookController {
 			return ResponseEntity.ok()
 					.body("파일 변환에 실패했습니다.");
 		}
+	}
+
+	@GetMapping(path = "download/{filename}")
+	public ResponseEntity<?> downloadEbookFile(@PathVariable String filename) throws IOException {
+		log.info("RootPath = " + System.getProperty("user.dir"));
+		ByteArrayResource resource = ebookService.getEpubAsResource(filename);
+
+		return ResponseEntity
+				.ok()
+				.header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.builder("attachment")
+						.filename(filename, StandardCharsets.UTF_8)
+						.build()
+						.toString())
+				.header(HttpHeaders.CONTENT_TYPE, "application/epub+zip")
+				.header(HttpHeaders.CONTENT_LENGTH, Long.toString(resource.getByteArray().length))
+				.body(resource);
 	}
 }
