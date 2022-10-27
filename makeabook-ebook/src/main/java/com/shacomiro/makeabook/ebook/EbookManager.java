@@ -23,8 +23,9 @@ public class EbookManager {
 	}
 
 	public EpubFileInfo translateTxtToEpub2(InputStream inputStream, String fileName) throws IOException {
-		if (inputStream.available() == 0)
-			throw new EmptyFileException(fileName + "is empty file");
+		if (inputStream.available() == 0) {
+			throw new EmptyFileException(fileName + " is empty file");
+		}
 
 		ByteArrayOutputStream baos = getByteArrayOutputStream(inputStream);
 		EpubFileInfo fileInfo = epub2Translator.createEpub2(baos, getEncoding(baos), fileName);
