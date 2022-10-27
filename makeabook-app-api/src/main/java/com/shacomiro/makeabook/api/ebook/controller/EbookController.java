@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.shacomiro.makeabook.api.ebook.error.NoFileException;
 import com.shacomiro.makeabook.api.ebook.service.EbookService;
+import com.shacomiro.makeabook.api.error.NotExistException;
 import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
 import com.shacomiro.makeabook.ebook.error.EmptyFileException;
 
@@ -35,7 +35,7 @@ public class EbookController {
 	public ResponseEntity<?> uploadTextFile(MultipartFile file) {
 		try {
 			if (file == null) {
-				throw new NoFileException("no file uploaded");
+				throw new NotExistException("no file uploaded");
 			}
 
 			ByteArrayResource resource = new ByteArrayResource(file.getBytes());
@@ -46,7 +46,7 @@ public class EbookController {
 		} catch (EmptyFileException e) {
 			return ResponseEntity.ok()
 					.body("빈 파일입니다.");
-		} catch (NoFileException e) {
+		} catch (NotExistException e) {
 			return ResponseEntity.ok()
 					.body("파일이 업로드되지 않았습니다.");
 		} catch (IOException e) {
