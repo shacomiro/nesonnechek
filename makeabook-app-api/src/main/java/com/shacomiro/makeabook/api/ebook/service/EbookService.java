@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 
-import com.shacomiro.makeabook.api.ebook.error.NotFoundException;
+import com.shacomiro.makeabook.api.error.NotFoundException;
 import com.shacomiro.makeabook.ebook.EbookManager;
 import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
 

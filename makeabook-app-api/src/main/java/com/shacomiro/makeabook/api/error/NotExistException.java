@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.api.ebook.error;
+package com.shacomiro.makeabook.api.error;
 
 public class NotExistException extends RuntimeException {
 
