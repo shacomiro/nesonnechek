@@ -4,7 +4,7 @@ import static com.shacomiro.makeabook.ebook.util.IOUtil.*;
 import static j2html.TagCreator.*;
 
 import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -52,7 +53,7 @@ public class Epub2Translator {
 		return resource;
 	}
 
-	public EpubFileInfo createEpub2(ByteArrayOutputStream baos, String encoding, String fileName) throws
+	public EpubFileInfo createEpub2(byte[] bytes, String encoding, String fileName) throws
 			IOException {
 		String fileNameWithoutExtension = FilenameUtils.removeExtension(fileName);
 		createDirectory(fileNameWithoutExtension);
@@ -60,7 +61,7 @@ public class Epub2Translator {
 
 		List<Section> sectionList = new ArrayList<>();
 		Map<String, String> metainfo = new HashMap<>();
-		preProcess(baos, encoding, sectionList, metainfo);
+		convertBytesTextToEbookInfo(bytes, encoding, sectionList, metainfo);
 
 		int sectionNum = 0;
 		for (Section section : sectionList) {
@@ -75,7 +76,7 @@ public class Epub2Translator {
 		metadata.addAuthor(new Author(metainfo.get("Author")));
 
 		String[] xhtmlFileNames = new File(dirPath).list();
-		for (int i = 0; i < xhtmlFileNames.length; i++) {
+		for (int i = 0; i < Objects.requireNonNull(xhtmlFileNames).length; i++) {
 			book.addSection(sectionList.get(i).getTitle(),
 					getResource(fileNameWithoutExtension, xhtmlFileNames[i], xhtmlFileNames[i]));
 		}
@@ -93,9 +94,11 @@ public class Epub2Translator {
 				.build();
 	}
 
-	private void preProcess(ByteArrayOutputStream baos, String encoding, List<Section> sectionList,
+	private void convertBytesTextToEbookInfo(byte[] bytes, String encoding, List<Section> sectionList,
 			Map<String, String> metainfo) throws IOException {
-		readStream(baos, encoding, sectionList, metainfo);
+		InputStream is = new ByteArrayInputStream(bytes);
+		readStream(is, encoding, sectionList, metainfo);
+		is.close();
 	}
 
 	private void createSectionXhtml(Section section, String dirPath, int sectionNum) throws

@@ -21,7 +21,7 @@ public class EbookService {
 	}
 
 	public EpubFileInfo createEpub2(ByteArrayResource resource, String fileName) throws IOException {
-		return ebookManager.translateTxtToEpub2(resource.getInputStream(), fileName);
+		return ebookManager.translateTxtToEpub2(resource.getByteArray(), fileName);
 	}
 
 	public ByteArrayResource getEpubAsResource(String fileName) throws IOException {

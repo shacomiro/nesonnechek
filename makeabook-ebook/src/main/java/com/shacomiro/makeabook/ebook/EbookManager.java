@@ -3,7 +3,6 @@ package com.shacomiro.makeabook.ebook;
 import static com.shacomiro.makeabook.ebook.util.IOUtil.*;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -22,16 +21,12 @@ public class EbookManager {
 		this.epub2Translator = new Epub2Translator();
 	}
 
-	public EpubFileInfo translateTxtToEpub2(InputStream inputStream, String fileName) throws IOException {
-		if (inputStream.available() == 0) {
+	public EpubFileInfo translateTxtToEpub2(byte[] bytes, String fileName) throws IOException {
+		if (bytes.length == 0) {
 			throw new EmptyFileException(fileName + " is empty file");
 		}
 
-		ByteArrayOutputStream baos = getByteArrayOutputStream(inputStream);
-		EpubFileInfo fileInfo = epub2Translator.createEpub2(baos, getEncoding(baos), fileName);
-		baos.close();
-
-		return fileInfo;
+		return epub2Translator.createEpub2(bytes, getEncoding(bytes), fileName);
 	}
 
 	public Path getExistEpubFilePath(String fileName) {
@@ -39,10 +34,14 @@ public class EbookManager {
 	}
 
 	public void deleteRemainFiles(String fileName) throws IOException {
-		deleteDirectoryIfExists(FilenameUtils.removeExtension(fileName));
+		deleteDirectory(FilenameUtils.removeExtension(fileName));
 	}
 
-	private String getEncoding(ByteArrayOutputStream baos) throws IOException {
-		return UniversalDetector.detectCharset(new ByteArrayInputStream(baos.toByteArray()));
+	private String getEncoding(byte[] bytes) throws IOException {
+		InputStream is = new ByteArrayInputStream(bytes);
+		String charset = UniversalDetector.detectCharset(is);
+		is.close();
+
+		return charset;
 	}
 }
