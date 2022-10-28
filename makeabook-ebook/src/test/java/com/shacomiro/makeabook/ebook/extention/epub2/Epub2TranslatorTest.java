@@ -1,6 +1,5 @@
 package com.shacomiro.makeabook.ebook.extention.epub2;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -37,14 +36,11 @@ class Epub2TranslatorTest {
 				.normalize();
 
 		InputStream is = loadTestFile(fileName);
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		is.transferTo(baos);
-		is.close();
 
 		//when
 		Epub2Translator epub2Translator = new Epub2Translator();
-		EpubFileInfo info = epub2Translator.createEpub2(baos, "utf-8", fileName);
-		baos.close();
+		EpubFileInfo info = epub2Translator.createEpub2(is.readAllBytes(), "utf-8", fileName);
+		is.close();
 
 		//then
 		Assertions.assertEquals(expectTestResultPath, info.getFilePath());

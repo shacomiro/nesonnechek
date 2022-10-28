@@ -39,7 +39,7 @@ class EbookManagerTest {
 
 		//when
 		EbookManager ebookManager = new EbookManager();
-		EpubFileInfo info = ebookManager.translateTxtToEpub2(is, fileName);
+		EpubFileInfo info = ebookManager.translateTxtToEpub2(is.readAllBytes(), fileName);
 		is.close();
 
 		//then
@@ -57,7 +57,8 @@ class EbookManagerTest {
 		EbookManager ebookManager = new EbookManager();
 
 		//then
-		Assertions.assertThrows(EmptyFileException.class, () -> ebookManager.translateTxtToEpub2(is, fileName));
+		Assertions.assertThrows(EmptyFileException.class,
+				() -> ebookManager.translateTxtToEpub2(is.readAllBytes(), fileName));
 		is.close();
 	}
 
