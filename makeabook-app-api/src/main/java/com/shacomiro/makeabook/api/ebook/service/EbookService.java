@@ -1,6 +1,5 @@
 package com.shacomiro.makeabook.api.ebook.service;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,12 +23,15 @@ public class EbookService {
 		return ebookManager.translateTxtToEpub2(resource.getByteArray(), fileName);
 	}
 
-	public ByteArrayResource getEpubAsResource(String fileName) throws IOException {
+	public ByteArrayResource getEpubAsResource(String fileName) {
 		Path path = ebookManager.getExistEpubFilePath(fileName);
-		File targetFile = new File(path.toString());
 
-		if (targetFile.exists()) {
-			return new ByteArrayResource(Files.readAllBytes(path));
+		if (Files.exists(path)) {
+			try {
+				return new ByteArrayResource(Files.readAllBytes(path));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			throw new NotFoundException(fileName + " does not exist");
 		}

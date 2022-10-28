@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.shacomiro.makeabook.api.ebook.service.EbookService;
 import com.shacomiro.makeabook.api.error.NotExistException;
+import com.shacomiro.makeabook.api.error.NotFoundException;
 import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
 import com.shacomiro.makeabook.ebook.error.EmptyFileException;
 
@@ -56,18 +57,23 @@ public class EbookController {
 	}
 
 	@GetMapping(path = "download/{filename}")
-	public ResponseEntity<?> downloadEbookFile(@PathVariable String filename) throws IOException {
+	public ResponseEntity<?> downloadEbookFile(@PathVariable String filename) {
 		log.info("RootPath = " + System.getProperty("user.dir"));
-		ByteArrayResource resource = ebookService.getEpubAsResource(filename);
+		try {
+			ByteArrayResource resource = ebookService.getEpubAsResource(filename);
 
-		return ResponseEntity
-				.ok()
-				.header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.builder("attachment")
-						.filename(filename, StandardCharsets.UTF_8)
-						.build()
-						.toString())
-				.header(HttpHeaders.CONTENT_TYPE, "application/epub+zip")
-				.header(HttpHeaders.CONTENT_LENGTH, Long.toString(resource.getByteArray().length))
-				.body(resource);
+			return ResponseEntity
+					.ok()
+					.header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.builder("attachment")
+							.filename(filename, StandardCharsets.UTF_8)
+							.build()
+							.toString())
+					.header(HttpHeaders.CONTENT_TYPE, "application/epub+zip")
+					.header(HttpHeaders.CONTENT_LENGTH, Long.toString(resource.getByteArray().length))
+					.body(resource);
+		} catch (NotFoundException e) {
+			return ResponseEntity.ok()
+					.body(e.getMessage());
+		}
 	}
 }
