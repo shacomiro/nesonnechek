@@ -21,7 +21,7 @@ public class EbookManager {
 		this.epub2Translator = new Epub2Translator();
 	}
 
-	public EpubFileInfo translateTxtToEpub2(byte[] bytes, String fileName) throws IOException {
+	public EpubFileInfo translateTxtToEpub2(byte[] bytes, String fileName) {
 		if (bytes.length == 0) {
 			throw new EmptyFileException(fileName + " is empty file");
 		}
@@ -33,14 +33,18 @@ public class EbookManager {
 		return getFilePath(FilenameUtils.removeExtension(fileName), fileName);
 	}
 
-	public void deleteRemainFiles(String fileName) throws IOException {
+	public void deleteRemainFiles(String fileName) {
 		deleteDirectory(FilenameUtils.removeExtension(fileName));
 	}
 
-	private String getEncoding(byte[] bytes) throws IOException {
-		InputStream is = new ByteArrayInputStream(bytes);
-		String charset = UniversalDetector.detectCharset(is);
-		is.close();
+	private String getEncoding(byte[] bytes) {
+		String charset = null;
+
+		try (InputStream is = new ByteArrayInputStream(bytes)) {
+			charset = UniversalDetector.detectCharset(is);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 
 		return charset;
 	}

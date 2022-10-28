@@ -37,24 +37,31 @@ public class Epub2Translator {
 		return Epub2Translator.class.getResourceAsStream(path);
 	}
 
-	private static Resource getResource(String path, String href) throws IOException {
-		InputStream is = getResource(path);
-		Resource resource = new Resource(is, href);
-		is.close();
+	private static Resource getResource(String path, String href) {
+		Resource resource = null;
+
+		try (InputStream is = getResource(path)) {
+			resource = new Resource(is, href);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 
 		return resource;
 	}
 
-	private static Resource getResource(String dirName, String fileName, String href) throws IOException {
-		InputStream is = loadFileToInputStream(dirName, fileName);
-		Resource resource = new Resource(is, href);
-		is.close();
+	private static Resource getResource(String dirName, String fileName, String href) {
+		Resource resource = null;
+
+		try (InputStream is = loadFileToInputStream(dirName, fileName)) {
+			resource = new Resource(is, href);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 
 		return resource;
 	}
 
-	public EpubFileInfo createEpub2(byte[] bytes, String encoding, String fileName) throws
-			IOException {
+	public EpubFileInfo createEpub2(byte[] bytes, String encoding, String fileName) {
 		String fileNameWithoutExtension = FilenameUtils.removeExtension(fileName);
 		createDirectory(fileNameWithoutExtension);
 		String dirPath = getDirPath(fileNameWithoutExtension).toString();
@@ -84,9 +91,12 @@ public class Epub2Translator {
 		EpubWriter epubWriter = new EpubWriter();
 		String bookFileName = metainfo.get("Title") + MediatypeService.EPUB.getDefaultExtension();
 		Path bookFilePath = Paths.get(dirPath, File.separatorChar + bookFileName).toAbsolutePath().normalize();
-		OutputStream os = new FileOutputStream(bookFilePath.toString());
-		epubWriter.write(book, os);
-		os.close();
+
+		try (OutputStream os = new FileOutputStream(bookFilePath.toString())) {
+			epubWriter.write(book, os);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 
 		return EpubFileInfo.builder()
 				.fileName(bookFileName)
@@ -95,14 +105,15 @@ public class Epub2Translator {
 	}
 
 	private void convertBytesTextToEbookInfo(byte[] bytes, String encoding, List<Section> sectionList,
-			Map<String, String> metainfo) throws IOException {
-		InputStream is = new ByteArrayInputStream(bytes);
-		readStream(is, encoding, sectionList, metainfo);
-		is.close();
+			Map<String, String> metainfo) {
+		try (InputStream is = new ByteArrayInputStream(bytes)) {
+			readStream(is, encoding, sectionList, metainfo);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	private void createSectionXhtml(Section section, String dirPath, int sectionNum) throws
-			IOException {
+	private void createSectionXhtml(Section section, String dirPath, int sectionNum) {
 		String sectionFileName = "chapter" + sectionNum + MediatypeService.XHTML.getDefaultExtension();
 		String sectionFilePath = dirPath + File.separatorChar + sectionFileName;
 
@@ -121,23 +132,22 @@ public class Epub2Translator {
 		writeXhtml(sectionFilePath, head, body);
 	}
 
-	private void writeXhtml(String sectionFilePath, String head, String body) throws IOException {
+	private void writeXhtml(String sectionFilePath, String head, String body) {
 		File sectionFile = new File(sectionFilePath);
 
-		FileWriter fw = new FileWriter(sectionFile);
-		BufferedWriter bw = new BufferedWriter(fw);
-
-		bw.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-		bw.write("\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"");
-		bw.write("\r\n\t\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
-		bw.write("\r\n");
-		bw.write("\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">");
-		bw.write("\r\n");
-		bw.write(head);
-		bw.write(body);
-		bw.write("</html>");
-
-		bw.close();
-		fw.close();
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(sectionFile))) {
+			bw.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+			bw.write("\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"");
+			bw.write("\r\n\t\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+			bw.write("\r\n");
+			bw.write("\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+			bw.write("\r\n");
+			bw.write(head);
+			bw.write(body);
+			bw.write("</html>");
+			bw.flush();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

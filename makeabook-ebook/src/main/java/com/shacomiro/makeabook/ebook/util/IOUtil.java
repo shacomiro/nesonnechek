@@ -27,55 +27,54 @@ public class IOUtil {
 	}
 
 	public static void readStream(InputStream is, String encoding, List<Section> sectionList,
-			Map<String, String> metainfo) throws IOException {
-		Section section = new Section();
-		List<String> paragraphList = new ArrayList<>();
-		boolean isNonSectionEbook = true;
+			Map<String, String> metainfo) {
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(is, encoding))) {
+			Section section = new Section();
+			List<String> paragraphList = new ArrayList<>();
+			boolean isNonSectionEbook = true;
 
-		InputStreamReader isr = new InputStreamReader(is, encoding);
-		BufferedReader br = new BufferedReader(isr);
+			while (br.ready()) {
+				String str = br.readLine();
+				boolean isParagraph = true;
 
-		while (br.ready()) {
-			String str = br.readLine();
-			boolean isParagraph = true;
-
-			if (StringUtils.isEmpty(str)) {
-				continue;
-			}
-
-			if (StringUtils.contains(str, EbookGrammar.BOOK_TITLE)) {
-				isParagraph = false;
-				metainfo.put("Title", StringUtils.split(str, EbookGrammar.BOOK_TITLE)[0]);
-			}
-
-			if (StringUtils.contains(str, EbookGrammar.BOOK_AUTHOR)) {
-				isParagraph = false;
-				metainfo.put("Author", StringUtils.split(str, EbookGrammar.BOOK_AUTHOR)[0]);
-			}
-
-			if (StringUtils.contains(str, EbookGrammar.SECTION_TITLE)) {
-				isParagraph = false;
-
-				if (isNonSectionEbook) {
-					isNonSectionEbook = false;
-				} else {
-					updateSectionList(sectionList, section, paragraphList);
+				if (StringUtils.isEmpty(str)) {
+					continue;
 				}
 
-				paragraphList = new ArrayList<>();
-				section = Section.builder()
-						.title(StringUtils.split(str, EbookGrammar.SECTION_TITLE)[0])
-						.build();
+				if (StringUtils.contains(str, EbookGrammar.BOOK_TITLE)) {
+					isParagraph = false;
+					metainfo.put("Title", StringUtils.split(str, EbookGrammar.BOOK_TITLE)[0]);
+				}
+
+				if (StringUtils.contains(str, EbookGrammar.BOOK_AUTHOR)) {
+					isParagraph = false;
+					metainfo.put("Author", StringUtils.split(str, EbookGrammar.BOOK_AUTHOR)[0]);
+				}
+
+				if (StringUtils.contains(str, EbookGrammar.SECTION_TITLE)) {
+					isParagraph = false;
+
+					if (isNonSectionEbook) {
+						isNonSectionEbook = false;
+					} else {
+						updateSectionList(sectionList, section, paragraphList);
+					}
+
+					paragraphList = new ArrayList<>();
+					section = Section.builder()
+							.title(StringUtils.split(str, EbookGrammar.SECTION_TITLE)[0])
+							.build();
+				}
+
+				if (isParagraph) {
+					paragraphList.add(str);
+				}
 			}
 
-			if (isParagraph) {
-				paragraphList.add(str);
-			}
+			updateSectionList(sectionList, section, paragraphList);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
-		updateSectionList(sectionList, section, paragraphList);
-
-		br.close();
-		isr.close();
 	}
 
 	private static void updateSectionList(List<Section> sectionList, Section section, List<String> paragraphList) {
@@ -91,43 +90,64 @@ public class IOUtil {
 		return Paths.get(getDirPath(dirName).toString(), File.separatorChar + fileName).toAbsolutePath().normalize();
 	}
 
-	public static InputStream loadFileToInputStream(String dirName, String fileName) throws IOException {
-		return Files.newInputStream(getFilePath(dirName, fileName));
+	public static InputStream loadFileToInputStream(String dirName, String fileName) {
+		try {
+			return Files.newInputStream(getFilePath(dirName, fileName));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public static OutputStream loadFileToOutputStream(String dirName, String fileName) throws IOException {
-		return Files.newOutputStream(getFilePath(dirName, fileName));
+	public static OutputStream loadFileToOutputStream(String dirName, String fileName) {
+		try {
+			return Files.newOutputStream(getFilePath(dirName, fileName));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public static void createDirectory(String dirName) throws IOException {
+	public static void createDirectory(String dirName) {
 		Path targetPath = getDirPath(dirName);
 
 		if (Files.exists(targetPath)) {
 			deleteDirectory(dirName);
 		}
-		Files.createDirectory(targetPath);
-	}
 
-	public static void deleteDirectory(String dirName) throws IOException {
-		Path targetPath = getDirPath(dirName);
-
-		if (Files.exists(targetPath)) {
-			List<Path> dirListPath = Files.list(targetPath).collect(Collectors.toList());
-
-			if (!dirListPath.isEmpty()) {
-				for (Path path : dirListPath) {
-					if (Files.isDirectory(path)) {
-						deleteDirectory(dirName + File.separatorChar + path.getFileName());
-					} else {
-						Files.delete(path);
-					}
-				}
-			}
-			Files.delete(targetPath);
+		try {
+			Files.createDirectory(targetPath);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
-	public static void deleteFile(String dirName, String fileName) throws IOException {
-		Files.delete(getFilePath(dirName, fileName));
+	public static void deleteDirectory(String dirName) {
+		Path targetPath = getDirPath(dirName);
+
+		if (Files.exists(targetPath)) {
+			try {
+				List<Path> dirListPath = Files.list(targetPath).collect(Collectors.toList());
+
+				if (!dirListPath.isEmpty()) {
+					for (Path path : dirListPath) {
+						if (Files.isDirectory(path)) {
+							deleteDirectory(dirName + File.separatorChar + path.getFileName());
+						} else {
+							Files.delete(path);
+						}
+					}
+				}
+				Files.delete(targetPath);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
+	public static void deleteFile(String dirName, String fileName) {
+		try {
+			Files.delete(getFilePath(dirName, fileName));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

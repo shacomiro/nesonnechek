@@ -20,7 +20,7 @@ public class EbookService {
 		this.ebookManager = new EbookManager();
 	}
 
-	public EpubFileInfo createEpub2(ByteArrayResource resource, String fileName) throws IOException {
+	public EpubFileInfo createEpub2(ByteArrayResource resource, String fileName) {
 		return ebookManager.translateTxtToEpub2(resource.getByteArray(), fileName);
 	}
 
