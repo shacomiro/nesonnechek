@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.shacomiro.makeabook.api.ebook.service.EbookService;
 import com.shacomiro.makeabook.api.error.NotExistException;
-import com.shacomiro.makeabook.api.error.NotFoundException;
 import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
 import com.shacomiro.makeabook.ebook.error.EmptyFileException;
 
@@ -33,47 +34,32 @@ public class EbookController {
 	}
 
 	@PostMapping(path = "upload")
-	public ResponseEntity<?> uploadTextFile(MultipartFile file) {
+	public EpubFileInfo uploadTextFile(MultipartFile file) {
+		if (file == null) {
+			throw new NotExistException("No file uploaded");
+		} else if (file.isEmpty()) {
+			throw new EmptyFileException("Empty file is uploaded");
+		}
+
 		try {
-			if (file == null) {
-				throw new NotExistException("no file uploaded");
-			}
-
-			ByteArrayResource resource = new ByteArrayResource(file.getBytes());
-			EpubFileInfo info = ebookService.createEpub2(resource, file.getOriginalFilename());
-
-			return ResponseEntity.ok()
-					.body(info);
-		} catch (EmptyFileException e) {
-			return ResponseEntity.ok()
-					.body("빈 파일입니다.");
-		} catch (NotExistException e) {
-			return ResponseEntity.ok()
-					.body("파일이 업로드되지 않았습니다.");
+			return ebookService.createEpub2(new ByteArrayResource(file.getBytes()), file.getOriginalFilename());
 		} catch (IOException e) {
-			return ResponseEntity.ok()
-					.body("파일 변환에 실패했습니다.");
+			throw new RuntimeException(e);
 		}
 	}
 
 	@GetMapping(path = "download/{filename}")
-	public ResponseEntity<?> downloadEbookFile(@PathVariable String filename) {
-		log.info("RootPath = " + System.getProperty("user.dir"));
-		try {
-			ByteArrayResource resource = ebookService.getEpubAsResource(filename);
+	public ResponseEntity<Resource> downloadEbookFile(@PathVariable String filename) {
+		ByteArrayResource resource = ebookService.getEpubAsResource(filename);
 
-			return ResponseEntity
-					.ok()
-					.header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.builder("attachment")
-							.filename(filename, StandardCharsets.UTF_8)
-							.build()
-							.toString())
-					.header(HttpHeaders.CONTENT_TYPE, "application/epub+zip")
-					.header(HttpHeaders.CONTENT_LENGTH, Long.toString(resource.getByteArray().length))
-					.body(resource);
-		} catch (NotFoundException e) {
-			return ResponseEntity.ok()
-					.body(e.getMessage());
-		}
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.builder("attachment")
+				.filename(filename, StandardCharsets.UTF_8)
+				.build()
+				.toString());
+		headers.add(HttpHeaders.CONTENT_TYPE, "application/epub+zip");
+		headers.add(HttpHeaders.CONTENT_LENGTH, Long.toString(resource.getByteArray().length));
+
+		return new ResponseEntity<>(resource, headers, HttpStatus.OK);
 	}
 }

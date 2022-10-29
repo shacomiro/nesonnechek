@@ -11,7 +11,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.mozilla.universalchardet.UniversalDetector;
 
 import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
-import com.shacomiro.makeabook.ebook.error.EmptyFileException;
 import com.shacomiro.makeabook.ebook.extention.epub2.Epub2Translator;
 
 public class EbookManager {
@@ -22,10 +21,6 @@ public class EbookManager {
 	}
 
 	public EpubFileInfo translateTxtToEpub2(byte[] bytes, String fileName) {
-		if (bytes.length == 0) {
-			throw new EmptyFileException(fileName + " is empty file");
-		}
-
 		return epub2Translator.createEpub2(bytes, getEncoding(bytes), fileName);
 	}
 
