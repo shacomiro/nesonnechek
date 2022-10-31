@@ -6,11 +6,13 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import org.apache.commons.io.FilenameUtils;
 import org.mozilla.universalchardet.UniversalDetector;
 
 import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
+import com.shacomiro.makeabook.ebook.error.FileIOException;
 import com.shacomiro.makeabook.ebook.extention.epub2.Epub2Translator;
 
 public class EbookManager {
@@ -33,14 +35,15 @@ public class EbookManager {
 	}
 
 	private String getEncoding(byte[] bytes) {
-		String charset = null;
+		Optional<String> charset;
 
 		try (InputStream is = new ByteArrayInputStream(bytes)) {
-			charset = UniversalDetector.detectCharset(is);
+			charset = Optional.ofNullable(UniversalDetector.detectCharset(is));
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new FileIOException("fail to detect charset", e);
 		}
 
-		return charset;
+		return charset
+				.orElseThrow(() -> new FileIOException("fail to detect charset"));
 	}
 }
