@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
-import com.shacomiro.makeabook.ebook.error.EmptyFileException;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class EbookManagerTest {
@@ -57,7 +56,7 @@ class EbookManagerTest {
 		EbookManager ebookManager = new EbookManager();
 
 		//then
-		Assertions.assertThrows(EmptyFileException.class,
+		Assertions.assertThrows(NullPointerException.class,
 				() -> ebookManager.translateTxtToEpub2(is.readAllBytes(), fileName));
 		is.close();
 	}
