@@ -5,8 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MultipartException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
-import com.shacomiro.makeabook.ebook.error.EmptyFileException;
 import com.shacomiro.makeabook.ebook.error.FileIOException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ public class GeneralExceptionHandler {
 	}
 
 	@ExceptionHandler({
+			NoHandlerFoundException.class,
 			NotFoundException.class
 	})
 	public ResponseEntity<?> handleNotFoundException(Exception e) {
@@ -33,8 +35,9 @@ public class GeneralExceptionHandler {
 	}
 
 	@ExceptionHandler({
-			NotExistException.class,
-			EmptyFileException.class
+			IllegalArgumentException.class,
+			IllegalStateException.class,
+			MultipartException.class
 	})
 	public ResponseEntity<?> handleBadRequestException(Exception e) {
 		return newResponse(e, HttpStatus.BAD_REQUEST);

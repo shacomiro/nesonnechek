@@ -44,6 +44,6 @@ public class EbookManager {
 		}
 
 		return charset
-				.orElseThrow(() -> new FileIOException("fail to detect charset"));
+				.orElseThrow(() -> new NullPointerException("Could not detect charset"));
 	}
 }

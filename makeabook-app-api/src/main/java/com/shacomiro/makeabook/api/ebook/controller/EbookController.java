@@ -8,18 +8,19 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.shacomiro.makeabook.api.ebook.service.EbookService;
-import com.shacomiro.makeabook.api.error.NotExistException;
 import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
-import com.shacomiro.makeabook.ebook.error.EmptyFileException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,18 +35,21 @@ public class EbookController {
 	}
 
 	@PostMapping(path = "upload")
-	public EpubFileInfo uploadTextFile(MultipartFile file) {
-		if (file == null) {
-			throw new NotExistException("No file uploaded");
-		} else if (file.isEmpty()) {
-			throw new EmptyFileException("Empty file is uploaded");
+	public EpubFileInfo uploadTextFile(@RequestBody @RequestParam(name = "file") MultipartFile file) {
+		if (file.isEmpty()) {
+			throw new IllegalStateException("File is empty");
+		} else if (file.getContentType() == null || !file.getContentType().equals(MediaType.TEXT_PLAIN_VALUE)) {
+			throw new IllegalArgumentException("File content type is invalid");
 		}
 
+		ByteArrayResource resource;
 		try {
-			return ebookService.createEpub2(new ByteArrayResource(file.getBytes()), file.getOriginalFilename());
+			resource = new ByteArrayResource(file.getBytes());
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new IllegalStateException("Fail to read upload file", e);
 		}
+
+		return ebookService.createEpub2(resource, file.getOriginalFilename());
 	}
 
 	@GetMapping(path = "download/{filename}")
