@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import com.shacomiro.makeabook.ebook.domain.Section;
+import com.shacomiro.makeabook.ebook.error.FileIOException;
 import com.shacomiro.makeabook.ebook.grammar.EbookGrammar;
 
 public class IOUtil {
@@ -73,7 +74,7 @@ public class IOUtil {
 
 			updateSectionList(sectionList, section, paragraphList);
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new FileIOException("fail to read text file", e);
 		}
 	}
 
@@ -94,7 +95,7 @@ public class IOUtil {
 		try {
 			return Files.newInputStream(getFilePath(dirName, fileName));
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new FileIOException("fail to load InputStream of file '" + fileName + "'", e);
 		}
 	}
 
@@ -102,7 +103,7 @@ public class IOUtil {
 		try {
 			return Files.newOutputStream(getFilePath(dirName, fileName));
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new FileIOException("fail to load OutputStream of file '" + fileName + "'", e);
 		}
 	}
 
@@ -116,7 +117,7 @@ public class IOUtil {
 		try {
 			Files.createDirectory(targetPath);
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new FileIOException("fail to create directory '" + dirName + "'", e);
 		}
 	}
 
@@ -138,7 +139,7 @@ public class IOUtil {
 				}
 				Files.delete(targetPath);
 			} catch (IOException e) {
-				throw new RuntimeException(e);
+				throw new FileIOException("fail to delete directory '" + dirName + "'", e);
 			}
 		}
 	}
@@ -147,7 +148,7 @@ public class IOUtil {
 		try {
 			Files.delete(getFilePath(dirName, fileName));
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new FileIOException("fail to delete file '" + fileName + "'", e);
 		}
 	}
 }

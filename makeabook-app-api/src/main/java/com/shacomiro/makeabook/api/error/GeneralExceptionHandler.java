@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.shacomiro.makeabook.ebook.error.EmptyFileException;
+import com.shacomiro.makeabook.ebook.error.FileIOException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,7 +42,8 @@ public class GeneralExceptionHandler {
 
 	@ExceptionHandler({
 			Exception.class,
-			RuntimeException.class
+			RuntimeException.class,
+			FileIOException.class
 	})
 	public ResponseEntity<?> handleException(Exception e) {
 		log.error("Unexpected exception occurred: {}", e.getMessage(), e);

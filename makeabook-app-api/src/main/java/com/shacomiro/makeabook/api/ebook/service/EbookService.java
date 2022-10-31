@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.shacomiro.makeabook.api.error.NotFoundException;
 import com.shacomiro.makeabook.ebook.EbookManager;
 import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
+import com.shacomiro.makeabook.ebook.error.FileIOException;
 
 @Service
 public class EbookService {
@@ -30,7 +31,7 @@ public class EbookService {
 			try {
 				return new ByteArrayResource(Files.readAllBytes(path));
 			} catch (IOException e) {
-				throw new RuntimeException(e);
+				throw new FileIOException("fail to load file", e);
 			}
 		} else {
 			throw new NotFoundException(fileName + " does not exist");

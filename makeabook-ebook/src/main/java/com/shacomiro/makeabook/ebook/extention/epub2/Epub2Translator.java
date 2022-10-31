@@ -23,6 +23,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
 import com.shacomiro.makeabook.ebook.domain.Section;
+import com.shacomiro.makeabook.ebook.error.FileIOException;
 
 import nl.siegmann.epublib.domain.Author;
 import nl.siegmann.epublib.domain.Book;
@@ -43,7 +44,7 @@ public class Epub2Translator {
 		try (InputStream is = getResource(path)) {
 			resource = new Resource(is, href);
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new FileIOException("fail to load resource", e);
 		}
 
 		return resource;
@@ -55,7 +56,7 @@ public class Epub2Translator {
 		try (InputStream is = loadFileToInputStream(dirName, fileName)) {
 			resource = new Resource(is, href);
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new FileIOException("fail to load resource", e);
 		}
 
 		return resource;
@@ -95,7 +96,7 @@ public class Epub2Translator {
 		try (OutputStream os = new FileOutputStream(bookFilePath.toString())) {
 			epubWriter.write(book, os);
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new FileIOException("fail to write epub file", e);
 		}
 
 		return EpubFileInfo.builder()
@@ -109,7 +110,7 @@ public class Epub2Translator {
 		try (InputStream is = new ByteArrayInputStream(bytes)) {
 			readStream(is, encoding, sectionList, metainfo);
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new FileIOException("fail to convert text to ebook info", e);
 		}
 	}
 
@@ -147,7 +148,7 @@ public class Epub2Translator {
 			bw.write("</html>");
 			bw.flush();
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new FileIOException("fail to write xhtml file", e);
 		}
 	}
 }
