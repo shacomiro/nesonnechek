@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.shacomiro.makeabook.api.ebook.domain.EpubVersion;
 import com.shacomiro.makeabook.api.ebook.service.EbookService;
 import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
 
@@ -34,8 +35,9 @@ public class EbookController {
 		this.ebookService = ebookService;
 	}
 
-	@PostMapping(path = "upload")
-	public EpubFileInfo uploadTextFile(@RequestBody @RequestParam(name = "file") MultipartFile file) {
+	@PostMapping(path = "{epubVersion}/upload")
+	public EpubFileInfo uploadTextFile(@PathVariable EpubVersion epubVersion,
+			@RequestBody @RequestParam(name = "file") MultipartFile file) {
 		if (file.isEmpty()) {
 			throw new IllegalStateException("File is empty");
 		} else if (file.getContentType() == null || !file.getContentType().equals(MediaType.TEXT_PLAIN_VALUE)) {
@@ -49,12 +51,13 @@ public class EbookController {
 			throw new IllegalStateException("Fail to read upload file", e);
 		}
 
-		return ebookService.createEpub2(resource, file.getOriginalFilename());
+		return ebookService.createEpub(resource, epubVersion, file.getOriginalFilename());
 	}
 
-	@GetMapping(path = "download/{filename}")
-	public ResponseEntity<Resource> downloadEbookFile(@PathVariable String filename) {
-		ByteArrayResource resource = ebookService.getEpubAsResource(filename);
+	@GetMapping(path = "{epubVersion}/download/{filename}")
+	public ResponseEntity<Resource> downloadEbookFile(@PathVariable EpubVersion epubVersion,
+			@PathVariable String filename) {
+		ByteArrayResource resource = ebookService.getEpubAsResource(epubVersion, filename);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.builder("attachment")

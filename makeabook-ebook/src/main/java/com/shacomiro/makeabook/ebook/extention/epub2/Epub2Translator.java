@@ -33,15 +33,13 @@ import nl.siegmann.epublib.epub.EpubWriter;
 import nl.siegmann.epublib.service.MediatypeService;
 
 public class Epub2Translator {
+	private final String epub2ContentsBasePath;
+	private final String epub2EbookBasePath;
 
-	private static InputStream getResource(String path) {
-		return Epub2Translator.class.getResourceAsStream(path);
-	}
+	private static Resource getResource(Path path, String href) {
+		Resource resource;
 
-	private static Resource getResource(String path, String href) {
-		Resource resource = null;
-
-		try (InputStream is = getResource(path)) {
+		try (InputStream is = loadFileToInputStream(path)) {
 			resource = new Resource(is, href);
 		} catch (IOException e) {
 			throw new FileIOException("fail to load resource", e);
@@ -50,22 +48,16 @@ public class Epub2Translator {
 		return resource;
 	}
 
-	private static Resource getResource(String dirName, String fileName, String href) {
-		Resource resource = null;
-
-		try (InputStream is = loadFileToInputStream(dirName, fileName)) {
-			resource = new Resource(is, href);
-		} catch (IOException e) {
-			throw new FileIOException("fail to load resource", e);
-		}
-
-		return resource;
+	public Epub2Translator(String contentsBasePath, String ebookBasePath) {
+		this.epub2ContentsBasePath = contentsBasePath + "/epub2";
+		this.epub2EbookBasePath = ebookBasePath + "/epub2";
+		initEpub2BaseDirectory();
 	}
 
 	public EpubFileInfo createEpub2(byte[] bytes, String encoding, String fileName) {
 		String fileNameWithoutExtension = FilenameUtils.removeExtension(fileName);
-		createDirectory(fileNameWithoutExtension);
-		String dirPath = getDirPath(fileNameWithoutExtension).toString();
+		Path contentsPath = Paths.get(epub2ContentsBasePath, File.separatorChar + fileNameWithoutExtension);
+		createDirectory(contentsPath);
 
 		List<Section> sectionList = new ArrayList<>();
 		Map<String, String> metainfo = new HashMap<>();
@@ -74,7 +66,7 @@ public class Epub2Translator {
 		int sectionNum = 0;
 		for (Section section : sectionList) {
 			sectionNum++;
-			createSectionXhtml(section, dirPath, sectionNum);
+			createSectionXhtml(section, contentsPath, sectionNum);
 		}
 
 		Book book = new Book();
@@ -83,20 +75,24 @@ public class Epub2Translator {
 		metadata.addTitle(metainfo.get("Title"));
 		metadata.addAuthor(new Author(metainfo.get("Author")));
 
-		String[] xhtmlFileNames = new File(dirPath).list();
-		for (int i = 0; i < Objects.requireNonNull(xhtmlFileNames).length; i++) {
+		File[] contentsFiles = contentsPath.toFile().listFiles();
+		for (int i = 0; i < Objects.requireNonNull(contentsFiles).length; i++) {
 			book.addSection(sectionList.get(i).getTitle(),
-					getResource(fileNameWithoutExtension, xhtmlFileNames[i], xhtmlFileNames[i]));
+					getResource(Path.of(contentsFiles[i].getPath()), contentsFiles[i].getName()));
 		}
 
 		EpubWriter epubWriter = new EpubWriter();
 		String bookFileName = metainfo.get("Title") + MediatypeService.EPUB.getDefaultExtension();
-		Path bookFilePath = Paths.get(dirPath, File.separatorChar + bookFileName).toAbsolutePath().normalize();
+		Path bookFilePath = Paths.get(epub2EbookBasePath, File.separatorChar + bookFileName)
+				.toAbsolutePath()
+				.normalize();
 
 		try (OutputStream os = new FileOutputStream(bookFilePath.toString())) {
 			epubWriter.write(book, os);
 		} catch (IOException e) {
 			throw new FileIOException("fail to write epub file", e);
+		} finally {
+			deleteDirectory(contentsPath);
 		}
 
 		return EpubFileInfo.builder()
@@ -114,9 +110,9 @@ public class Epub2Translator {
 		}
 	}
 
-	private void createSectionXhtml(Section section, String dirPath, int sectionNum) {
+	private void createSectionXhtml(Section section, Path path, int sectionNum) {
 		String sectionFileName = "chapter" + sectionNum + MediatypeService.XHTML.getDefaultExtension();
-		String sectionFilePath = dirPath + File.separatorChar + sectionFileName;
+		Path sectionFilePath = Paths.get(path.toString(), File.separatorChar + sectionFileName);
 
 		String head = String.valueOf(
 				head(
@@ -133,8 +129,8 @@ public class Epub2Translator {
 		writeXhtml(sectionFilePath, head, body);
 	}
 
-	private void writeXhtml(String sectionFilePath, String head, String body) {
-		File sectionFile = new File(sectionFilePath);
+	private void writeXhtml(Path sectionFilePath, String head, String body) {
+		File sectionFile = sectionFilePath.toFile();
 
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(sectionFile))) {
 			bw.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
@@ -150,5 +146,10 @@ public class Epub2Translator {
 		} catch (IOException e) {
 			throw new FileIOException("fail to write xhtml file", e);
 		}
+	}
+
+	private void initEpub2BaseDirectory() {
+		createDirectory(Paths.get(epub2ContentsBasePath));
+		createDirectory(Paths.get(epub2EbookBasePath));
 	}
 }
