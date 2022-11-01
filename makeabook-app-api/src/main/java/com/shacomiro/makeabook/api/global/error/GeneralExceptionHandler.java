@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.api.error;
+package com.shacomiro.makeabook.api.global.error;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
