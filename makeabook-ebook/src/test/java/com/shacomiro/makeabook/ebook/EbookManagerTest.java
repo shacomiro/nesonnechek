@@ -18,7 +18,6 @@ import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class EbookManagerTest {
 	static final String testFilePath = "./makeabook-ebook/src/test/resources";
-	static final String mainFilePath = "./makeabook-ebook/src/main/resources/file";
 
 	InputStream loadTestFile(String fileName) throws FileNotFoundException {
 		return new FileInputStream(
@@ -30,14 +29,14 @@ class EbookManagerTest {
 	void createBookByCorrectFileTest() throws IOException {
 		//given
 		String fileName = "애국가.txt";
-		Path expectTestResultPath = Paths.get(mainFilePath,
-						File.separatorChar + "애국가" + File.separatorChar + "애국가.epub")
+		Path expectTestResultPath = Paths.get(testFilePath,
+						File.separatorChar + "ebook" + File.separatorChar + "epub2" + File.separatorChar + "애국가.epub")
 				.toAbsolutePath()
 				.normalize();
 		InputStream is = loadTestFile(fileName);
 
 		//when
-		EbookManager ebookManager = new EbookManager();
+		EbookManager ebookManager = new EbookManager(testFilePath);
 		EpubFileInfo info = ebookManager.translateTxtToEpub2(is.readAllBytes(), fileName);
 		is.close();
 
@@ -53,7 +52,7 @@ class EbookManagerTest {
 		InputStream is = loadTestFile(fileName);
 
 		//when
-		EbookManager ebookManager = new EbookManager();
+		EbookManager ebookManager = new EbookManager(testFilePath);
 
 		//then
 		Assertions.assertThrows(NullPointerException.class,
