@@ -42,7 +42,7 @@ public class EbookManager {
 		try (InputStream is = new ByteArrayInputStream(bytes)) {
 			charset = Optional.ofNullable(UniversalDetector.detectCharset(is));
 		} catch (IOException e) {
-			throw new FileIOException("fail to detect charset", e);
+			throw new FileIOException("Fail to detect charset", e);
 		}
 
 		return charset

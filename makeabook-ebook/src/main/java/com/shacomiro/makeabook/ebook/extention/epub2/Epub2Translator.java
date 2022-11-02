@@ -90,7 +90,7 @@ public class Epub2Translator {
 		try (OutputStream os = new FileOutputStream(bookFilePath.toString())) {
 			epubWriter.write(book, os);
 		} catch (IOException e) {
-			throw new FileIOException("fail to write epub file", e);
+			throw new FileIOException("Fail to write epub file", e);
 		} finally {
 			deleteDirectory(contentsPath);
 		}
@@ -106,7 +106,7 @@ public class Epub2Translator {
 		try (InputStream is = new ByteArrayInputStream(bytes)) {
 			readStream(is, encoding, sectionList, metainfo);
 		} catch (IOException e) {
-			throw new FileIOException("fail to convert text to ebook info", e);
+			throw new FileIOException("Fail to convert text to ebook info", e);
 		}
 	}
 
@@ -144,7 +144,7 @@ public class Epub2Translator {
 			bw.write("</html>");
 			bw.flush();
 		} catch (IOException e) {
-			throw new FileIOException("fail to write xhtml file", e);
+			throw new FileIOException("Fail to write xhtml file", e);
 		}
 	}
 

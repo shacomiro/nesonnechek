@@ -72,7 +72,7 @@ public class IOUtil {
 
 			updateSectionList(sectionList, section, paragraphList);
 		} catch (IOException e) {
-			throw new FileIOException("fail to read text file", e);
+			throw new FileIOException("Fail to read stream of text file", e);
 		}
 	}
 
@@ -85,7 +85,7 @@ public class IOUtil {
 		try {
 			return Files.newInputStream(path);
 		} catch (IOException e) {
-			throw new FileIOException("fail to load InputStream of file '" + path.getFileName() + "'", e);
+			throw new FileIOException("Fail to load InputStream of file '" + path.getFileName() + "'", e);
 		}
 	}
 
@@ -93,7 +93,7 @@ public class IOUtil {
 		try {
 			return Files.newOutputStream(path);
 		} catch (IOException e) {
-			throw new FileIOException("fail to load OutputStream of file '" + path.getFileName() + "'", e);
+			throw new FileIOException("Fail to load OutputStream of file '" + path.getFileName() + "'", e);
 		}
 	}
 
@@ -103,7 +103,7 @@ public class IOUtil {
 				Files.createDirectory(path);
 			} catch (IOException e) {
 				throw new FileIOException(
-						"fail to create directory '" + path.toAbsolutePath().normalize().toString() + "'", e);
+						"Fail to create directory '" + path.toAbsolutePath().normalize().toString() + "'", e);
 			}
 		}
 	}
@@ -124,7 +124,7 @@ public class IOUtil {
 				}
 				Files.delete(path);
 			} catch (IOException e) {
-				throw new FileIOException("fail to delete directory '" + path + "'", e);
+				throw new FileIOException("Fail to delete directory '" + path + "'", e);
 			}
 		}
 	}
@@ -133,7 +133,7 @@ public class IOUtil {
 		try {
 			Files.delete(path);
 		} catch (IOException e) {
-			throw new FileIOException("fail to delete file '" + path.getFileName() + "'", e);
+			throw new FileIOException("Fail to delete file '" + path.getFileName() + "'", e);
 		}
 	}
 }

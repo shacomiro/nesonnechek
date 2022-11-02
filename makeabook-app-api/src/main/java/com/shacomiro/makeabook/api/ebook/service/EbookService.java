@@ -39,7 +39,7 @@ public class EbookService {
 			try {
 				return new ByteArrayResource(Files.readAllBytes(path));
 			} catch (IOException e) {
-				throw new FileIOException("fail to load file", e);
+				throw new FileIOException("Fail to load file", e);
 			}
 		} else {
 			throw new NotFoundException(fileName + " does not exist");
