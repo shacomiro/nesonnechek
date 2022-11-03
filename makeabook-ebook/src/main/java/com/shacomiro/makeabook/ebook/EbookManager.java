@@ -22,6 +22,7 @@ public class EbookManager {
 	private final Epub2Translator epub2Translator;
 
 	public EbookManager(String resourcesDir) {
+		createDirectory(Paths.get(resourcesDir));
 		this.contentsBasePath = resourcesDir + "/contents";
 		this.ebookBasePath = resourcesDir + "/ebook";
 		initBaseDirectory();

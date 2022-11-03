@@ -15,7 +15,7 @@ import com.shacomiro.makeabook.ebook.error.FileIOException;
 
 @Service
 public class EbookService {
-	private static final String RESOURCES_DIR = "./makeabook-app-api/src/main/resources";
+	private static final String RESOURCES_DIR = "./files";
 	private final EbookManager ebookManager;
 
 	public EbookService() {
