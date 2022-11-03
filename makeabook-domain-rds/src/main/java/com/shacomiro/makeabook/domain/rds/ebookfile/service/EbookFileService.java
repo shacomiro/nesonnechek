@@ -31,9 +31,9 @@ public class EbookFileService {
 
 	public EbookFile createEpub(ByteArrayResource resource, String uuid, EbookFileExtension ebookFileExtension,
 			String fileName) {
-		EpubFileInfo epubFileInfo = null;
+		EpubFileInfo epubFileInfo;
 		EbookFile ebookFile = null;
-		String ebookExtension = null;
+		String ebookExtension;
 
 		if (ebookFileExtension.equals(EbookFileExtension.EPUB2)) {
 			epubFileInfo = ebookManager.translateTxtToEpub2(resource.getByteArray(), fileName);
