@@ -1,5 +1,7 @@
 package com.shacomiro.makeabook.ebook;
 
+import static com.shacomiro.makeabook.ebook.util.IOUtil.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -10,12 +12,16 @@ import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class EbookManagerTest {
 	static final String testFilePath = "./src/test/resources";
 
@@ -25,6 +31,7 @@ class EbookManagerTest {
 	}
 
 	@Test
+	@Order(1)
 	@DisplayName("Ebook 파일 생성(올바른 파일)")
 	void createBookByCorrectFileTest() throws IOException {
 		//given
@@ -42,9 +49,11 @@ class EbookManagerTest {
 
 		//then
 		Assertions.assertEquals(expectTestResultPath, info.getFilePath());
+		deleteFile(info.getFilePath());
 	}
 
 	@Test
+	@Order(2)
 	@DisplayName("Ebook 파일 생성(빈 파일)")
 	void createEbookByWorngFileTest() throws IOException {
 		//given
