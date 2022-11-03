@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.api.ebook.controller;
+package com.shacomiro.makeabook.api.ebook.api;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -31,10 +31,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequestMapping(path = "api/ebook")
-public class EbookController {
+public class EbookApi {
 	private final EbookFileService ebookFileService;
 
-	public EbookController(EbookFileService ebookFileService) {
+	public EbookApi(EbookFileService ebookFileService) {
 		this.ebookFileService = ebookFileService;
 	}
 
