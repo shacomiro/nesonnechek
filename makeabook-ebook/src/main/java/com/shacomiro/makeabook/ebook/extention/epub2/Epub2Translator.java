@@ -82,8 +82,9 @@ public class Epub2Translator {
 		}
 
 		EpubWriter epubWriter = new EpubWriter();
-		String bookFileName = metainfo.get("Title") + MediatypeService.EPUB.getDefaultExtension();
-		Path bookFilePath = Paths.get(epub2EbookBasePath, File.separatorChar + bookFileName)
+		String bookFileName = metainfo.get("Title");
+		Path bookFilePath = Paths.get(epub2EbookBasePath,
+						File.separatorChar + bookFileName + MediatypeService.EPUB.getDefaultExtension())
 				.toAbsolutePath()
 				.normalize();
 

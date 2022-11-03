@@ -33,8 +33,8 @@ public class EbookManager {
 		return epub2Translator.createEpub2(bytes, getEncoding(bytes), fileName);
 	}
 
-	public Path getEpubFilePath(String epubVersion, String fileName) {
-		return Paths.get(ebookBasePath, File.separatorChar + epubVersion + File.separatorChar + fileName);
+	public Path getEpubFilePath(String ebookExtension, String fileName) {
+		return Paths.get(ebookBasePath, File.separatorChar + ebookExtension + File.separatorChar + fileName);
 	}
 
 	private String getEncoding(byte[] bytes) {
