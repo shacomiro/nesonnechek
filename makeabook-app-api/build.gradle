@@ -1,4 +1,6 @@
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+    implementation project(':makeabook-domain-rds')
     implementation project(':makeabook-ebook')
 }
