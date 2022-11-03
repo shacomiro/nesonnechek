@@ -19,7 +19,7 @@ import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Epub2TranslatorTest {
-	static final String testFilePath = "./makeabook-ebook/src/test/resources";
+	static final String testFilePath = "./src/test/resources";
 
 	InputStream loadTestFile(String fileName) throws FileNotFoundException {
 		return new FileInputStream(
