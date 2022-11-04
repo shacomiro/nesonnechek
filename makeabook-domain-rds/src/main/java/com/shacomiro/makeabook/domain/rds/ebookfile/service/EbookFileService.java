@@ -46,7 +46,6 @@ public class EbookFileService {
 					.downloadUrl(/*"http://localhost:8080/api/ebook/epub2/"*/
 							downloadUrlPrefix + "/" + ebookExtension + "/download/" + epubFileInfo.getFileName()
 									+ ".epub")
-					.validDurationDay(1)
 					.build());
 		}
 

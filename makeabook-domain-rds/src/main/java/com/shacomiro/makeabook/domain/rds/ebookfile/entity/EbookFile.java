@@ -60,14 +60,13 @@ public class EbookFile {
 	private User user;
 
 	@Builder
-	public EbookFile(String uuid, String filename, String fileType, String downloadUrl, int validDurationDay,
-			User user) {
-		this(null, uuid, filename, fileType, downloadUrl, 0, null, null, user);
+	public EbookFile(String uuid, String filename, String fileType, String downloadUrl, User user) {
+		this(null, uuid, filename, fileType, downloadUrl, 0, null, null, false, user);
 	}
 
 	@Builder
 	public EbookFile(Long seq, String uuid, String filename, String fileType, String downloadUrl, int downloadCount,
-			LocalDateTime createdAt, LocalDateTime expiredAt, User user) {
+			LocalDateTime createdAt, LocalDateTime expiredAt, boolean isExpired, User user) {
 		this.seq = seq;
 		this.uuid = uuid;
 		this.filename = filename;
@@ -76,6 +75,7 @@ public class EbookFile {
 		this.downloadCount = downloadCount;
 		this.createdAt = defaultIfNull(createdAt, now());
 		this.expiredAt = defaultIfNull(expiredAt, now().plusDays(3));
+		this.isExpired = isExpired;
 		this.user = user;
 	}
 }
