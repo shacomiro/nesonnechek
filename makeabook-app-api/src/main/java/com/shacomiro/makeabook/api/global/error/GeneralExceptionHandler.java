@@ -40,7 +40,8 @@ public class GeneralExceptionHandler {
 			IllegalArgumentException.class,
 			IllegalStateException.class,
 			MethodArgumentTypeMismatchException.class,
-			MultipartException.class
+			MultipartException.class,
+			ExpiredException.class
 	})
 	public ResponseEntity<?> handleBadRequestException(Exception e) {
 		log.debug("Bad request exception occurred: {}", e.getMessage(), e);
