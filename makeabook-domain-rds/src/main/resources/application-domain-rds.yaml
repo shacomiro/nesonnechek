@@ -1,0 +1,14 @@
+spring:
+  config:
+    activate:
+      on-profile: domain-rds-local
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${secret-key.local-database-url}?serverTimezone=UTC&characterEncoding=UTF-8
+    username: ${secret-key.local-database-username}
+    password: ${secret-key.local-database-password}
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true

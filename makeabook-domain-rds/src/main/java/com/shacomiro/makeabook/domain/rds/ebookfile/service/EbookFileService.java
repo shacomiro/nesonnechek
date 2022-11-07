@@ -21,7 +21,7 @@ public class EbookFileService {
 	private static final String RESOURCES_DIR = "./files";
 	private final EbookManager ebookManager;
 	private final EbookFileRepository ebookFileRepository;
-	@Value("${makeabook-app-api.download-url-prefix}")
+	@Value("${app-api.download-url-prefix}")
 	private String downloadUrlPrefix;
 
 	public EbookFileService(EbookFileRepository ebookFileRepository) {
