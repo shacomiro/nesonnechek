@@ -54,9 +54,9 @@ public class Epub2Translator {
 		initEpub2BaseDirectory();
 	}
 
-	public EpubFileInfo createEpub2(byte[] bytes, String encoding, String fileName) {
+	public EpubFileInfo createEpub2(byte[] bytes, String encoding, String uuid, String fileName) {
 		String fileNameWithoutExtension = FilenameUtils.removeExtension(fileName);
-		Path contentsPath = Paths.get(epub2ContentsBasePath, File.separatorChar + fileNameWithoutExtension);
+		Path contentsPath = Paths.get(epub2ContentsBasePath, File.separatorChar + uuid);
 		createDirectory(contentsPath);
 
 		List<Section> sectionList = new ArrayList<>();
@@ -72,8 +72,10 @@ public class Epub2Translator {
 		Book book = new Book();
 		Metadata metadata = book.getMetadata();
 
-		metadata.addTitle(metainfo.get("Title"));
-		metadata.addAuthor(new Author(metainfo.get("Author")));
+		metadata.addTitle(metainfo.getOrDefault("Title", fileNameWithoutExtension));
+		if (metainfo.containsKey("Author")) {
+			metadata.addAuthor(new Author(metainfo.get("Author")));
+		}
 
 		File[] contentsFiles = contentsPath.toFile().listFiles();
 		for (int i = 0; i < Objects.requireNonNull(contentsFiles).length; i++) {
@@ -82,9 +84,9 @@ public class Epub2Translator {
 		}
 
 		EpubWriter epubWriter = new EpubWriter();
-		String bookFileName = metainfo.get("Title");
+		String bookFileName = metainfo.getOrDefault("Title", fileNameWithoutExtension);
 		Path bookFilePath = Paths.get(epub2EbookBasePath,
-						File.separatorChar + bookFileName + MediatypeService.EPUB.getDefaultExtension())
+						File.separatorChar + uuid + MediatypeService.EPUB.getDefaultExtension())
 				.toAbsolutePath()
 				.normalize();
 
