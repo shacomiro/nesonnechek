@@ -21,8 +21,6 @@ import com.shacomiro.makeabook.ebook.error.FileIOException;
 import com.shacomiro.makeabook.ebook.grammar.EbookGrammar;
 
 public class IOUtil {
-	private static final String BASE_PATH = "./makeabook-ebook/src/main/resources/file";
-
 	private IOUtil() {
 		throw new IllegalStateException("Utility class");
 	}
@@ -74,7 +72,7 @@ public class IOUtil {
 
 			updateSectionList(sectionList, section, paragraphList);
 		} catch (IOException e) {
-			throw new FileIOException("fail to read text file", e);
+			throw new FileIOException("Fail to read stream of text file", e);
 		}
 	}
 
@@ -83,72 +81,59 @@ public class IOUtil {
 		sectionList.add(section);
 	}
 
-	public static Path getDirPath(String dirName) {
-		return Paths.get(BASE_PATH, File.separatorChar + dirName).toAbsolutePath().normalize();
-	}
-
-	public static Path getFilePath(String dirName, String fileName) {
-		return Paths.get(getDirPath(dirName).toString(), File.separatorChar + fileName).toAbsolutePath().normalize();
-	}
-
-	public static InputStream loadFileToInputStream(String dirName, String fileName) {
+	public static InputStream loadFileToInputStream(Path path) {
 		try {
-			return Files.newInputStream(getFilePath(dirName, fileName));
+			return Files.newInputStream(path);
 		} catch (IOException e) {
-			throw new FileIOException("fail to load InputStream of file '" + fileName + "'", e);
+			throw new FileIOException("Fail to load InputStream of file '" + path.getFileName() + "'", e);
 		}
 	}
 
-	public static OutputStream loadFileToOutputStream(String dirName, String fileName) {
+	public static OutputStream loadFileToOutputStream(Path path) {
 		try {
-			return Files.newOutputStream(getFilePath(dirName, fileName));
+			return Files.newOutputStream(path);
 		} catch (IOException e) {
-			throw new FileIOException("fail to load OutputStream of file '" + fileName + "'", e);
+			throw new FileIOException("Fail to load OutputStream of file '" + path.getFileName() + "'", e);
 		}
 	}
 
-	public static void createDirectory(String dirName) {
-		Path targetPath = getDirPath(dirName);
-
-		if (Files.exists(targetPath)) {
-			deleteDirectory(dirName);
-		}
-
-		try {
-			Files.createDirectory(targetPath);
-		} catch (IOException e) {
-			throw new FileIOException("fail to create directory '" + dirName + "'", e);
-		}
-	}
-
-	public static void deleteDirectory(String dirName) {
-		Path targetPath = getDirPath(dirName);
-
-		if (Files.exists(targetPath)) {
+	public static void createDirectory(Path path) {
+		if (!Files.exists(path)) {
 			try {
-				List<Path> dirListPath = Files.list(targetPath).collect(Collectors.toList());
-
-				if (!dirListPath.isEmpty()) {
-					for (Path path : dirListPath) {
-						if (Files.isDirectory(path)) {
-							deleteDirectory(dirName + File.separatorChar + path.getFileName());
-						} else {
-							Files.delete(path);
-						}
-					}
-				}
-				Files.delete(targetPath);
+				Files.createDirectory(path);
 			} catch (IOException e) {
-				throw new FileIOException("fail to delete directory '" + dirName + "'", e);
+				throw new FileIOException(
+						"Fail to create directory '" + path.toAbsolutePath().normalize().toString() + "'", e);
 			}
 		}
 	}
 
-	public static void deleteFile(String dirName, String fileName) {
+	public static void deleteDirectory(Path path) {
+		if (Files.exists(path)) {
+			try {
+				List<Path> dirListPath = Files.list(path).collect(Collectors.toList());
+
+				if (!dirListPath.isEmpty()) {
+					for (Path p : dirListPath) {
+						if (Files.isDirectory(p)) {
+							deleteDirectory(Paths.get(p.toString(), File.separatorChar + p.getFileName().toString()));
+						} else {
+							Files.delete(p);
+						}
+					}
+				}
+				Files.delete(path);
+			} catch (IOException e) {
+				throw new FileIOException("Fail to delete directory '" + path + "'", e);
+			}
+		}
+	}
+
+	public static void deleteFile(Path path) {
 		try {
-			Files.delete(getFilePath(dirName, fileName));
+			Files.delete(path);
 		} catch (IOException e) {
-			throw new FileIOException("fail to delete file '" + fileName + "'", e);
+			throw new FileIOException("Fail to delete file '" + path.getFileName() + "'", e);
 		}
 	}
 }

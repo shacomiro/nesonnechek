@@ -1,5 +1,7 @@
 package com.shacomiro.makeabook.ebook.extention.epub2;
 
+import static com.shacomiro.makeabook.ebook.util.IOUtil.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -17,8 +19,7 @@ import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Epub2TranslatorTest {
-	static final String testFilePath = "./makeabook-ebook/src/test/resources";
-	static final String mainFilePath = "./makeabook-ebook/src/main/resources/file";
+	static final String testFilePath = "./src/test/resources";
 
 	InputStream loadTestFile(String fileName) throws FileNotFoundException {
 		return new FileInputStream(
@@ -30,15 +31,17 @@ class Epub2TranslatorTest {
 	void createEpub2Test() throws IOException {
 		//given
 		String fileName = "애국가.txt";
-		Path expectTestResultPath = Paths.get(mainFilePath,
-						File.separatorChar + "애국가" + File.separatorChar + "애국가.epub")
+		Path expectTestResultPath = Paths.get(testFilePath,
+						File.separatorChar + "ebook" + File.separatorChar + "epub2" + File.separatorChar + "애국가.epub")
 				.toAbsolutePath()
 				.normalize();
 
 		InputStream is = loadTestFile(fileName);
+		createDirectory(Paths.get(testFilePath, File.separatorChar + "contents"));
+		createDirectory(Paths.get(testFilePath, File.separatorChar + "ebook"));
 
 		//when
-		Epub2Translator epub2Translator = new Epub2Translator();
+		Epub2Translator epub2Translator = new Epub2Translator(testFilePath + "/contents", testFilePath + "/ebook");
 		EpubFileInfo info = epub2Translator.createEpub2(is.readAllBytes(), "utf-8", fileName);
 		is.close();
 

@@ -1,10 +1,12 @@
-package com.shacomiro.makeabook.api.error;
+package com.shacomiro.makeabook.api.global.error;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
@@ -37,9 +39,23 @@ public class GeneralExceptionHandler {
 	@ExceptionHandler({
 			IllegalArgumentException.class,
 			IllegalStateException.class,
-			MultipartException.class
+			MethodArgumentTypeMismatchException.class,
+			MultipartException.class,
+			ExpiredException.class
 	})
 	public ResponseEntity<?> handleBadRequestException(Exception e) {
+		log.debug("Bad request exception occurred: {}", e.getMessage(), e);
+		if (e instanceof MethodArgumentNotValidException) {
+			return newResponse(
+					((MethodArgumentNotValidException)e).getBindingResult().getAllErrors().get(0).getDefaultMessage(),
+					HttpStatus.BAD_REQUEST
+			);
+		} else if (e instanceof MethodArgumentTypeMismatchException) {
+			return newResponse(
+					((MethodArgumentTypeMismatchException)e).getValue() + " is not supported ebook type",
+					HttpStatus.BAD_REQUEST
+			);
+		}
 		return newResponse(e, HttpStatus.BAD_REQUEST);
 	}
 

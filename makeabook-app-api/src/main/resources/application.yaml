@@ -1,0 +1,22 @@
+spring:
+  config:
+    import:
+      - file:./secret-config/application-secret.yaml
+      - application-domain-rds.yaml
+  profiles:
+    group:
+      local:
+        - app-api-local
+        - domain-rds-local
+    active: local
+---
+spring:
+  config:
+    activate:
+      on-profile: app-api-local
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+app-api:
+  download-url-prefix: http://localhost:8080/api/ebook

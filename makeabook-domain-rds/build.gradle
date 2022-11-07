@@ -1,6 +1,15 @@
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
-    implementation project(':makeabook-domain-rds')
+    runtimeOnly 'mysql:mysql-connector-java'
     implementation project(':makeabook-ebook')
 }
