@@ -1,0 +1,5 @@
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    testImplementation 'org.springframework.boot:spring-boot-starter-batch'
+    implementation project(':makeabook-domain-rds')
+}
