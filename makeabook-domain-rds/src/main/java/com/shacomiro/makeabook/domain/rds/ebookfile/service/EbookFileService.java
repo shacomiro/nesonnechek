@@ -64,6 +64,9 @@ public class EbookFileService {
 
 		if (Files.exists(path)) {
 			try {
+				ebookFile.addDownloadCount();
+				ebookFileRepository.save(ebookFile);
+				
 				return Optional.of(new ByteArrayResource(Files.readAllBytes(path), ebookFile.getFilename()));
 			} catch (IOException e) {
 				throw new FileIOException("Fail to load file", e);

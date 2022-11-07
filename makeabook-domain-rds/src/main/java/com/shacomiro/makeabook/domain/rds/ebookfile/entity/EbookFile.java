@@ -81,6 +81,10 @@ public class EbookFile {
 		this.user = user;
 	}
 
+	public void addDownloadCount() {
+		downloadCount++;
+	}
+
 	public boolean isExpired() {
 		return expiredAt.compareTo(now()) < 0;
 	}
