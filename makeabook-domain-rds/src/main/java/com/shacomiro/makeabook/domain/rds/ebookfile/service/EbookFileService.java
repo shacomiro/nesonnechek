@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
 import com.shacomiro.makeabook.ebook.error.FileIOException;
 
 @Service
+@Transactional
 public class EbookFileService {
 	private static final String RESOURCES_DIR = "./files";
 	private final EbookManager ebookManager;
@@ -66,7 +69,7 @@ public class EbookFileService {
 			try {
 				ebookFile.addDownloadCount();
 				ebookFileRepository.save(ebookFile);
-				
+
 				return Optional.of(new ByteArrayResource(Files.readAllBytes(path), ebookFile.getFilename()));
 			} catch (IOException e) {
 				throw new FileIOException("Fail to load file", e);
