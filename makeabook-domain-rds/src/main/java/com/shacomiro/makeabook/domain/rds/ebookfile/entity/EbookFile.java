@@ -40,6 +40,9 @@ public class EbookFile {
 	@Column(name = "file_type")
 	private String fileType;
 
+	@Column(name = "file_extention")
+	private String fileExtention;
+
 	@Column(name = "download_url")
 	private String downloadUrl;
 
@@ -52,30 +55,33 @@ public class EbookFile {
 	@Column(name = "expired_at")
 	private LocalDateTime expiredAt;
 
-	@Column(name = "is_expired")
-	private boolean isExpired;
-
 	@ManyToOne
 	@JoinColumn(name = "user_seq")
 	private User user;
 
 	@Builder
-	public EbookFile(String uuid, String filename, String fileType, String downloadUrl, User user) {
-		this(null, uuid, filename, fileType, downloadUrl, 0, null, null, false, user);
+	public EbookFile(String uuid, String filename, String fileType, String fileExtention, String downloadUrl,
+			User user) {
+		this(null, uuid, filename, fileType, fileExtention, downloadUrl, 0, null, null, user);
 	}
 
 	@Builder
-	public EbookFile(Long seq, String uuid, String filename, String fileType, String downloadUrl, int downloadCount,
-			LocalDateTime createdAt, LocalDateTime expiredAt, boolean isExpired, User user) {
+	public EbookFile(Long seq, String uuid, String filename, String fileType, String fileExtention, String downloadUrl,
+			int downloadCount,
+			LocalDateTime createdAt, LocalDateTime expiredAt, User user) {
 		this.seq = seq;
 		this.uuid = uuid;
 		this.filename = filename;
 		this.fileType = fileType;
+		this.fileExtention = fileExtention;
 		this.downloadUrl = downloadUrl;
 		this.downloadCount = downloadCount;
 		this.createdAt = defaultIfNull(createdAt, now());
 		this.expiredAt = defaultIfNull(expiredAt, now().plusDays(3));
-		this.isExpired = isExpired;
 		this.user = user;
+	}
+
+	public boolean isExpired() {
+		return expiredAt.compareTo(now()) < 0;
 	}
 }

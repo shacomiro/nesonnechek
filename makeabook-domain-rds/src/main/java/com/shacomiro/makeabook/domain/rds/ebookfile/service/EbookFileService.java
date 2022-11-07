@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
@@ -29,41 +30,46 @@ public class EbookFileService {
 		this.ebookManager = new EbookManager(RESOURCES_DIR);
 	}
 
-	public EbookFile createEpub(ByteArrayResource resource, String uuid, EbookFileExtension ebookFileExtension,
+	public EbookFile createEpub(ByteArrayResource resource, EbookFileExtension ebookFileExtension,
 			String fileName) {
+		String uuid = UUID.randomUUID().toString();
 		EpubFileInfo epubFileInfo;
 		EbookFile ebookFile = null;
 		String ebookExtension;
 
 		if (ebookFileExtension.equals(EbookFileExtension.EPUB2)) {
-			epubFileInfo = ebookManager.translateTxtToEpub2(resource.getByteArray(), fileName);
+			epubFileInfo = ebookManager.translateTxtToEpub2(resource.getByteArray(), uuid, fileName);
 			ebookExtension = EbookFileExtension.EPUB2.getEbookExt().toLowerCase();
 
-			ebookFile = ebookFileRepository.save(EbookFile.builder()
-					.uuid(uuid)
-					.filename(epubFileInfo.getFileName())
-					.fileType(ebookExtension)
-					.downloadUrl(/*"http://localhost:8080/api/ebook/epub2/"*/
-							downloadUrlPrefix + "/" + ebookExtension + "/download/" + epubFileInfo.getFileName()
-									+ ".epub")
-					.build());
+			ebookFile = ebookFileRepository
+					.save(EbookFile.builder()
+							.uuid(uuid)
+							.filename(epubFileInfo.getFileName())
+							.fileType(ebookExtension)
+							.fileExtention("epub")
+							.downloadUrl(downloadUrlPrefix + "/download/" + uuid)
+							.build());
 		}
 
 		return ebookFile;
 	}
 
-	public Optional<ByteArrayResource> getEpubAsResource(EbookFileExtension ebookFileExtension, String fileName) {
-		Path path = ebookManager.getEpubFilePath(ebookFileExtension.toString(), fileName);
-		ByteArrayResource resource = null;
+	public Optional<EbookFile> findEbookFileByUuid(String uuid) {
+		return ebookFileRepository.findByUuid(uuid);
+	}
+
+	public Optional<ByteArrayResource> getEpubAsResource(EbookFile ebookFile) {
+		Path path = ebookManager.getEpubFilePath(ebookFile.getFileType(),
+				ebookFile.getUuid() + "." + ebookFile.getFileExtention());
 
 		if (Files.exists(path)) {
 			try {
-				resource = new ByteArrayResource(Files.readAllBytes(path));
+				return Optional.of(new ByteArrayResource(Files.readAllBytes(path), ebookFile.getFilename()));
 			} catch (IOException e) {
 				throw new FileIOException("Fail to load file", e);
 			}
+		} else {
+			return Optional.empty();
 		}
-
-		return Optional.ofNullable(resource);
 	}
 }
