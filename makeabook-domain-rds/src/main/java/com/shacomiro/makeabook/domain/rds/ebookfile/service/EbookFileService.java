@@ -25,8 +25,8 @@ public class EbookFileService {
 	private static final String RESOURCES_DIR = "./files";
 	private final EbookManager ebookManager;
 	private final EbookFileRepository ebookFileRepository;
-	@Value("${app-api.download-url-prefix}")
-	private String downloadUrlPrefix;
+	@Value("${secret-key.api-server-url}")
+	private String apiServerUrl;
 
 	public EbookFileService(EbookFileRepository ebookFileRepository) {
 		this.ebookFileRepository = ebookFileRepository;
@@ -50,7 +50,7 @@ public class EbookFileService {
 							.filename(epubFileInfo.getFileName())
 							.fileType(ebookExtension)
 							.fileExtension("epub")
-							.downloadUrl(downloadUrlPrefix + "/download/" + uuid)
+							.downloadUrl(apiServerUrl + "/api/ebook/download/" + uuid)
 							.build());
 		}
 
