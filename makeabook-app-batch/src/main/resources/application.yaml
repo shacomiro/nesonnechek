@@ -1,0 +1,15 @@
+spring:
+  config:
+    import:
+      - file:./secret-config/application-secret.yaml
+      - application-domain-rds.yaml
+  profiles:
+    group:
+      local:
+        - domain-rds-local
+    active: local
+  batch:
+    jdbc:
+      initialize-schema: always
+server:
+  port: 8081
