@@ -40,8 +40,8 @@ public class EbookFile {
 	@Column(name = "file_type")
 	private String fileType;
 
-	@Column(name = "file_extention")
-	private String fileExtention;
+	@Column(name = "file_extension")
+	private String fileExtension;
 
 	@Column(name = "download_url")
 	private String downloadUrl;
@@ -60,20 +60,20 @@ public class EbookFile {
 	private User user;
 
 	@Builder
-	public EbookFile(String uuid, String filename, String fileType, String fileExtention, String downloadUrl,
+	public EbookFile(String uuid, String filename, String fileType, String fileExtension, String downloadUrl,
 			User user) {
-		this(null, uuid, filename, fileType, fileExtention, downloadUrl, 0, null, null, user);
+		this(null, uuid, filename, fileType, fileExtension, downloadUrl, 0, null, null, user);
 	}
 
 	@Builder
-	public EbookFile(Long seq, String uuid, String filename, String fileType, String fileExtention, String downloadUrl,
+	public EbookFile(Long seq, String uuid, String filename, String fileType, String fileExtension, String downloadUrl,
 			int downloadCount,
 			LocalDateTime createdAt, LocalDateTime expiredAt, User user) {
 		this.seq = seq;
 		this.uuid = uuid;
 		this.filename = filename;
 		this.fileType = fileType;
-		this.fileExtention = fileExtention;
+		this.fileExtension = fileExtension;
 		this.downloadUrl = downloadUrl;
 		this.downloadCount = downloadCount;
 		this.createdAt = defaultIfNull(createdAt, now());

@@ -46,7 +46,7 @@ public class EbookFileService {
 							.uuid(uuid)
 							.filename(epubFileInfo.getFileName())
 							.fileType(ebookExtension)
-							.fileExtention("epub")
+							.fileExtension("epub")
 							.downloadUrl(downloadUrlPrefix + "/download/" + uuid)
 							.build());
 		}
@@ -60,7 +60,7 @@ public class EbookFileService {
 
 	public Optional<ByteArrayResource> getEpubAsResource(EbookFile ebookFile) {
 		Path path = ebookManager.getEpubFilePath(ebookFile.getFileType(),
-				ebookFile.getUuid() + "." + ebookFile.getFileExtention());
+				ebookFile.getUuid() + "." + ebookFile.getFileExtension());
 
 		if (Files.exists(path)) {
 			try {
