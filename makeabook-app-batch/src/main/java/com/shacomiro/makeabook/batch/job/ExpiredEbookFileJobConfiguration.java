@@ -49,7 +49,7 @@ public class ExpiredEbookFileJobConfiguration {
 				.<EbookFile, EbookFile>chunk(CHUNK_SIZE)
 				.reader(ebookFileReader())
 				.processor(deleteExpiredEbookFileProcessor())
-				.writer(ebookFilewriter())
+				.writer(ebookFileWriter())
 				.build();
 	}
 
@@ -83,7 +83,7 @@ public class ExpiredEbookFileJobConfiguration {
 
 	@Bean
 	@StepScope
-	public JpaItemWriter<EbookFile> ebookFilewriter() {
+	public JpaItemWriter<EbookFile> ebookFileWriter() {
 		return new JpaItemWriterBuilder<EbookFile>()
 				.entityManagerFactory(emf)
 				.build();
