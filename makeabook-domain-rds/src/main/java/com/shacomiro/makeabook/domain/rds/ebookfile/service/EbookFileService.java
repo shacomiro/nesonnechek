@@ -51,7 +51,7 @@ public class EbookFileService {
 			ebookExtension = EbookFileExtension.EPUB2.getEbookExt().toLowerCase();
 
 			ebookFile = ebookFileRepository
-					.save(EbookFile.builder()
+					.save(EbookFile.byEbookFileInfo()
 							.uuid(uuid)
 							.filename(epubFileInfo.getFileName())
 							.fileType(ebookExtension)

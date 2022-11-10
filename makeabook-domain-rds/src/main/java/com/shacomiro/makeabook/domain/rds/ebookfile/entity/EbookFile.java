@@ -59,16 +59,15 @@ public class EbookFile {
 	@JoinColumn(name = "user_seq")
 	private User user;
 
-	@Builder
+	@Builder(builderClassName = "ByEbookFileInfo", builderMethodName = "byEbookFileInfo")
 	public EbookFile(String uuid, String filename, String fileType, String fileExtension, String downloadUrl,
 			User user) {
 		this(null, uuid, filename, fileType, fileExtension, downloadUrl, 0, null, null, user);
 	}
 
-	@Builder
+	@Builder(builderClassName = "ByAllArguments", builderMethodName = "byAllArguments")
 	public EbookFile(Long seq, String uuid, String filename, String fileType, String fileExtension, String downloadUrl,
-			int downloadCount,
-			LocalDateTime createdAt, LocalDateTime expiredAt, User user) {
+			int downloadCount, LocalDateTime createdAt, LocalDateTime expiredAt, User user) {
 		this.seq = seq;
 		this.uuid = uuid;
 		this.filename = filename;
