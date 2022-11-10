@@ -3,4 +3,4 @@ include 'makeabook-app-api'
 include 'makeabook-ebook'
 include 'makeabook-domain-rds'
 include 'makeabook-app-batch'
-
+include 'makeabook-core'
