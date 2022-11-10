@@ -2,4 +2,5 @@ rootProject.name = 'makeabook'
 include 'makeabook-app-api'
 include 'makeabook-ebook'
 include 'makeabook-domain-rds'
+include 'makeabook-core'
 
