@@ -11,8 +11,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class IOUtil {
-	private IOUtil() {
+public class IOUtils {
+	private IOUtils() {
 		throw new IllegalStateException("Utility class");
 	}
 

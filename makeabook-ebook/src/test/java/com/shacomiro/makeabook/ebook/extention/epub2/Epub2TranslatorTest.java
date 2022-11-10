@@ -1,6 +1,6 @@
 package com.shacomiro.makeabook.ebook.extention.epub2;
 
-import static com.shacomiro.makeabook.core.util.IOUtil.*;
+import static com.shacomiro.makeabook.core.util.IOUtils.*;
 
 import java.io.File;
 import java.nio.file.Path;

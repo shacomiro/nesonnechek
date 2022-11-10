@@ -1,6 +1,6 @@
 package com.shacomiro.makeabook.ebook;
 
-import static com.shacomiro.makeabook.core.util.IOUtil.*;
+import static com.shacomiro.makeabook.core.util.IOUtils.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +14,7 @@ import java.util.Optional;
 
 import org.mozilla.universalchardet.UniversalDetector;
 
-import com.shacomiro.makeabook.core.util.IOUtil;
+import com.shacomiro.makeabook.core.util.IOUtils;
 import com.shacomiro.makeabook.ebook.domain.ContentTempFileInfo;
 import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
 import com.shacomiro.makeabook.ebook.error.FileIOException;
@@ -42,7 +42,7 @@ public class EbookManager {
 	}
 
 	private List<String> readTxtAllLines(Path path) {
-		return IOUtil.readStringFromFile(path, Charset.forName(getEncoding(path)));
+		return IOUtils.readStringFromFile(path, Charset.forName(getEncoding(path)));
 	}
 
 	private String getEncoding(Path path) {

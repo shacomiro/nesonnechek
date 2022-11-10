@@ -15,7 +15,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.shacomiro.makeabook.core.util.IOUtil;
+import com.shacomiro.makeabook.core.util.IOUtils;
 import com.shacomiro.makeabook.domain.rds.ebookfile.entity.EbookFile;
 import com.shacomiro.makeabook.domain.rds.ebookfile.entity.EbookFileExtension;
 import com.shacomiro.makeabook.domain.rds.ebookfile.repository.EbookFileRepository;
@@ -92,7 +92,7 @@ public class EbookFileService {
 	}
 
 	private ContentTempFileInfo saveUploadToTempFile(MultipartFile txtFile) {
-		Path tempUploadFilePath = IOUtil.createTempFile(
+		Path tempUploadFilePath = IOUtils.createTempFile(
 				Paths.get(ebookManager.getContentsBasePath()).normalize().toAbsolutePath(),
 				"." + FilenameUtils.getExtension(txtFile.getOriginalFilename()));
 
