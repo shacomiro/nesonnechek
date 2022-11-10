@@ -3,7 +3,6 @@ package com.shacomiro.makeabook.batch.job;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
 
 import javax.persistence.EntityManagerFactory;
 
@@ -25,7 +24,9 @@ import org.springframework.context.annotation.Configuration;
 import com.shacomiro.makeabook.domain.rds.ebookfile.entity.EbookFile;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Configuration
 @EnableBatchProcessing
 @RequiredArgsConstructor
@@ -73,6 +74,8 @@ public class ExpiredEbookFileJobConfiguration {
 				Path targetPath = Paths.get("./files/ebook/", ebookFile.getFileType() + "/",
 						ebookFile.getUuid() + "." + ebookFile.getFileExtension()).normalize().toAbsolutePath();
 				boolean deleteResult = Files.deleteIfExists(targetPath);
+				log.info("EbookFile uuid={}, isExpired={}, deleteResult={}", ebookFile.getUuid(), ebookFile.isExpired(),
+						deleteResult);
 
 				return ebookFile;
 			} else {
