@@ -9,7 +9,9 @@ spring:
         - domain-rds-local
     active: local
   batch:
+    job:
+      names: ${job.name:NONE}
     jdbc:
       initialize-schema: always
-server:
-  port: 8081
+  main:
+    web-application-type: none
