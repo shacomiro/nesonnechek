@@ -5,11 +5,10 @@ import static j2html.TagCreator.*;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -91,7 +90,7 @@ public class Epub2Translator {
 				.toAbsolutePath()
 				.normalize();
 
-		try (OutputStream os = new FileOutputStream(bookFilePath.toString())) {
+		try (OutputStream os = loadFileToOutputStream(bookFilePath)) {
 			epubWriter.write(book, os);
 		} catch (IOException e) {
 			throw new FileIOException("Fail to write epub file", e);
@@ -175,9 +174,7 @@ public class Epub2Translator {
 	}
 
 	private void writeXhtml(Path sectionFilePath, String head, String body) {
-		File sectionFile = sectionFilePath.toFile();
-
-		try (BufferedWriter bw = new BufferedWriter(new FileWriter(sectionFile))) {
+		try (BufferedWriter bw = Files.newBufferedWriter(sectionFilePath)) {
 			bw.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
 			bw.write("\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"");
 			bw.write("\r\n\t\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
