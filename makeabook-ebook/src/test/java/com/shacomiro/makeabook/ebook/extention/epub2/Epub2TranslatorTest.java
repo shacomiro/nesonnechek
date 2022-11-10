@@ -1,14 +1,13 @@
 package com.shacomiro.makeabook.ebook.extention.epub2;
 
-import static com.shacomiro.makeabook.ebook.util.IOUtil.*;
+import static com.shacomiro.makeabook.core.util.IOUtils.*;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -21,31 +20,34 @@ import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
 class Epub2TranslatorTest {
 	static final String testFilePath = "./src/test/resources";
 
-	InputStream loadTestFile(String fileName) throws FileNotFoundException {
-		return new FileInputStream(
-				Paths.get(testFilePath, File.separatorChar + fileName).toAbsolutePath().normalize().toString());
-	}
-
 	@Test
 	@DisplayName("생성된 epub2 파일 Path 반환")
-	void createEpub2Test() throws IOException {
+	void createEpub2Test() {
 		//given
+		String uuid = UUID.randomUUID().toString();
 		String fileName = "애국가.txt";
 		Path expectTestResultPath = Paths.get(testFilePath,
-						File.separatorChar + "ebook" + File.separatorChar + "epub2" + File.separatorChar + "애국가.epub")
+						File.separatorChar + "ebook" + File.separatorChar + "epub2" + File.separatorChar + uuid + ".epub")
 				.toAbsolutePath()
 				.normalize();
+		List<String> lines = new ArrayList<>();
+		lines.add("*BT*애국가");
+		lines.add("*BA*안익태");
+		lines.add("*ST*1절");
+		lines.add("동해 물과 백두산이");
+		lines.add("마르고 닳도록");
+		lines.add("하느님이 보우하사");
+		lines.add("우리나라 만세");
 
-		InputStream is = loadTestFile(fileName);
 		createDirectory(Paths.get(testFilePath, File.separatorChar + "contents"));
 		createDirectory(Paths.get(testFilePath, File.separatorChar + "ebook"));
 
 		//when
 		Epub2Translator epub2Translator = new Epub2Translator(testFilePath + "/contents", testFilePath + "/ebook");
-		EpubFileInfo info = epub2Translator.createEpub2(is.readAllBytes(), "utf-8", fileName);
-		is.close();
+		EpubFileInfo info = epub2Translator.createEpub2(uuid, fileName, lines);
 
 		//then
 		Assertions.assertEquals(expectTestResultPath, info.getFilePath());
+		new File(info.getFilePath().toUri()).deleteOnExit();
 	}
 }

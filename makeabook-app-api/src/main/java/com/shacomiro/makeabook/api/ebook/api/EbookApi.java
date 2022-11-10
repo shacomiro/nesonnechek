@@ -1,10 +1,8 @@
 package com.shacomiro.makeabook.api.ebook.api;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -47,15 +45,7 @@ public class EbookApi {
 			throw new IllegalArgumentException("File content type is invalid");
 		}
 
-		ByteArrayResource resource;
-		try {
-			resource = new ByteArrayResource(file.getBytes());
-		} catch (IOException e) {
-			throw new IllegalStateException("Fail to read upload file", e);
-		}
-
-		return Optional.ofNullable(
-						ebookFileService.createEpub(resource, ebookFileExtension, file.getOriginalFilename()))
+		return Optional.ofNullable(ebookFileService.createEpub(file, ebookFileExtension))
 				.map(EbookResultResponse::new)
 				.orElseThrow(() -> new NullPointerException("Fail to create ebook"));
 	}

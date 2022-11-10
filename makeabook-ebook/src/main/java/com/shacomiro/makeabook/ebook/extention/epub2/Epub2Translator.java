@@ -1,10 +1,9 @@
 package com.shacomiro.makeabook.ebook.extention.epub2;
 
-import static com.shacomiro.makeabook.ebook.util.IOUtil.*;
+import static com.shacomiro.makeabook.core.util.IOUtils.*;
 import static j2html.TagCreator.*;
 
 import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -20,10 +19,12 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
 import com.shacomiro.makeabook.ebook.domain.Section;
 import com.shacomiro.makeabook.ebook.error.FileIOException;
+import com.shacomiro.makeabook.ebook.grammar.EbookGrammar;
 
 import nl.siegmann.epublib.domain.Author;
 import nl.siegmann.epublib.domain.Book;
@@ -54,14 +55,14 @@ public class Epub2Translator {
 		initEpub2BaseDirectory();
 	}
 
-	public EpubFileInfo createEpub2(byte[] bytes, String encoding, String uuid, String fileName) {
+	public EpubFileInfo createEpub2(String uuid, String fileName, List<String> lines) {
 		String fileNameWithoutExtension = FilenameUtils.removeExtension(fileName);
 		Path contentsPath = Paths.get(epub2ContentsBasePath, File.separatorChar + uuid);
 		createDirectory(contentsPath);
 
 		List<Section> sectionList = new ArrayList<>();
 		Map<String, String> metainfo = new HashMap<>();
-		convertBytesTextToEbookInfo(bytes, encoding, sectionList, metainfo);
+		convertLinesToEbookInfo(lines, sectionList, metainfo);
 
 		int sectionNum = 0;
 		for (Section section : sectionList) {
@@ -104,13 +105,54 @@ public class Epub2Translator {
 				.build();
 	}
 
-	private void convertBytesTextToEbookInfo(byte[] bytes, String encoding, List<Section> sectionList,
-			Map<String, String> metainfo) {
-		try (InputStream is = new ByteArrayInputStream(bytes)) {
-			readStream(is, encoding, sectionList, metainfo);
-		} catch (IOException e) {
-			throw new FileIOException("Fail to convert text to ebook info", e);
+	private void convertLinesToEbookInfo(List<String> lines, List<Section> sectionList, Map<String, String> metainfo) {
+		Section section = new Section();
+		List<String> paragraphList = new ArrayList<>();
+		boolean isNonSectionEbook = true;
+
+		for (String line : lines) {
+			boolean isParagraph = true;
+
+			if (StringUtils.isEmpty(line)) {
+				continue;
+			}
+
+			if (StringUtils.contains(line, EbookGrammar.BOOK_TITLE)) {
+				isParagraph = false;
+				metainfo.put("Title", StringUtils.split(line, EbookGrammar.BOOK_TITLE)[0]);
+			}
+
+			if (StringUtils.contains(line, EbookGrammar.BOOK_AUTHOR)) {
+				isParagraph = false;
+				metainfo.put("Author", StringUtils.split(line, EbookGrammar.BOOK_AUTHOR)[0]);
+			}
+
+			if (StringUtils.contains(line, EbookGrammar.SECTION_TITLE)) {
+				isParagraph = false;
+
+				if (isNonSectionEbook) {
+					isNonSectionEbook = false;
+				} else {
+					updateSectionList(sectionList, section, paragraphList);
+				}
+
+				paragraphList = new ArrayList<>();
+				section = Section.builder()
+						.title(StringUtils.split(line, EbookGrammar.SECTION_TITLE)[0])
+						.build();
+			}
+
+			if (isParagraph) {
+				paragraphList.add(line);
+			}
 		}
+
+		updateSectionList(sectionList, section, paragraphList);
+	}
+
+	private void updateSectionList(List<Section> sectionList, Section section, List<String> paragraphList) {
+		section.updateParagraphList(paragraphList);
+		sectionList.add(section);
 	}
 
 	private void createSectionXhtml(Section section, Path path, int sectionNum) {
