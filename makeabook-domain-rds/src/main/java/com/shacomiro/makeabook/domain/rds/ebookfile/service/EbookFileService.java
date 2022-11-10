@@ -15,6 +15,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.shacomiro.makeabook.core.util.IOUtil;
 import com.shacomiro.makeabook.domain.rds.ebookfile.entity.EbookFile;
 import com.shacomiro.makeabook.domain.rds.ebookfile.entity.EbookFileExtension;
 import com.shacomiro.makeabook.domain.rds.ebookfile.repository.EbookFileRepository;
@@ -22,7 +23,6 @@ import com.shacomiro.makeabook.ebook.EbookManager;
 import com.shacomiro.makeabook.ebook.domain.ContentTempFileInfo;
 import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
 import com.shacomiro.makeabook.ebook.error.FileIOException;
-import com.shacomiro.makeabook.ebook.util.IOUtil;
 
 @Service
 @Transactional

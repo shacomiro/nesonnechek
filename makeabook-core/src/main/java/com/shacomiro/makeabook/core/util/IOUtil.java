@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.ebook.util;
+package com.shacomiro.makeabook.core.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,8 +11,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.shacomiro.makeabook.ebook.error.FileIOException;
-
 public class IOUtil {
 	private IOUtil() {
 		throw new IllegalStateException("Utility class");
@@ -22,7 +20,7 @@ public class IOUtil {
 		try {
 			return Files.readAllLines(path, charset);
 		} catch (IOException e) {
-			throw new FileIOException("Fail to read string from file", e);
+			throw new RuntimeException("Fail to read string from file", e);
 		}
 	}
 
@@ -30,7 +28,7 @@ public class IOUtil {
 		try {
 			return Files.createTempFile(path, "temp_", extension);
 		} catch (IOException e) {
-			throw new FileIOException("Fail to create temporary file", e);
+			throw new RuntimeException("Fail to create temporary file", e);
 		}
 	}
 
@@ -38,7 +36,7 @@ public class IOUtil {
 		try {
 			return Files.newInputStream(path);
 		} catch (IOException e) {
-			throw new FileIOException("Fail to load InputStream of file '" + path.getFileName() + "'", e);
+			throw new RuntimeException("Fail to load InputStream of file '" + path.getFileName() + "'", e);
 		}
 	}
 
@@ -46,7 +44,7 @@ public class IOUtil {
 		try {
 			return Files.newOutputStream(path);
 		} catch (IOException e) {
-			throw new FileIOException("Fail to load OutputStream of file '" + path.getFileName() + "'", e);
+			throw new RuntimeException("Fail to load OutputStream of file '" + path.getFileName() + "'", e);
 		}
 	}
 
@@ -55,7 +53,7 @@ public class IOUtil {
 			try {
 				Files.createDirectory(path);
 			} catch (IOException e) {
-				throw new FileIOException(
+				throw new RuntimeException(
 						"Fail to create directory '" + path.toAbsolutePath().normalize().toString() + "'", e);
 			}
 		}
@@ -77,7 +75,7 @@ public class IOUtil {
 				}
 				Files.delete(path);
 			} catch (IOException e) {
-				throw new FileIOException("Fail to delete directory '" + path + "'", e);
+				throw new RuntimeException("Fail to delete directory '" + path + "'", e);
 			}
 		}
 	}
@@ -86,7 +84,7 @@ public class IOUtil {
 		try {
 			Files.delete(path);
 		} catch (IOException e) {
-			throw new FileIOException("Fail to delete file '" + path.getFileName() + "'", e);
+			throw new RuntimeException("Fail to delete file '" + path.getFileName() + "'", e);
 		}
 	}
 }
