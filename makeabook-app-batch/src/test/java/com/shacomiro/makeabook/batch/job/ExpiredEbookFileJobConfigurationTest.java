@@ -1,6 +1,8 @@
 package com.shacomiro.makeabook.batch.job;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.After;
@@ -32,6 +34,22 @@ import lombok.extern.slf4j.Slf4j;
 @SpringBatchTest
 @SpringBootTest(classes = {ExpiredEbookFileJobConfiguration.class, TestBatchConfig.class})
 public class ExpiredEbookFileJobConfigurationTest {
+	private static final List<EbookFile> testEbookFiles = new ArrayList<>() {{
+		for (int i = 1; i <= 3; i++) {
+			String uuid = UUID.randomUUID().toString();
+			add(EbookFile.byAllArguments()
+					.seq(null).uuid(uuid)
+					.filename("test_file" + i)
+					.fileType(EbookFileExtension.EPUB2.getEbookExt().toLowerCase())
+					.fileExtension("epub")
+					.downloadUrl("http://localhost:8080/api/ebook/download/" + uuid)
+					.downloadCount(0)
+					.createdAt(LocalDateTime.now().minusDays(i * 4))
+					.expiredAt(LocalDateTime.now().minusDays(i * 4).plusDays(7))
+					.user(null)
+					.build());
+		}
+	}};
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
 	@Autowired
@@ -39,7 +57,7 @@ public class ExpiredEbookFileJobConfigurationTest {
 
 	@After
 	public void tearDown() {
-		ebookFileRepository.deleteAllInBatch();
+		ebookFileRepository.deleteAllInBatch(testEbookFiles);
 	}
 
 	@Test
@@ -47,20 +65,7 @@ public class ExpiredEbookFileJobConfigurationTest {
 	@DisplayName("만료된 전자책 파일 삭제 성공")
 	public void deleteExpiredEbookFileJobSuccess() throws Exception {
 		//given
-		String uuid = UUID.randomUUID().toString();
-		LocalDateTime localDateTime = LocalDateTime.of(2022, 8, 13, 18, 30, 0);
-		ebookFileRepository.save(EbookFile.byAllArguments()
-				.seq(null)
-				.uuid(uuid)
-				.filename("file1")
-				.fileType(EbookFileExtension.EPUB2.getEbookExt().toLowerCase())
-				.fileExtension("epub")
-				.downloadUrl("http://localhost:8080/api/ebook/download/" + uuid)
-				.downloadCount(0)
-				.createdAt(localDateTime)
-				.expiredAt(localDateTime.plusDays(14))
-				.user(null)
-				.build());
+		ebookFileRepository.saveAll(testEbookFiles);
 
 		JobParameters jobParameters = new JobParametersBuilder()
 				.addLong("date", System.currentTimeMillis())
