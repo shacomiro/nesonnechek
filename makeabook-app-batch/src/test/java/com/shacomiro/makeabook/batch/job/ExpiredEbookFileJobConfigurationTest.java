@@ -46,6 +46,7 @@ public class ExpiredEbookFileJobConfigurationTest {
 					.downloadCount(0)
 					.createdAt(LocalDateTime.now().minusDays(i * 4))
 					.expiredAt(LocalDateTime.now().minusDays(i * 4).plusDays(7))
+					.isExist(true)
 					.user(null)
 					.build());
 		}
