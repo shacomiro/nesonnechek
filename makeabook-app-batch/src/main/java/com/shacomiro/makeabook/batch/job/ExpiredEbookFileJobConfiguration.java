@@ -74,8 +74,8 @@ public class ExpiredEbookFileJobConfiguration {
 				Path targetPath = Paths.get("./files/ebook/", ebookFile.getFileType() + "/",
 						ebookFile.getUuid() + "." + ebookFile.getFileExtension()).normalize().toAbsolutePath();
 				boolean deleteResult = Files.deleteIfExists(targetPath);
-				log.info("EbookFile uuid={}, isExpired={}, deleteResult={}", ebookFile.getUuid(), ebookFile.isExpired(),
-						deleteResult);
+				log.info(">>> EbookFile(uuid={}) is expired! (isExpired={}, deleteResult={})", ebookFile.getUuid(),
+						ebookFile.isExpired(), deleteResult);
 
 				return ebookFile;
 			} else {
