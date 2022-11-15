@@ -55,20 +55,22 @@ public class EbookFile {
 	@Column(name = "expired_at")
 	private LocalDateTime expiredAt;
 
+	@Column(name = "is_exist")
+	private boolean isExist;
+
 	@ManyToOne
 	@JoinColumn(name = "user_seq")
 	private User user;
 
-	@Builder
+	@Builder(builderClassName = "ByEbookFileInfo", builderMethodName = "byEbookFileInfo")
 	public EbookFile(String uuid, String filename, String fileType, String fileExtension, String downloadUrl,
 			User user) {
-		this(null, uuid, filename, fileType, fileExtension, downloadUrl, 0, null, null, user);
+		this(null, uuid, filename, fileType, fileExtension, downloadUrl, 0, null, null, true, user);
 	}
 
-	@Builder
+	@Builder(builderClassName = "ByAllArguments", builderMethodName = "byAllArguments")
 	public EbookFile(Long seq, String uuid, String filename, String fileType, String fileExtension, String downloadUrl,
-			int downloadCount,
-			LocalDateTime createdAt, LocalDateTime expiredAt, User user) {
+			int downloadCount, LocalDateTime createdAt, LocalDateTime expiredAt, boolean isExist, User user) {
 		this.seq = seq;
 		this.uuid = uuid;
 		this.filename = filename;
@@ -78,6 +80,7 @@ public class EbookFile {
 		this.downloadCount = downloadCount;
 		this.createdAt = defaultIfNull(createdAt, now());
 		this.expiredAt = defaultIfNull(expiredAt, now().plusDays(3));
+		this.isExist = defaultIfNull(isExist, true);
 		this.user = user;
 	}
 
@@ -86,6 +89,10 @@ public class EbookFile {
 	}
 
 	public boolean isExpired() {
-		return expiredAt.compareTo(now()) < 0;
+		return !isExist || expiredAt.compareTo(now()) < 0;
+	}
+
+	public void updateExists() {
+		this.isExist = false;
 	}
 }
