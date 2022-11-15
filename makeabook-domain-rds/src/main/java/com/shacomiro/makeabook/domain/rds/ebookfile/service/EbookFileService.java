@@ -38,10 +38,10 @@ public class EbookFileService {
 		this.ebookManager = new EbookManager(RESOURCES_DIR);
 	}
 
-	public EbookFile createEpub(MultipartFile file, EbookFileExtension ebookFileExtension) {
+	public Optional<EbookFile> createEpub(MultipartFile file, EbookFileExtension ebookFileExtension) {
+		Optional<EbookFile> ebookFile = Optional.empty();
 		String uuid = UUID.randomUUID().toString();
 		EpubFileInfo epubFileInfo;
-		EbookFile ebookFile = null;
 		String ebookExtension;
 
 		ContentTempFileInfo contentTempFileInfo = saveUploadToTempFile(file);
@@ -50,14 +50,15 @@ public class EbookFileService {
 			epubFileInfo = ebookManager.translateTxtToEpub2(uuid, file.getOriginalFilename(), contentTempFileInfo);
 			ebookExtension = EbookFileExtension.EPUB2.getEbookExt().toLowerCase();
 
-			ebookFile = ebookFileRepository
+			ebookFile = Optional.of(ebookFileRepository
 					.save(EbookFile.byEbookFileInfo()
 							.uuid(uuid)
 							.filename(epubFileInfo.getFileName())
 							.fileType(ebookExtension)
 							.fileExtension("epub")
 							.downloadUrl(apiServerUrl + "/api/ebook/download/" + uuid)
-							.build());
+							.build())
+			);
 		}
 
 		try {

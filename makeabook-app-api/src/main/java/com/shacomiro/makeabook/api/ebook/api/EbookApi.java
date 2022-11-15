@@ -3,7 +3,6 @@ package com.shacomiro.makeabook.api.ebook.api;
 import static com.shacomiro.makeabook.api.global.util.ApiUtils.*;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 
 import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
@@ -47,7 +46,7 @@ public class EbookApi {
 			throw new IllegalArgumentException("File content type is invalid");
 		}
 
-		return success(Optional.ofNullable(ebookFileService.createEpub(file, ebookFileExtension))
+		return success(ebookFileService.createEpub(file, ebookFileExtension)
 				.map(EbookResultResponse::new)
 				.orElseThrow(() -> new NullPointerException("Fail to create ebook"))
 		);
