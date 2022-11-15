@@ -30,22 +30,22 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 @EnableBatchProcessing
 @RequiredArgsConstructor
-public class ExpiredEbookFileJobConfiguration {
+public class DeleteExpiredEbookFileJobConfiguration {
 	private final JobBuilderFactory jobBuilderFactory;
 	private final StepBuilderFactory stepBuilderFactory;
 	private final EntityManagerFactory emf;
 	private static final int CHUNK_SIZE = 10;
 
 	@Bean
-	public Job expiredEbookFileDeleteJob() {
+	public Job deleteExpiredEbookFileJob() {
 		return jobBuilderFactory.get("expiredEbookFileDeleteJob")
-				.start(expiredEbookFileDeleteStep())
+				.start(deleteExpiredEbookFileStep())
 				.build();
 	}
 
 	@Bean
 	@JobScope
-	public Step expiredEbookFileDeleteStep() {
+	public Step deleteExpiredEbookFileStep() {
 		return stepBuilderFactory.get("expiredEbookFileDeleteStep")
 				.<EbookFile, EbookFile>chunk(CHUNK_SIZE)
 				.reader(ebookFileReader())

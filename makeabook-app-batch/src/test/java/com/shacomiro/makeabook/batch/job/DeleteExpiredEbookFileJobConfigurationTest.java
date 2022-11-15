@@ -32,8 +32,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RunWith(SpringRunner.class)
 @SpringBatchTest
-@SpringBootTest(classes = {ExpiredEbookFileJobConfiguration.class, TestBatchConfig.class})
-public class ExpiredEbookFileJobConfigurationTest {
+@SpringBootTest(classes = {DeleteExpiredEbookFileJobConfiguration.class, TestBatchConfig.class})
+public class DeleteExpiredEbookFileJobConfigurationTest {
 	private static final List<EbookFile> testEbookFiles = new ArrayList<>() {{
 		for (int i = 1; i <= 3; i++) {
 			String uuid = UUID.randomUUID().toString();
