@@ -38,7 +38,7 @@ public class DeleteExpiredEbookFileJobConfiguration {
 
 	@Bean
 	public Job deleteExpiredEbookFileJob() {
-		return jobBuilderFactory.get("expiredEbookFileDeleteJob")
+		return jobBuilderFactory.get("deleteExpiredEbookFileJob")
 				.start(deleteExpiredEbookFileStep())
 				.build();
 	}
@@ -46,7 +46,7 @@ public class DeleteExpiredEbookFileJobConfiguration {
 	@Bean
 	@JobScope
 	public Step deleteExpiredEbookFileStep() {
-		return stepBuilderFactory.get("expiredEbookFileDeleteStep")
+		return stepBuilderFactory.get("deleteExpiredEbookFileStep")
 				.<EbookFile, EbookFile>chunk(CHUNK_SIZE)
 				.reader(ebookFileReader())
 				.processor(deleteExpiredEbookFileProcessor())
