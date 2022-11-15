@@ -1,5 +1,7 @@
 package com.shacomiro.makeabook.api.ebook.api;
 
+import static com.shacomiro.makeabook.api.global.util.ApiUtils.*;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
@@ -37,7 +39,7 @@ public class EbookApi {
 	}
 
 	@PostMapping(path = "{ebookFileExtension}/upload")
-	public EbookResultResponse uploadTextFile(@PathVariable EbookFileExtension ebookFileExtension,
+	public ApiResult<EbookResultResponse> uploadTextFile(@PathVariable EbookFileExtension ebookFileExtension,
 			@RequestBody @RequestParam(name = "file") MultipartFile file) {
 		if (file.isEmpty()) {
 			throw new IllegalStateException("File is empty");
@@ -45,9 +47,10 @@ public class EbookApi {
 			throw new IllegalArgumentException("File content type is invalid");
 		}
 
-		return Optional.ofNullable(ebookFileService.createEpub(file, ebookFileExtension))
+		return success(Optional.ofNullable(ebookFileService.createEpub(file, ebookFileExtension))
 				.map(EbookResultResponse::new)
-				.orElseThrow(() -> new NullPointerException("Fail to create ebook"));
+				.orElseThrow(() -> new NullPointerException("Fail to create ebook"))
+		);
 	}
 
 	@GetMapping(path = "download/{uuid}")
