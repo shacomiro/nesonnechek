@@ -30,14 +30,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequestMapping(path = "api/ebook")
-public class EbookApi {
+public class EbookRestApi {
 	private final EbookFileService ebookFileService;
 
-	public EbookApi(EbookFileService ebookFileService) {
+	public EbookRestApi(EbookFileService ebookFileService) {
 		this.ebookFileService = ebookFileService;
 	}
 
-	@PostMapping(path = "{ebookFileExtension}/upload")
+	@PostMapping(path = "{ebookFileExtension}")
 	public ApiResult<EbookResultResponse> uploadTextFile(@PathVariable EbookFileExtension ebookFileExtension,
 			@RequestBody @RequestParam(name = "file") MultipartFile file) {
 		if (file.isEmpty()) {
@@ -52,7 +52,7 @@ public class EbookApi {
 		);
 	}
 
-	@GetMapping(path = "download/{uuid}")
+	@GetMapping(path = "{uuid}")
 	public ResponseEntity<Resource> downloadEbookFile(@PathVariable String uuid) {
 		return ebookFileService.findEbookFileByUuid(uuid)
 				.map(ebookFile -> {
