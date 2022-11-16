@@ -1,5 +1,7 @@
 package com.shacomiro.makeabook.api.global.error;
 
+import static com.shacomiro.makeabook.api.global.util.ApiUtils.*;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +27,7 @@ public class GeneralExceptionHandler {
 	private ResponseEntity<?> newResponse(String message, HttpStatus status) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
-		return new ResponseEntity<>(message, headers, status);
+		return new ResponseEntity<>(error(message, status), headers, status);
 	}
 
 	@ExceptionHandler({
