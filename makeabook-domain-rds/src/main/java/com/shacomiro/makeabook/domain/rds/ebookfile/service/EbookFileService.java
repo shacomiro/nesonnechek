@@ -56,7 +56,7 @@ public class EbookFileService {
 							.filename(epubFileInfo.getFileName())
 							.fileType(ebookExtension)
 							.fileExtension("epub")
-							.downloadUrl(apiServerUrl + "/api/ebook/download/" + uuid)
+							.downloadUrl(apiServerUrl + "/api/ebook/" + uuid)
 							.build())
 			);
 		}
