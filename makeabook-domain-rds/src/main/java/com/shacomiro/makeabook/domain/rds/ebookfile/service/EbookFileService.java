@@ -30,7 +30,7 @@ public class EbookFileService {
 	private static final String RESOURCES_DIR = "./files";
 	private final EbookManager ebookManager;
 	private final EbookFileRepository ebookFileRepository;
-	@Value("${secret-key.api-server-url}")
+	@Value("${secret.api.root-url}")
 	private String apiServerUrl;
 
 	public EbookFileService(EbookFileRepository ebookFileRepository) {

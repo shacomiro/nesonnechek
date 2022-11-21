@@ -4,9 +4,9 @@ spring:
       on-profile: domain-rds-local
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${secret-key.local-database-url}?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: ${secret-key.local-database-username}
-    password: ${secret-key.local-database-password}
+    url: jdbc:mysql://${secret.database.url}?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: ${secret.database.username}
+    password: ${secret.database.password}
   jpa:
     properties:
       hibernate:
