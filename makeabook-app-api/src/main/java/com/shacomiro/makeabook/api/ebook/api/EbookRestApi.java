@@ -1,10 +1,14 @@
 package com.shacomiro.makeabook.api.ebook.api;
 
 import static com.shacomiro.makeabook.api.global.util.ApiUtils.*;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import org.springframework.core.io.Resource;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -37,8 +41,9 @@ public class EbookRestApi {
 		this.ebookFileService = ebookFileService;
 	}
 
-	@PostMapping(path = "{ebookFileExtension}")
-	public ApiResult<EbookResultResponse> uploadTextFile(@PathVariable EbookFileExtension ebookFileExtension,
+	@PostMapping(path = "", produces = "application/hal+json")
+	public ResponseEntity<EntityModel<ApiResult<EbookResultResponse>>> uploadTextFile(
+			@RequestParam(name = "type", defaultValue = "epub2") EbookFileExtension ebookFileExtension,
 			@RequestBody @RequestParam(name = "file") MultipartFile file) {
 		if (file.isEmpty()) {
 			throw new IllegalStateException("File is empty");
@@ -46,10 +51,18 @@ public class EbookRestApi {
 			throw new IllegalArgumentException("File content type is invalid");
 		}
 
-		return success(ebookFileService.createEpub(file, ebookFileExtension)
-				.map(EbookResultResponse::new)
+		return new ResponseEntity<>(ebookFileService.createEpub(file, ebookFileExtension)
+				.map(ebookFile -> success(new EbookResultResponse(ebookFile),
+						Arrays.asList(
+								linkTo(methodOn(EbookRestApi.class).uploadTextFile(ebookFileExtension, null))
+										.withSelfRel(),
+								linkTo(methodOn(EbookRestApi.class).downloadEbookFile(ebookFile.getUuid()))
+										.withRel("download-ebook"),
+								Link.of(getCurrentApiServletMapping() + "/api/static/docs/index.html")
+										.withRel("docs")
+						)))
 				.orElseThrow(() -> new NullPointerException("Fail to create ebook"))
-		);
+				, HttpStatus.CREATED);
 	}
 
 	@GetMapping(path = "{uuid}")

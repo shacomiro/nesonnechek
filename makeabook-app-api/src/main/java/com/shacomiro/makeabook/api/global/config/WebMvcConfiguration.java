@@ -2,6 +2,7 @@ package com.shacomiro.makeabook.api.global.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.shacomiro.makeabook.api.global.config.formatter.EbookExtensionFormatter;
@@ -14,4 +15,15 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 		WebMvcConfigurer.super.addFormatters(registry);
 		registry.addFormatter(new EbookExtensionFormatter());
 	}
+
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry.addResourceHandler("/api/static/docs/**")
+				.addResourceLocations("classpath:/static/docs/");
+	}
+
+	// @Bean
+	// ForwardedHeaderTransformer forwardedHeaderFilter() {
+	// 	return new ForwardedHeaderTransformer();
+	// }
 }
