@@ -29,6 +29,10 @@ public class ApiUtils {
 		return new ResponseEntity<>(representationModelAssembler.toCollectionModel(response).add(docsLink()), status);
 	}
 
+	public static EntityModel<ApiError> error(Throwable throwable, HttpStatus status) {
+		return EntityModel.of(new ApiError(throwable, status));
+	}
+
 	public static EntityModel<ApiError> error(String message, HttpStatus status) {
 		return EntityModel.of(new ApiError(message, status), errorLinks());
 	}
