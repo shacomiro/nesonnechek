@@ -2,9 +2,6 @@ package com.shacomiro.makeabook.api.global.error;
 
 import static com.shacomiro.makeabook.api.global.util.ApiUtils.*;
 
-import java.util.List;
-
-import org.springframework.hateoas.Link;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,23 +21,13 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 public class GeneralExceptionHandler {
 
-	private ResponseEntity<?> newResponse(Throwable throwable, HttpStatus status, List<Link> links) {
-		return newResponse(throwable.getMessage(), status, links);
-	}
-
 	private ResponseEntity<?> newResponse(Throwable throwable, HttpStatus status) {
 		return newResponse(throwable.getMessage(), status);
 	}
 
-	private ResponseEntity<?> newResponse(String message, HttpStatus status, List<Link> links) {
-		HttpHeaders headers = new HttpHeaders();
-		headers.add(HttpHeaders.CONTENT_TYPE, "application/hal+json");
-		return new ResponseEntity<>(error(message, status, links), headers, status);
-	}
-
 	private ResponseEntity<?> newResponse(String message, HttpStatus status) {
 		HttpHeaders headers = new HttpHeaders();
-		headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
+		headers.add(HttpHeaders.CONTENT_TYPE, "application/hal+json");
 		return new ResponseEntity<>(error(message, status), headers, status);
 	}
 
@@ -49,7 +36,7 @@ public class GeneralExceptionHandler {
 			NotFoundException.class
 	})
 	public ResponseEntity<?> handleNotFoundException(Exception e) {
-		return newResponse(e, HttpStatus.NOT_FOUND, errorLinks());
+		return newResponse(e, HttpStatus.NOT_FOUND);
 	}
 
 	@ExceptionHandler({
@@ -65,14 +52,15 @@ public class GeneralExceptionHandler {
 		if (e instanceof MethodArgumentNotValidException) {
 			return newResponse(
 					((MethodArgumentNotValidException)e).getBindingResult().getAllErrors().get(0).getDefaultMessage(),
-					HttpStatus.BAD_REQUEST, errorLinks());
+					HttpStatus.BAD_REQUEST
+			);
 		} else if (e instanceof MethodArgumentTypeMismatchException) {
 			return newResponse(
 					((MethodArgumentTypeMismatchException)e).getValue() + " is not supported ebook type",
-					HttpStatus.BAD_REQUEST, errorLinks()
+					HttpStatus.BAD_REQUEST
 			);
 		}
-		return newResponse(e, HttpStatus.BAD_REQUEST, errorLinks());
+		return newResponse(e, HttpStatus.BAD_REQUEST);
 	}
 
 	@ExceptionHandler({
@@ -82,6 +70,6 @@ public class GeneralExceptionHandler {
 	})
 	public ResponseEntity<?> handleException(Exception e) {
 		log.error("Unexpected exception occurred: {}", e.getMessage(), e);
-		return newResponse(e, HttpStatus.INTERNAL_SERVER_ERROR, errorLinks());
+		return newResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }

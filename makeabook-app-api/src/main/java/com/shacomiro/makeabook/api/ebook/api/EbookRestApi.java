@@ -4,11 +4,8 @@ import static com.shacomiro.makeabook.api.global.util.ApiUtils.*;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 import org.springframework.core.io.Resource;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.Link;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,9 +20,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.shacomiro.makeabook.api.ebook.dto.EbookResultResponse;
 import com.shacomiro.makeabook.api.global.error.ExpiredException;
 import com.shacomiro.makeabook.api.global.error.NotFoundException;
+import com.shacomiro.makeabook.api.global.hateoas.assembler.EbookFileResponseModelAssembler;
 import com.shacomiro.makeabook.domain.rds.ebookfile.entity.EbookFileExtension;
 import com.shacomiro.makeabook.domain.rds.ebookfile.service.EbookFileService;
 
@@ -36,13 +33,15 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping(path = "api/ebook")
 public class EbookRestApi {
 	private final EbookFileService ebookFileService;
+	private final EbookFileResponseModelAssembler ebookFileResponseModelAssembler;
 
-	public EbookRestApi(EbookFileService ebookFileService) {
+	public EbookRestApi(EbookFileService ebookFileService, EbookFileResponseModelAssembler ebookFileResponseModelAssembler) {
 		this.ebookFileService = ebookFileService;
+		this.ebookFileResponseModelAssembler = ebookFileResponseModelAssembler;
 	}
 
-	@PostMapping(path = "", produces = "application/hal+json")
-	public ResponseEntity<EntityModel<ApiResult<EbookResultResponse>>> uploadTextFile(
+	@PostMapping(path = "")
+	public ResponseEntity<?> createEbookFile(
 			@RequestParam(name = "type", defaultValue = "epub2") EbookFileExtension ebookFileExtension,
 			@RequestBody @RequestParam(name = "file") MultipartFile file) {
 		if (file.isEmpty()) {
@@ -51,21 +50,25 @@ public class EbookRestApi {
 			throw new IllegalArgumentException("File content type is invalid");
 		}
 
-		return new ResponseEntity<>(ebookFileService.createEpub(file, ebookFileExtension)
-				.map(ebookFile -> success(new EbookResultResponse(ebookFile),
-						Arrays.asList(
-								linkTo(methodOn(EbookRestApi.class).uploadTextFile(ebookFileExtension, null))
-										.withSelfRel(),
-								linkTo(methodOn(EbookRestApi.class).downloadEbookFile(ebookFile.getUuid()))
-										.withRel("download-ebook"),
-								Link.of(getCurrentApiServletMapping() + "/api/static/docs/index.html")
-										.withRel("docs")
-						)))
-				.orElseThrow(() -> new NullPointerException("Fail to create ebook"))
-				, HttpStatus.CREATED);
+		return success(
+				ebookFileService.createEpub(file, ebookFileExtension)
+						.orElseThrow(() -> new NullPointerException("Fail to create ebook")),
+				ebookFileResponseModelAssembler,
+				HttpStatus.CREATED
+		);
 	}
 
 	@GetMapping(path = "{uuid}")
+	public ResponseEntity<?> getEbookFile(@PathVariable String uuid) {
+		return success(
+				ebookFileService.findEbookFileByUuid(uuid)
+						.orElseThrow(() -> new NotFoundException("File is not found")),
+				ebookFileResponseModelAssembler,
+				HttpStatus.OK
+		);
+	}
+
+	@GetMapping(path = "{uuid}/file", produces = "application/epub+zip")
 	public ResponseEntity<Resource> downloadEbookFile(@PathVariable String uuid) {
 		return ebookFileService.findEbookFileByUuid(uuid)
 				.map(ebookFile -> {
