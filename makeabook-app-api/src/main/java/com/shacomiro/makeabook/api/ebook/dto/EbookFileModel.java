@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.hateoas.RepresentationModel;
 
-import com.shacomiro.makeabook.domain.rds.ebookfile.entity.EbookFile;
+import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,12 +28,12 @@ public class EbookFileModel extends RepresentationModel<EbookFileModel> {
 	private LocalDateTime expiredAt;
 	private String owner;
 
-	public EbookFileModel(EbookFile source) {
+	public EbookFileModel(Ebook source) {
 		copyProperties(source, this);
 
 		this.ebookId = source.getUuid();
-		this.ebookName = source.getFilename();
-		this.ebookType = source.getFileType();
+		this.ebookName = source.getName();
+		this.ebookType = source.getType();
 		this.owner = ObjectUtils.isEmpty(source.getUser()) ? "guest" : source.getUser().getUsername();
 	}
 }

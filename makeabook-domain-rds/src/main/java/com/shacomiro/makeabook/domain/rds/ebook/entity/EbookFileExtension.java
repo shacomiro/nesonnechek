@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.domain.rds.ebookfile.entity;
+package com.shacomiro.makeabook.domain.rds.ebook.entity;
 
 public enum EbookFileExtension {
 	EPUB2("epub2");

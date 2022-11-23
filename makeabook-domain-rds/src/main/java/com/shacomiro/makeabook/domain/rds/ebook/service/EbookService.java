@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.domain.rds.ebookfile.service;
+package com.shacomiro.makeabook.domain.rds.ebook.service;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,15 +10,14 @@ import java.util.UUID;
 import javax.transaction.Transactional;
 
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.shacomiro.makeabook.core.util.IOUtils;
-import com.shacomiro.makeabook.domain.rds.ebookfile.entity.EbookFile;
-import com.shacomiro.makeabook.domain.rds.ebookfile.entity.EbookFileExtension;
-import com.shacomiro.makeabook.domain.rds.ebookfile.repository.EbookFileRepository;
+import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
+import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookFileExtension;
+import com.shacomiro.makeabook.domain.rds.ebook.repository.EbookRepository;
 import com.shacomiro.makeabook.ebook.EbookManager;
 import com.shacomiro.makeabook.ebook.domain.ContentTempFileInfo;
 import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
@@ -26,20 +25,18 @@ import com.shacomiro.makeabook.ebook.error.FileIOException;
 
 @Service
 @Transactional
-public class EbookFileService {
+public class EbookService {
 	private static final String RESOURCES_DIR = "./files";
 	private final EbookManager ebookManager;
-	private final EbookFileRepository ebookFileRepository;
-	@Value("${secret.api.root-url}")
-	private String apiServerUrl;
+	private final EbookRepository ebookRepository;
 
-	public EbookFileService(EbookFileRepository ebookFileRepository) {
-		this.ebookFileRepository = ebookFileRepository;
+	public EbookService(EbookRepository ebookRepository) {
+		this.ebookRepository = ebookRepository;
 		this.ebookManager = new EbookManager(RESOURCES_DIR);
 	}
 
-	public Optional<EbookFile> createEpub(MultipartFile file, EbookFileExtension ebookFileExtension) {
-		Optional<EbookFile> ebookFile = Optional.empty();
+	public Optional<Ebook> createEpub(MultipartFile file, EbookFileExtension ebookFileExtension) {
+		Optional<Ebook> ebook = Optional.empty();
 		String uuid = UUID.randomUUID().toString();
 		EpubFileInfo epubFileInfo;
 		String ebookExtension;
@@ -50,13 +47,12 @@ public class EbookFileService {
 			epubFileInfo = ebookManager.translateTxtToEpub2(uuid, file.getOriginalFilename(), contentTempFileInfo);
 			ebookExtension = EbookFileExtension.EPUB2.getEbookExt().toLowerCase();
 
-			ebookFile = Optional.of(ebookFileRepository
-					.save(EbookFile.byEbookFileInfo()
+			ebook = Optional.of(ebookRepository
+					.save(Ebook.byEbookFileInfo()
 							.uuid(uuid)
-							.filename(epubFileInfo.getFileName())
-							.fileType(ebookExtension)
-							.fileExtension("epub")
-							.downloadUrl(apiServerUrl + "/api/ebook/" + uuid)
+							.name(epubFileInfo.getFileName())
+							.type(ebookExtension)
+							.extension("epub")
 							.build())
 			);
 		}
@@ -67,23 +63,22 @@ public class EbookFileService {
 			throw new RuntimeException(e);
 		}
 
-		return ebookFile;
+		return ebook;
 	}
 
-	public Optional<EbookFile> findEbookFileByUuid(String uuid) {
-		return ebookFileRepository.findByUuid(uuid);
+	public Optional<Ebook> findEbookFileByUuid(String uuid) {
+		return ebookRepository.findByUuid(uuid);
 	}
 
-	public Optional<ByteArrayResource> getEpubAsResource(EbookFile ebookFile) {
-		Path path = ebookManager.getEpubFilePath(ebookFile.getFileType(),
-				ebookFile.getUuid() + "." + ebookFile.getFileExtension());
+	public Optional<ByteArrayResource> getEpubAsResource(Ebook ebook) {
+		Path path = ebookManager.getEpubFilePath(ebook.getType(), ebook.getFileName());
 
 		if (Files.exists(path)) {
 			try {
-				ebookFile.addDownloadCount();
-				ebookFileRepository.save(ebookFile);
+				ebook.addDownloadCount();
+				ebookRepository.save(ebook);
 
-				return Optional.of(new ByteArrayResource(Files.readAllBytes(path), ebookFile.getFilename()));
+				return Optional.of(new ByteArrayResource(Files.readAllBytes(path), ebook.getName()));
 			} catch (IOException e) {
 				throw new FileIOException("Fail to load file", e);
 			}

@@ -4,7 +4,7 @@ import java.util.Locale;
 
 import org.springframework.format.Formatter;
 
-import com.shacomiro.makeabook.domain.rds.ebookfile.entity.EbookFileExtension;
+import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookFileExtension;
 
 public class EbookExtensionFormatter implements Formatter<EbookFileExtension> {
 
