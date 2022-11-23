@@ -69,9 +69,9 @@ public class Ebook {
 		this.isExist = defaultIfNull(isExist, true);
 		this.user = user;
 	}
-	
+
 	public String getFileName() {
-		return name + "." + extension;
+		return uuid + "." + extension;
 	}
 
 	public void addDownloadCount() {
