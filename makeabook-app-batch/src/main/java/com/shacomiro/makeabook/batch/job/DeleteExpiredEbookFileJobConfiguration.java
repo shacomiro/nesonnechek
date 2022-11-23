@@ -21,7 +21,7 @@ import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilde
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.shacomiro.makeabook.domain.rds.ebookfile.entity.EbookFile;
+import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,53 +37,53 @@ public class DeleteExpiredEbookFileJobConfiguration {
 	private static final int CHUNK_SIZE = 10;
 
 	@Bean
-	public Job deleteExpiredEbookFileJob() {
-		return jobBuilderFactory.get("deleteExpiredEbookFileJob")
-				.start(deleteExpiredEbookFileStep())
+	public Job deleteExpiredEbookJob() {
+		return jobBuilderFactory.get("deleteExpiredEbookJob")
+				.start(deleteExpiredEbookStep())
 				.build();
 	}
 
 	@Bean
 	@JobScope
-	public Step deleteExpiredEbookFileStep() {
-		return stepBuilderFactory.get("deleteExpiredEbookFileStep")
-				.<EbookFile, EbookFile>chunk(CHUNK_SIZE)
-				.reader(ebookFileReader())
-				.processor(deleteExpiredEbookFileProcessor())
-				.writer(ebookFileWriter())
+	public Step deleteExpiredEbookStep() {
+		return stepBuilderFactory.get("deleteExpiredEbookStep")
+				.<Ebook, Ebook>chunk(CHUNK_SIZE)
+				.reader(ebookReader())
+				.processor(deleteExpiredEbookProcessor())
+				.writer(ebookWriter())
 				.build();
 	}
 
 	@Bean
 	@StepScope
-	public JpaPagingItemReader<EbookFile> ebookFileReader() {
-		return new JpaPagingItemReaderBuilder<EbookFile>()
-				.name("expiredEbookFileReader")
+	public JpaPagingItemReader<Ebook> ebookReader() {
+		return new JpaPagingItemReaderBuilder<Ebook>()
+				.name("expiredEbookReader")
 				.entityManagerFactory(emf)
 				.pageSize(CHUNK_SIZE)
-				.queryString("SELECT ef FROM EbookFile ef")
+				.queryString("SELECT ef FROM Ebook ef")
 				.build();
 	}
 
 	@Bean
 	@StepScope
-	public ItemProcessor<EbookFile, EbookFile> deleteExpiredEbookFileProcessor() {
-		return ebookFile -> {
+	public ItemProcessor<Ebook, Ebook> deleteExpiredEbookProcessor() {
+		return ebook -> {
 
-			if (ebookFile.isExpired()) {
-				Path targetPath = Paths.get("./files/ebook/", ebookFile.getFileType() + "/",
-						ebookFile.getUuid() + "." + ebookFile.getFileExtension()).normalize().toAbsolutePath();
+			if (ebook.isExpired()) {
+				Path targetPath = Paths.get("./files/ebook/", ebook.getType() + "/",
+						ebook.getUuid() + "." + ebook.getExtension()).normalize().toAbsolutePath();
 				boolean isDeleted = Files.deleteIfExists(targetPath);
 				if (isDeleted) {
-					ebookFile.updateExists();
+					ebook.updateExists();
 				}
 				log.info(
 						">>> EbookFile(uuid={}, filename={}, expiredAt={}) is expired! :: (isExist={}, isExpired={}, isDeleted={})",
-						ebookFile.getUuid(), ebookFile.getFilename(), ebookFile.getExpiredAt(), ebookFile.isExist(),
-						ebookFile.isExpired(),
+						ebook.getUuid(), ebook.getName(), ebook.getExpiredAt(), ebook.isExist(),
+						ebook.isExpired(),
 						isDeleted);
 
-				return ebookFile;
+				return ebook;
 			} else {
 				return null;
 			}
@@ -92,8 +92,8 @@ public class DeleteExpiredEbookFileJobConfiguration {
 
 	@Bean
 	@StepScope
-	public JpaItemWriter<EbookFile> ebookFileWriter() {
-		return new JpaItemWriterBuilder<EbookFile>()
+	public JpaItemWriter<Ebook> ebookWriter() {
+		return new JpaItemWriterBuilder<Ebook>()
 				.entityManagerFactory(emf)
 				.build();
 	}
