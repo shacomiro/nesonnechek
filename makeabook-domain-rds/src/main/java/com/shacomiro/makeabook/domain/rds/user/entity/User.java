@@ -19,9 +19,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 	@Id
-	@Column(name = "seq")
+	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long seq;
+	private Long id;
 
 	@Column(name = "email")
 	private String email;
