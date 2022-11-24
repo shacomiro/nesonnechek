@@ -30,8 +30,8 @@ public class EbookResponseModelAssembler extends RepresentationModelAssemblerSup
 
 		ebookModel.setUuid(entity.getUuid());
 		ebookModel.setName(entity.getName());
-		ebookModel.setType(entity.getType());
-		ebookModel.setExtension(entity.getExtension());
+		ebookModel.setType(entity.getType().getValue());
+		ebookModel.setExtension(entity.getExtension().getValue());
 		ebookModel.setDownloadCount(entity.getDownloadCount());
 		ebookModel.setCreatedAt(entity.getCreatedAt());
 		ebookModel.setExpiredAt(entity.getExpiredAt());

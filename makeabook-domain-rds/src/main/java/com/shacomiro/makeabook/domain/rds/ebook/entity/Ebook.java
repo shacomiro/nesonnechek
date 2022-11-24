@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -34,10 +36,12 @@ public class Ebook {
 	private String uuid;
 	@Column(name = "name")
 	private String name;
+	@Enumerated(EnumType.STRING)
 	@Column(name = "type")
-	private String type;
+	private EbookType type;
+	@Enumerated(EnumType.STRING)
 	@Column(name = "extension")
-	private String extension;
+	private EbookExtension extension;
 	@Column(name = "download_count")
 	private int downloadCount;
 	@Column(name = "created_at")
@@ -51,12 +55,12 @@ public class Ebook {
 	private User user;
 
 	@Builder(builderClassName = "ByEbookFileInfo", builderMethodName = "byEbookFileInfo")
-	public Ebook(String uuid, String name, String type, String extension, User user) {
+	public Ebook(String uuid, String name, EbookType type, EbookExtension extension, User user) {
 		this(null, uuid, name, type, extension, 0, null, null, true, user);
 	}
 
 	@Builder(builderClassName = "ByAllArguments", builderMethodName = "byAllArguments")
-	public Ebook(Long id, String uuid, String name, String type, String extension,
+	public Ebook(Long id, String uuid, String name, EbookType type, EbookExtension extension,
 			int downloadCount, LocalDateTime createdAt, LocalDateTime expiredAt, boolean isExist, User user) {
 		this.id = id;
 		this.uuid = uuid;

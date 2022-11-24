@@ -50,8 +50,8 @@ public class EbookService {
 					.save(Ebook.byEbookFileInfo()
 							.uuid(uuid)
 							.name(epubFileInfo.getFileName())
-							.type(EbookType.EPUB2.getType())
-							.extension(EbookExtension.EPUB.getExtension())
+							.type(EbookType.EPUB2)
+							.extension(EbookExtension.EPUB)
 							.build())
 			);
 		}
@@ -70,7 +70,7 @@ public class EbookService {
 	}
 
 	public Optional<ByteArrayResource> getEpubAsResource(Ebook ebook) {
-		Path path = ebookManager.getEpubFilePath(ebook.getType(), ebook.getFileName());
+		Path path = ebookManager.getEpubFilePath(ebook.getType().getValue(), ebook.getFileName());
 
 		if (Files.exists(path)) {
 			try {
