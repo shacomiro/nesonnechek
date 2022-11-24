@@ -16,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.shacomiro.makeabook.core.util.IOUtils;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
-import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookExtension;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookType;
 import com.shacomiro.makeabook.domain.rds.ebook.repository.EbookRepository;
 import com.shacomiro.makeabook.ebook.EbookManager;
@@ -51,7 +50,6 @@ public class EbookService {
 							.uuid(uuid)
 							.name(epubFileInfo.getFileName())
 							.type(EbookType.EPUB2)
-							.extension(EbookExtension.EPUB)
 							.build())
 			);
 		}
@@ -71,7 +69,7 @@ public class EbookService {
 
 	public Optional<ByteArrayResource> getEbookResource(Ebook ebook) {
 		ebook.verifyExpiration();
-		Path path = ebookManager.getEpubFilePath(ebook.getType().getValue(), ebook.getFileName());
+		Path path = ebookManager.getEpubFilePath(ebook.getType().getValue(), ebook.getOriginalFileName());
 
 		if (Files.exists(path)) {
 			try {

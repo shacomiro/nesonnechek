@@ -74,8 +74,7 @@ public class EbookRestApi {
 							HttpHeaders headers = new HttpHeaders();
 							headers.add(HttpHeaders.CONTENT_DISPOSITION,
 									ContentDisposition.builder("attachment")
-											.filename(ebook.getName() + "."
-													+ ebook.getExtension(), StandardCharsets.UTF_8)
+											.filename(ebook.getEbookFileName(), StandardCharsets.UTF_8)
 											.build()
 											.toString());
 							headers.add(HttpHeaders.CONTENT_TYPE, "application/epub+zip");

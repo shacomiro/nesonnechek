@@ -24,7 +24,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.shacomiro.makeabook.batch.config.TestBatchConfig;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
-import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookExtension;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookType;
 import com.shacomiro.makeabook.domain.rds.ebook.repository.EbookRepository;
 
@@ -42,7 +41,6 @@ public class DeleteExpiredEbookJobConfigurationTest {
 					.id(null).uuid(uuid)
 					.name("test_file" + i)
 					.type(EbookType.EPUB2)
-					.extension(EbookExtension.EPUB)
 					.downloadCount(0)
 					.createdAt(LocalDateTime.now().minusDays(i * 4))
 					.expiredAt(LocalDateTime.now().minusDays(i * 4).plusDays(7))

@@ -40,9 +40,6 @@ public class Ebook {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "type")
 	private EbookType type;
-	@Enumerated(EnumType.STRING)
-	@Column(name = "extension")
-	private EbookExtension extension;
 	@Column(name = "download_count")
 	private int downloadCount;
 	@Column(name = "created_at")
@@ -56,18 +53,17 @@ public class Ebook {
 	private User user;
 
 	@Builder(builderClassName = "ByEbookFileInfo", builderMethodName = "byEbookFileInfo")
-	public Ebook(String uuid, String name, EbookType type, EbookExtension extension, User user) {
-		this(null, uuid, name, type, extension, 0, null, null, true, user);
+	public Ebook(String uuid, String name, EbookType type, User user) {
+		this(null, uuid, name, type, 0, null, null, true, user);
 	}
 
 	@Builder(builderClassName = "ByAllArguments", builderMethodName = "byAllArguments")
-	public Ebook(Long id, String uuid, String name, EbookType type, EbookExtension extension,
+	public Ebook(Long id, String uuid, String name, EbookType type,
 			int downloadCount, LocalDateTime createdAt, LocalDateTime expiredAt, boolean isExist, User user) {
 		this.id = id;
 		this.uuid = uuid;
 		this.name = name;
 		this.type = type;
-		this.extension = extension;
 		this.downloadCount = downloadCount;
 		this.createdAt = defaultIfNull(createdAt, now());
 		this.expiredAt = defaultIfNull(expiredAt, now().plusDays(3));
@@ -75,8 +71,12 @@ public class Ebook {
 		this.user = user;
 	}
 
-	public String getFileName() {
-		return uuid + "." + extension;
+	public String getOriginalFileName() {
+		return uuid + type.getExtension();
+	}
+
+	public String getEbookFileName() {
+		return name + type.getExtension();
 	}
 
 	public void addDownloadCount() {

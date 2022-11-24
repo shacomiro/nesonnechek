@@ -72,7 +72,7 @@ public class DeleteExpiredEbookJobConfiguration {
 
 			if (ebook.isExpired()) {
 				Path targetPath = Paths.get("./files/ebook/", ebook.getType() + "/",
-						ebook.getUuid() + "." + ebook.getExtension()).normalize().toAbsolutePath();
+						ebook.getOriginalFileName()).normalize().toAbsolutePath();
 				boolean isDeleted = Files.deleteIfExists(targetPath);
 				if (isDeleted) {
 					ebook.updateExists();
