@@ -4,17 +4,17 @@ import java.util.Locale;
 
 import org.springframework.format.Formatter;
 
-import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookFileExtension;
+import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookExtension;
 
-public class EbookExtensionFormatter implements Formatter<EbookFileExtension> {
+public class EbookExtensionFormatter implements Formatter<EbookExtension> {
 
 	@Override
-	public EbookFileExtension parse(String text, Locale locale) {
-		return text.isEmpty() ? null : EbookFileExtension.valueOf(text.trim().toUpperCase());
+	public EbookExtension parse(String text, Locale locale) {
+		return text.isEmpty() ? null : EbookExtension.valueOf(text.trim().toUpperCase());
 	}
 
 	@Override
-	public String print(EbookFileExtension ebookFileExtension, Locale locale) {
-		return ebookFileExtension.toString().toLowerCase();
+	public String print(EbookExtension ebookExtension, Locale locale) {
+		return ebookExtension.toString().toLowerCase();
 	}
 }

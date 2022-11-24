@@ -19,21 +19,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 // @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class EbookFileModel extends RepresentationModel<EbookFileModel> {
-	private String ebookId;
-	private String ebookName;
-	private String ebookType;
-	private String downloadUrl;
+public class EbookModel extends RepresentationModel<EbookModel> {
+	private String uuid;
+	private String name;
+	private String type;
+	private String extension;
+	private int downloadCount;
 	private LocalDateTime createdAt;
 	private LocalDateTime expiredAt;
 	private String owner;
 
-	public EbookFileModel(Ebook source) {
+	public EbookModel(Ebook source) {
 		copyProperties(source, this);
 
-		this.ebookId = source.getUuid();
-		this.ebookName = source.getName();
-		this.ebookType = source.getType();
 		this.owner = ObjectUtils.isEmpty(source.getUser()) ? "guest" : source.getUser().getUsername();
 	}
 }

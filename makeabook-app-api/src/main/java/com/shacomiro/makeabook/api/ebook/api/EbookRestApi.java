@@ -21,8 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.shacomiro.makeabook.api.global.error.ExpiredException;
 import com.shacomiro.makeabook.api.global.error.NotFoundException;
-import com.shacomiro.makeabook.api.global.hateoas.assembler.EbookFileResponseModelAssembler;
-import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookFileExtension;
+import com.shacomiro.makeabook.api.global.hateoas.assembler.EbookResponseModelAssembler;
+import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookExtension;
 import com.shacomiro.makeabook.domain.rds.ebook.service.EbookService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -32,16 +32,16 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping(path = "api/ebook")
 public class EbookRestApi {
 	private final EbookService ebookService;
-	private final EbookFileResponseModelAssembler ebookFileResponseModelAssembler;
+	private final EbookResponseModelAssembler ebookResponseModelAssembler;
 
-	public EbookRestApi(EbookService ebookService, EbookFileResponseModelAssembler ebookFileResponseModelAssembler) {
+	public EbookRestApi(EbookService ebookService, EbookResponseModelAssembler ebookResponseModelAssembler) {
 		this.ebookService = ebookService;
-		this.ebookFileResponseModelAssembler = ebookFileResponseModelAssembler;
+		this.ebookResponseModelAssembler = ebookResponseModelAssembler;
 	}
 
 	@PostMapping(path = "")
-	public ResponseEntity<?> createEbookFile(
-			@RequestParam(name = "type", defaultValue = "epub2") EbookFileExtension ebookFileExtension,
+	public ResponseEntity<?> createEbook(
+			@RequestParam(name = "ebookExtension", defaultValue = "epub2") EbookExtension ebookExtension,
 			@RequestBody @RequestParam(name = "file") MultipartFile file) {
 		if (file.isEmpty()) {
 			throw new IllegalStateException("Upload file is empty");
@@ -50,26 +50,26 @@ public class EbookRestApi {
 		}
 
 		return success(
-				ebookService.createEpub(file, ebookFileExtension)
+				ebookService.createEbook(file, ebookExtension)
 						.orElseThrow(() -> new NullPointerException("Fail to create ebook")),
-				ebookFileResponseModelAssembler,
+				ebookResponseModelAssembler,
 				HttpStatus.CREATED
 		);
 	}
 
 	@GetMapping(path = "{uuid}")
-	public ResponseEntity<?> getEbookFile(@PathVariable String uuid) {
+	public ResponseEntity<?> getEbook(@PathVariable String uuid) {
 		return success(
-				ebookService.findEbookFileByUuid(uuid)
+				ebookService.findEbookByUuid(uuid)
 						.orElseThrow(() -> new NotFoundException("Ebook is not found")),
-				ebookFileResponseModelAssembler,
+				ebookResponseModelAssembler,
 				HttpStatus.OK
 		);
 	}
 
 	@GetMapping(path = "{uuid}/file", produces = "application/epub+zip")
-	public ResponseEntity<Resource> downloadEbookFile(@PathVariable String uuid) {
-		return ebookService.findEbookFileByUuid(uuid)
+	public ResponseEntity<Resource> downloadEbook(@PathVariable String uuid) {
+		return ebookService.findEbookByUuid(uuid)
 				.map(ebook -> {
 					if (ebook.isExpired()) {
 						throw new ExpiredException("Ebook is expired");

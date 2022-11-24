@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.shacomiro.makeabook.core.util.IOUtils;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
-import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookFileExtension;
+import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookExtension;
 import com.shacomiro.makeabook.domain.rds.ebook.repository.EbookRepository;
 import com.shacomiro.makeabook.ebook.EbookManager;
 import com.shacomiro.makeabook.ebook.domain.ContentTempFileInfo;
@@ -35,23 +35,21 @@ public class EbookService {
 		this.ebookManager = new EbookManager(RESOURCES_DIR);
 	}
 
-	public Optional<Ebook> createEpub(MultipartFile file, EbookFileExtension ebookFileExtension) {
+	public Optional<Ebook> createEbook(MultipartFile file, EbookExtension ebookExtension) {
 		Optional<Ebook> ebook = Optional.empty();
 		String uuid = UUID.randomUUID().toString();
 		EpubFileInfo epubFileInfo;
-		String ebookExtension;
 
 		ContentTempFileInfo contentTempFileInfo = saveUploadToTempFile(file);
 
-		if (ebookFileExtension.equals(EbookFileExtension.EPUB2)) {
+		if (ebookExtension.equals(EbookExtension.EPUB2)) {
 			epubFileInfo = ebookManager.translateTxtToEpub2(uuid, file.getOriginalFilename(), contentTempFileInfo);
-			ebookExtension = EbookFileExtension.EPUB2.getEbookExt().toLowerCase();
 
 			ebook = Optional.of(ebookRepository
 					.save(Ebook.byEbookFileInfo()
 							.uuid(uuid)
 							.name(epubFileInfo.getFileName())
-							.type(ebookExtension)
+							.type(EbookExtension.EPUB2.getEbookExt())
 							.extension("epub")
 							.build())
 			);
@@ -66,7 +64,7 @@ public class EbookService {
 		return ebook;
 	}
 
-	public Optional<Ebook> findEbookFileByUuid(String uuid) {
+	public Optional<Ebook> findEbookByUuid(String uuid) {
 		return ebookRepository.findByUuid(uuid);
 	}
 

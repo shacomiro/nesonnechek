@@ -1,11 +1,11 @@
 package com.shacomiro.makeabook.domain.rds.ebook.entity;
 
-public enum EbookFileExtension {
+public enum EbookExtension {
 	EPUB2("epub2");
 
 	private final String ebookExt;
 
-	EbookFileExtension(String ebookExt) {
+	EbookExtension(String ebookExt) {
 		this.ebookExt = ebookExt;
 	}
 
