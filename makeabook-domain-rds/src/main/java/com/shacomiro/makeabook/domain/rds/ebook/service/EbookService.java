@@ -69,7 +69,8 @@ public class EbookService {
 		return ebookRepository.findByUuid(uuid);
 	}
 
-	public Optional<ByteArrayResource> getEpubAsResource(Ebook ebook) {
+	public Optional<ByteArrayResource> getEbookResource(Ebook ebook) {
+		ebook.verifyExpiration();
 		Path path = ebookManager.getEpubFilePath(ebook.getType().getValue(), ebook.getFileName());
 
 		if (Files.exists(path)) {

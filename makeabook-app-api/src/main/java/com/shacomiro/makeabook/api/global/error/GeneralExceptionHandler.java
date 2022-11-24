@@ -13,6 +13,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import com.shacomiro.makeabook.domain.rds.ebook.exception.EbookExpiredException;
 import com.shacomiro.makeabook.ebook.error.FileIOException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,7 @@ public class GeneralExceptionHandler {
 			MethodArgumentTypeMismatchException.class,
 			MultipartException.class,
 			HttpRequestMethodNotSupportedException.class,
-			ExpiredException.class
+			EbookExpiredException.class
 	})
 	public ResponseEntity<?> handleBadRequestException(Exception e) {
 		log.debug("Bad request exception occurred: {}", e.getMessage(), e);

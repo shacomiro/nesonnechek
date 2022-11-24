@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.shacomiro.makeabook.api.global.error.ExpiredException;
 import com.shacomiro.makeabook.api.global.error.NotFoundException;
 import com.shacomiro.makeabook.api.global.hateoas.assembler.EbookResponseModelAssembler;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookType;
@@ -70,28 +69,22 @@ public class EbookRestApi {
 	@GetMapping(path = "{uuid}/file", produces = "application/epub+zip")
 	public ResponseEntity<Resource> downloadEbook(@PathVariable String uuid) {
 		return ebookService.findEbookByUuid(uuid)
-				.map(ebook -> {
-					if (ebook.isExpired()) {
-						throw new ExpiredException("Ebook is expired");
-					} else {
-						return ebookService.getEpubAsResource(ebook)
-								.map(resource -> {
-									HttpHeaders headers = new HttpHeaders();
-									headers.add(HttpHeaders.CONTENT_DISPOSITION,
-											ContentDisposition.builder("attachment")
-													.filename(ebook.getName() + "."
-															+ ebook.getExtension(), StandardCharsets.UTF_8)
-													.build()
-													.toString());
-									headers.add(HttpHeaders.CONTENT_TYPE, "application/epub+zip");
-									headers.add(HttpHeaders.CONTENT_LENGTH,
-											Long.toString(resource.getByteArray().length));
+				.map(ebook -> ebookService.getEbookResource(ebook)
+						.map(resource -> {
+							HttpHeaders headers = new HttpHeaders();
+							headers.add(HttpHeaders.CONTENT_DISPOSITION,
+									ContentDisposition.builder("attachment")
+											.filename(ebook.getName() + "."
+													+ ebook.getExtension(), StandardCharsets.UTF_8)
+											.build()
+											.toString());
+							headers.add(HttpHeaders.CONTENT_TYPE, "application/epub+zip");
+							headers.add(HttpHeaders.CONTENT_LENGTH,
+									Long.toString(resource.getByteArray().length));
 
-									return new ResponseEntity<>((Resource)resource, headers, HttpStatus.OK);
-								})
-								.orElseThrow(() -> new NotFoundException("Fail to load ebook resource"));
-					}
-				})
+							return new ResponseEntity<>((Resource)resource, headers, HttpStatus.OK);
+						})
+						.orElseThrow(() -> new NotFoundException("Fail to load ebook resource")))
 				.orElseThrow(() -> new NotFoundException("Ebook does not exist"));
 	}
 }

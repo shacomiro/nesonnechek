@@ -16,6 +16,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.shacomiro.makeabook.domain.rds.ebook.exception.EbookExpiredException;
 import com.shacomiro.makeabook.domain.rds.user.entity.User;
 
 import lombok.AccessLevel;
@@ -83,10 +84,16 @@ public class Ebook {
 	}
 
 	public boolean isExpired() {
-		return !isExist || expiredAt.compareTo(now()) < 0;
+		return !isExist || LocalDateTime.now().isAfter(expiredAt);
 	}
 
 	public void updateExists() {
 		this.isExist = false;
+	}
+
+	public void verifyExpiration() {
+		if (isExpired()) {
+			throw new EbookExpiredException("Ebook '" + name + "' is expired");
+		}
 	}
 }
