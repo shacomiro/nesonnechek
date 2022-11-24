@@ -22,7 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.shacomiro.makeabook.api.global.error.ExpiredException;
 import com.shacomiro.makeabook.api.global.error.NotFoundException;
 import com.shacomiro.makeabook.api.global.hateoas.assembler.EbookResponseModelAssembler;
-import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookExtension;
+import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookType;
 import com.shacomiro.makeabook.domain.rds.ebook.service.EbookService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +41,7 @@ public class EbookRestApi {
 
 	@PostMapping(path = "")
 	public ResponseEntity<?> createEbook(
-			@RequestParam(name = "ebookExtension", defaultValue = "epub2") EbookExtension ebookExtension,
+			@RequestParam(name = "type", defaultValue = "epub2") EbookType ebookType,
 			@RequestBody @RequestParam(name = "file") MultipartFile file) {
 		if (file.isEmpty()) {
 			throw new IllegalStateException("Upload file is empty");
@@ -50,7 +50,7 @@ public class EbookRestApi {
 		}
 
 		return success(
-				ebookService.createEbook(file, ebookExtension)
+				ebookService.createEbook(file, ebookType)
 						.orElseThrow(() -> new NullPointerException("Fail to create ebook")),
 				ebookResponseModelAssembler,
 				HttpStatus.CREATED
