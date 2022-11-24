@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 @EnableBatchProcessing
 @RequiredArgsConstructor
-public class DeleteExpiredEbookFileJobConfiguration {
+public class DeleteExpiredEbookJobConfiguration {
 	private final JobBuilderFactory jobBuilderFactory;
 	private final StepBuilderFactory stepBuilderFactory;
 	private final EntityManagerFactory emf;

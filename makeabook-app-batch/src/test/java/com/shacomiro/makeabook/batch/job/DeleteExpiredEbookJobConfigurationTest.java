@@ -24,7 +24,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.shacomiro.makeabook.batch.config.TestBatchConfig;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
-import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookFileExtension;
+import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookExtension;
 import com.shacomiro.makeabook.domain.rds.ebook.repository.EbookRepository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RunWith(SpringRunner.class)
 @SpringBatchTest
-@SpringBootTest(classes = {DeleteExpiredEbookFileJobConfiguration.class, TestBatchConfig.class})
+@SpringBootTest(classes = {DeleteExpiredEbookJobConfiguration.class, TestBatchConfig.class})
 public class DeleteExpiredEbookJobConfigurationTest {
 	private static final List<Ebook> TEST_EBOOKS = new ArrayList<>() {{
 		for (int i = 1; i <= 3; i++) {
@@ -40,7 +40,7 @@ public class DeleteExpiredEbookJobConfigurationTest {
 			add(Ebook.byAllArguments()
 					.id(null).uuid(uuid)
 					.name("test_file" + i)
-					.type(EbookFileExtension.EPUB2.getEbookExt().toLowerCase())
+					.type(EbookExtension.EPUB2.getEbookExt().toLowerCase())
 					.extension("epub")
 					.downloadCount(0)
 					.createdAt(LocalDateTime.now().minusDays(i * 4))
@@ -63,7 +63,7 @@ public class DeleteExpiredEbookJobConfigurationTest {
 	@Test
 	@Order(1)
 	@DisplayName("만료된 전자책 파일 삭제 성공")
-	public void deleteExpiredEbookFileJobSuccess() throws Exception {
+	public void deleteExpiredEbookJobSuccess() throws Exception {
 		//given
 		ebookRepository.saveAll(TEST_EBOOKS);
 
