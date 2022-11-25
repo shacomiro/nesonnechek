@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @Configuration
 @EntityScan({"com.shacomiro.makeabook.domain.rds"})
 @EnableJpaRepositories({"com.shacomiro.makeabook.domain.rds"})
-public class JpaConfig {
+public class JpaConfiguration {
 }
