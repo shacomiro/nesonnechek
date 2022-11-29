@@ -58,8 +58,8 @@ public class Ebook {
 	}
 
 	@Builder(builderClassName = "ByAllArguments", builderMethodName = "byAllArguments")
-	public Ebook(Long id, String uuid, String name, EbookType type,
-			int downloadCount, LocalDateTime createdAt, LocalDateTime expiredAt, boolean isExist, User user) {
+	public Ebook(Long id, String uuid, String name, EbookType type, int downloadCount, LocalDateTime createdAt,
+			LocalDateTime expiredAt, boolean isExist, User user) {
 		this.id = id;
 		this.uuid = uuid;
 		this.name = name;
@@ -84,10 +84,10 @@ public class Ebook {
 	}
 
 	public boolean isExpired() {
-		return !isExist || LocalDateTime.now().isAfter(expiredAt);
+		return !isExist || now().isAfter(expiredAt);
 	}
 
-	public void updateExists() {
+	public void ceaseToExist() {
 		this.isExist = false;
 	}
 

@@ -75,7 +75,7 @@ public class DeleteExpiredEbookJobConfiguration {
 						ebook.getOriginalFileName()).normalize().toAbsolutePath();
 				boolean isDeleted = Files.deleteIfExists(targetPath);
 				if (isDeleted) {
-					ebook.updateExists();
+					ebook.ceaseToExist();
 				}
 				log.info(
 						">>> EbookFile(uuid={}, filename={}, expiredAt={}) is expired! :: (isExist={}, isExpired={}, isDeleted={})",
