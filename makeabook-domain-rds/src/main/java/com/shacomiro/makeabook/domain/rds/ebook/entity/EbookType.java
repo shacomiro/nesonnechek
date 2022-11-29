@@ -1,21 +1,14 @@
 package com.shacomiro.makeabook.domain.rds.ebook.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
 public enum EbookType {
-	EPUB2("epub2", ".epub");
+	EPUB2("epub2", ".epub", "application/epub+zip");
 
 	private final String value;
 	private final String extension;
-
-	EbookType(String value, String extension) {
-		this.value = value;
-		this.extension = extension;
-	}
-
-	public String getValue() {
-		return value;
-	}
-
-	public String getExtension() {
-		return extension;
-	}
+	private final String contentType;
 }
