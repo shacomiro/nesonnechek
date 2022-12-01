@@ -3,6 +3,8 @@ package com.shacomiro.makeabook.domain.rds.user.entity;
 import static java.util.regex.Pattern.*;
 
 import javax.persistence.Embeddable;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -13,6 +15,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Email {
+	@NotBlank(message = "Email value must be provided")
+	@Size(min = 4, max = 50, message = "Email value length must be between 4 and 50 characters")
+	@javax.validation.constraints.Email(message = "Email value format must be like [user@example.com]")
 	private String value;
 
 	@Builder(builderClassName = "ByAllArguments", builderMethodName = "byAllArguments")
