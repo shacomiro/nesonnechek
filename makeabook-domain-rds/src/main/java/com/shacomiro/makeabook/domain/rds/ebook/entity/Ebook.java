@@ -15,6 +15,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import com.shacomiro.makeabook.domain.rds.ebook.exception.EbookExpiredException;
 import com.shacomiro.makeabook.domain.rds.user.entity.User;
@@ -34,19 +37,26 @@ public class Ebook {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	@Column(name = "uuid")
+	@NotBlank(message = "UUID must be provided")
+	@Size(min = 36, max = 36, message = "UUID value length must be 36 characters")
 	private String uuid;
 	@Column(name = "name")
+	@NotBlank(message = "Name must be provided")
 	private String name;
 	@Enumerated(EnumType.STRING)
 	@Column(name = "type")
 	private EbookType type;
 	@Column(name = "download_count")
+	@NotNull(message = "Download count must be provided")
 	private int downloadCount;
 	@Column(name = "created_at")
+	@NotNull(message = "Created date must be provided")
 	private LocalDateTime createdAt;
 	@Column(name = "expired_at")
+	@NotNull(message = "Expired date must be provided")
 	private LocalDateTime expiredAt;
 	@Column(name = "is_exist")
+	@NotNull(message = "exists must be provided")
 	private boolean isExist;
 	@ManyToOne
 	@JoinColumn(name = "user_id")
