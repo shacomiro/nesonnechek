@@ -20,6 +20,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.shacomiro.makeabook.domain.rds.ebook.exception.EbookExpiredException;
+import com.shacomiro.makeabook.domain.rds.global.validation.annotation.ValidEnum;
 import com.shacomiro.makeabook.domain.rds.user.entity.User;
 
 import lombok.AccessLevel;
@@ -45,6 +46,7 @@ public class Ebook {
 	private String name;
 	@Enumerated(EnumType.STRING)
 	@Column(name = "type")
+	@ValidEnum(enumClass = EbookType.class, message = "Ebook type value is invalid")
 	private EbookType type;
 	@Column(name = "download_count")
 	@NotNull(message = "Download count must be provided")
