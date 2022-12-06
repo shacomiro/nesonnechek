@@ -1,7 +1,6 @@
 package com.shacomiro.makeabook.domain.rds.ebook.entity;
 
 import static java.time.LocalDateTime.*;
-import static org.apache.commons.lang3.ObjectUtils.*;
 
 import java.time.LocalDateTime;
 
@@ -64,12 +63,11 @@ public class Ebook {
 	@JoinColumn(name = "user_id")
 	private User user;
 
-	@Builder(builderClassName = "ByEbookFileInfo", builderMethodName = "byEbookFileInfo")
+	@Builder(builderClassName = "ByEbookCreationResult", builderMethodName = "byEbookCreationResult")
 	public Ebook(String uuid, String name, EbookType type, User user) {
-		this(null, uuid, name, type, 0, null, null, true, user);
+		this(null, uuid, name, type, 0, now(), now().plusDays(3), true, user);
 	}
 
-	@Builder(builderClassName = "ByAllArguments", builderMethodName = "byAllArguments")
 	public Ebook(Long id, String uuid, String name, EbookType type, int downloadCount, LocalDateTime createdAt,
 			LocalDateTime expiredAt, boolean isExist, User user) {
 		this.id = id;
@@ -77,9 +75,9 @@ public class Ebook {
 		this.name = name;
 		this.type = type;
 		this.downloadCount = downloadCount;
-		this.createdAt = defaultIfNull(createdAt, now());
-		this.expiredAt = defaultIfNull(expiredAt, now().plusDays(3));
-		this.isExist = defaultIfNull(isExist, true);
+		this.createdAt = createdAt;
+		this.expiredAt = expiredAt;
+		this.isExist = isExist;
 		this.user = user;
 	}
 

@@ -20,7 +20,7 @@ public class Email {
 	@javax.validation.constraints.Email(message = "Email value format must be like [user@example.com]")
 	private String value;
 
-	@Builder(builderClassName = "ByAllArguments", builderMethodName = "byAllArguments")
+	@Builder(builderClassName = "ByValue", builderMethodName = "byValue")
 	public Email(String value) {
 		this.value = value;
 	}

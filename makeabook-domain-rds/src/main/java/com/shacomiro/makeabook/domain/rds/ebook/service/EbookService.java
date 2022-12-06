@@ -46,7 +46,7 @@ public class EbookService {
 			epubFileInfo = ebookManager.translateTxtToEpub2(uuid, file.getOriginalFilename(), contentTempFileInfo);
 
 			ebook = Optional.of(ebookRepository
-					.save(Ebook.byEbookFileInfo()
+					.save(Ebook.byEbookCreationResult()
 							.uuid(uuid)
 							.name(epubFileInfo.getFileName())
 							.type(EbookType.EPUB2)

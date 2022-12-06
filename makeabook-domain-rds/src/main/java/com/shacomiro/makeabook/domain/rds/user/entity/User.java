@@ -51,7 +51,11 @@ public class User {
 	@NotNull(message = "Created Date must be provided")
 	private LocalDateTime createdAt;
 
-	@Builder(builderClassName = "ByAllArguments", builderMethodName = "byAllArguments")
+	@Builder(builderClassName = "BySignUpDTO", builderMethodName = "bySignUpDTO")
+	public User(Email email, String password, String username) {
+		this(null, email, password, username, 0, null, now());
+	}
+
 	public User(Long id, Email email, String password, String username, int loginCount, LocalDateTime lastLoginAt,
 			LocalDateTime createdAt) {
 		this.id = id;
