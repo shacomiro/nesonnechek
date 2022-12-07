@@ -25,7 +25,7 @@ public class EbookResponseModelAssembler extends RepresentationModelAssemblerSup
 		ebookModel.add(linkTo(methodOn(EbookRestApi.class).getEbook(entity.getUuid())).withSelfRel());
 		if (!entity.isExpired()) {
 			ebookModel.add(linkTo(methodOn(EbookRestApi.class).downloadEbook(entity.getUuid()))
-					.withRel("download-ebook"));
+					.withRel("download"));
 		}
 
 		ebookModel.setUuid(entity.getUuid());
