@@ -57,7 +57,7 @@ public class GeneralExceptionHandler {
 			);
 		} else if (e instanceof MethodArgumentTypeMismatchException) {
 			return newResponse(
-					((MethodArgumentTypeMismatchException)e).getValue() + " is not supported ebook type",
+					((MethodArgumentTypeMismatchException)e).getValue() + " is not supported argument value",
 					HttpStatus.BAD_REQUEST
 			);
 		}
