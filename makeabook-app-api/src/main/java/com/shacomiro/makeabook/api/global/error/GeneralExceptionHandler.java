@@ -2,6 +2,7 @@ package com.shacomiro.makeabook.api.global.error;
 
 import static com.shacomiro.makeabook.api.global.util.ApiUtils.*;
 
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class GeneralExceptionHandler {
 
 	private ResponseEntity<?> newResponse(String message, HttpStatus status) {
 		HttpHeaders headers = new HttpHeaders();
-		headers.add(HttpHeaders.CONTENT_TYPE, "application/hal+json");
+		headers.add(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE);
 		return new ResponseEntity<>(error(message, status), headers, status);
 	}
 
