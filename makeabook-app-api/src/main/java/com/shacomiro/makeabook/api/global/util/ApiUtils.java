@@ -31,11 +31,11 @@ public class ApiUtils {
 	}
 
 	public static EntityModel<ApiError> error(Throwable throwable, HttpStatus status) {
-		return EntityModel.of(new ApiError(throwable, status), errorLinks());
+		return EntityModel.of(new ApiError(throwable, status), docsLink());
 	}
 
 	public static EntityModel<ApiError> error(String message, HttpStatus status) {
-		return EntityModel.of(new ApiError(message, status), errorLinks());
+		return EntityModel.of(new ApiError(message, status), docsLink());
 	}
 
 	public static String getCurrentApiRequest() {
