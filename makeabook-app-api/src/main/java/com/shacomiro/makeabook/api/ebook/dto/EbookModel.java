@@ -1,24 +1,28 @@
 package com.shacomiro.makeabook.api.ebook.dto;
 
-import static org.springframework.beans.BeanUtils.*;
-
 import java.time.LocalDateTime;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
-import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonRootName;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-// @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@JsonRootName(value = "ebook")
+@Relation(collectionRelation = "ebooks")
+@JsonInclude(Include.NON_NULL)
 public class EbookModel extends RepresentationModel<EbookModel> {
 	private String uuid;
 	private String name;
@@ -28,10 +32,4 @@ public class EbookModel extends RepresentationModel<EbookModel> {
 	private LocalDateTime createdAt;
 	private LocalDateTime expiredAt;
 	private String owner;
-
-	public EbookModel(Ebook source) {
-		copyProperties(source, this);
-
-		this.owner = ObjectUtils.isEmpty(source.getUser()) ? "guest" : source.getUser().getUsername();
-	}
 }

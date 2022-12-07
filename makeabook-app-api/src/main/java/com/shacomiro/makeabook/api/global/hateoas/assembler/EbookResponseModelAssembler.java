@@ -35,7 +35,7 @@ public class EbookResponseModelAssembler extends RepresentationModelAssemblerSup
 		ebookModel.setDownloadCount(entity.getDownloadCount());
 		ebookModel.setCreatedAt(entity.getCreatedAt());
 		ebookModel.setExpiredAt(entity.getExpiredAt());
-		ebookModel.setOwner(ObjectUtils.isEmpty(entity.getUser()) ? "guest" : entity.getUser().getUsername());
+		ebookModel.setOwner(ObjectUtils.isEmpty(entity.getUser()) ? null : entity.getUser().getUsername());
 
 		return ebookModel;
 	}
