@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.api.ebook.dto;
+package com.shacomiro.makeabook.api.ebook.dto.model;
 
 import java.time.LocalDateTime;
 

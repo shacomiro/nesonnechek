@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.api.global.hateoas.assembler;
+package com.shacomiro.makeabook.api.global.assembers;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
@@ -8,7 +8,7 @@ import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSuppor
 import org.springframework.stereotype.Component;
 
 import com.shacomiro.makeabook.api.ebook.api.EbookRestApi;
-import com.shacomiro.makeabook.api.ebook.dto.EbookModel;
+import com.shacomiro.makeabook.api.ebook.dto.model.EbookModel;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
 
 @Component
