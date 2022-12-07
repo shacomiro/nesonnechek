@@ -3,6 +3,8 @@ package com.shacomiro.makeabook.api.global.util;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
@@ -20,14 +22,27 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ApiUtils {
 
-	public static <T, D extends RepresentationModel<D>> ResponseEntity<D> success(T response,
-			RepresentationModelAssemblerSupport<T, D> representationModelAssembler, HttpStatus status) {
+	public static <T, D extends RepresentationModel<D>> ResponseEntity<D> success(
+			T response,
+			RepresentationModelAssemblerSupport<T, D> representationModelAssembler,
+			HttpStatus status) {
 		return new ResponseEntity<>(representationModelAssembler.toModel(response).add(docsLink()), status);
 	}
 
-	public static <T, D extends RepresentationModel<D>> ResponseEntity<CollectionModel<D>> success(List<T> response,
-			RepresentationModelAssemblerSupport<T, D> representationModelAssembler, HttpStatus status) {
+	public static <T, D extends RepresentationModel<D>> ResponseEntity<CollectionModel<D>> success(
+			List<T> response,
+			RepresentationModelAssemblerSupport<T, D> representationModelAssembler,
+			HttpStatus status) {
 		return new ResponseEntity<>(representationModelAssembler.toCollectionModel(response).add(docsLink()), status);
+	}
+
+	public static <T, D extends RepresentationModel<D>> ResponseEntity<CollectionModel<D>> success(
+			Page<T> response,
+			RepresentationModelAssemblerSupport<T, D> representationModelAssembler,
+			PagedResourcesAssembler<T> pagedResourcesAssembler,
+			HttpStatus status) {
+		return new ResponseEntity<>(pagedResourcesAssembler.toModel(response, representationModelAssembler).add(docsLink()),
+				status);
 	}
 
 	public static EntityModel<ApiError> error(Throwable throwable, HttpStatus status) {
