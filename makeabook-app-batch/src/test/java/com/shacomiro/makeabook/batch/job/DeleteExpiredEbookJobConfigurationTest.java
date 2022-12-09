@@ -23,26 +23,24 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.shacomiro.makeabook.batch.config.TestBatchConfig;
-import com.shacomiro.makeabook.domain.rds.ebookfile.entity.EbookFile;
-import com.shacomiro.makeabook.domain.rds.ebookfile.entity.EbookFileExtension;
-import com.shacomiro.makeabook.domain.rds.ebookfile.repository.EbookFileRepository;
+import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
+import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookType;
+import com.shacomiro.makeabook.domain.rds.ebook.repository.EbookRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RunWith(SpringRunner.class)
 @SpringBatchTest
-@SpringBootTest(classes = {DeleteExpiredEbookFileJobConfiguration.class, TestBatchConfig.class})
-public class DeleteExpiredEbookFileJobConfigurationTest {
-	private static final List<EbookFile> testEbookFiles = new ArrayList<>() {{
+@SpringBootTest(classes = {DeleteExpiredEbookJobConfiguration.class, TestBatchConfig.class})
+public class DeleteExpiredEbookJobConfigurationTest {
+	private static final List<Ebook> TEST_EBOOKS = new ArrayList<>() {{
 		for (int i = 1; i <= 3; i++) {
 			String uuid = UUID.randomUUID().toString();
-			add(EbookFile.byAllArguments()
-					.seq(null).uuid(uuid)
-					.filename("test_file" + i)
-					.fileType(EbookFileExtension.EPUB2.getEbookExt().toLowerCase())
-					.fileExtension("epub")
-					.downloadUrl("http://localhost:8080/api/ebook/download/" + uuid)
+			add(Ebook.byAllArguments()
+					.id(null).uuid(uuid)
+					.name("test_file" + i)
+					.type(EbookType.EPUB2)
 					.downloadCount(0)
 					.createdAt(LocalDateTime.now().minusDays(i * 4))
 					.expiredAt(LocalDateTime.now().minusDays(i * 4).plusDays(7))
@@ -54,19 +52,19 @@ public class DeleteExpiredEbookFileJobConfigurationTest {
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
 	@Autowired
-	private EbookFileRepository ebookFileRepository;
+	private EbookRepository ebookRepository;
 
 	@After
 	public void tearDown() {
-		ebookFileRepository.deleteAllInBatch(testEbookFiles);
+		ebookRepository.deleteAllInBatch(TEST_EBOOKS);
 	}
 
 	@Test
 	@Order(1)
 	@DisplayName("만료된 전자책 파일 삭제 성공")
-	public void deleteExpiredEbookFileJobSuccess() throws Exception {
+	public void deleteExpiredEbookJobSuccess() throws Exception {
 		//given
-		ebookFileRepository.saveAll(testEbookFiles);
+		ebookRepository.saveAll(TEST_EBOOKS);
 
 		JobParameters jobParameters = new JobParametersBuilder()
 				.addLong("date", System.currentTimeMillis())

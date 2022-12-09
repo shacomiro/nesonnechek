@@ -2,9 +2,11 @@ package com.shacomiro.makeabook.api.global.error;
 
 import static com.shacomiro.makeabook.api.global.util.ApiUtils.*;
 
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -12,6 +14,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import com.shacomiro.makeabook.domain.rds.ebook.exception.EbookExpiredException;
 import com.shacomiro.makeabook.ebook.error.FileIOException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +29,7 @@ public class GeneralExceptionHandler {
 
 	private ResponseEntity<?> newResponse(String message, HttpStatus status) {
 		HttpHeaders headers = new HttpHeaders();
-		headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
+		headers.add(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE);
 		return new ResponseEntity<>(error(message, status), headers, status);
 	}
 
@@ -43,7 +46,8 @@ public class GeneralExceptionHandler {
 			IllegalStateException.class,
 			MethodArgumentTypeMismatchException.class,
 			MultipartException.class,
-			ExpiredException.class
+			HttpRequestMethodNotSupportedException.class,
+			EbookExpiredException.class
 	})
 	public ResponseEntity<?> handleBadRequestException(Exception e) {
 		log.debug("Bad request exception occurred: {}", e.getMessage(), e);
@@ -54,7 +58,7 @@ public class GeneralExceptionHandler {
 			);
 		} else if (e instanceof MethodArgumentTypeMismatchException) {
 			return newResponse(
-					((MethodArgumentTypeMismatchException)e).getValue() + " is not supported ebook type",
+					((MethodArgumentTypeMismatchException)e).getValue() + " is not supported argument value",
 					HttpStatus.BAD_REQUEST
 			);
 		}
