@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.shacomiro.makeabook.api.global.assembers.EbookResponseModelAssembler;
 import com.shacomiro.makeabook.api.global.error.NotFoundException;
+import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookType;
 import com.shacomiro.makeabook.domain.rds.ebook.service.EbookService;
 
@@ -28,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping(path = "api/ebook")
+@RequestMapping(path = "api/ebooks")
 public class EbookRestApi {
 	private final EbookService ebookService;
 	private final EbookResponseModelAssembler ebookResponseModelAssembler;
@@ -38,8 +39,8 @@ public class EbookRestApi {
 		this.ebookResponseModelAssembler = ebookResponseModelAssembler;
 	}
 
-	@PostMapping(path = "")
-	public ResponseEntity<?> createEbook(
+	@PostMapping(path = "txt-ebook")
+	public ResponseEntity<?> createTxtEbook(
 			@RequestParam(name = "type", defaultValue = "epub2") EbookType ebookType,
 			@RequestBody @RequestParam(name = "file") MultipartFile file) {
 		if (file.isEmpty()) {
@@ -51,6 +52,16 @@ public class EbookRestApi {
 		return success(
 				ebookService.createEbook(file, ebookType)
 						.orElseThrow(() -> new NullPointerException("Fail to create ebook")),
+				ebookResponseModelAssembler,
+				HttpStatus.CREATED
+		);
+	}
+
+	@PostMapping(path = "files-ebook")
+	public ResponseEntity<?> createFilesEbook() {
+
+		return success(
+				(Ebook)null,
 				ebookResponseModelAssembler,
 				HttpStatus.CREATED
 		);
