@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.shacomiro.makeabook.api.global.assembers.EbookResponseModelAssembler;
 import com.shacomiro.makeabook.api.global.error.NotFoundException;
-import com.shacomiro.makeabook.api.global.hateoas.assembler.EbookResponseModelAssembler;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookType;
 import com.shacomiro.makeabook.domain.rds.ebook.service.EbookService;
 
