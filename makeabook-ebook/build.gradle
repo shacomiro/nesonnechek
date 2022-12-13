@@ -15,4 +15,7 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.12.0'
     implementation 'commons-io:commons-io:2.11.0'
     implementation project(':makeabook-core')
+    implementation 'org.slf4j:slf4j-api:2.0.5'
+    testImplementation 'org.slf4j:slf4j-simple:2.0.5'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
 }
