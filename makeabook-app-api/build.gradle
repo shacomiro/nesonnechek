@@ -1,6 +1,8 @@
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
     implementation project(':makeabook-domain-rds')
     implementation project(':makeabook-ebook')
