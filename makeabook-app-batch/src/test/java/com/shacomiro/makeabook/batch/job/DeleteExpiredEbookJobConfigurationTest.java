@@ -37,16 +37,16 @@ public class DeleteExpiredEbookJobConfigurationTest {
 	private static final List<Ebook> TEST_EBOOKS = new ArrayList<>() {{
 		for (int i = 1; i <= 3; i++) {
 			String uuid = UUID.randomUUID().toString();
-			add(Ebook.byAllArguments()
-					.id(null).uuid(uuid)
-					.name("test_file" + i)
-					.type(EbookType.EPUB2)
-					.downloadCount(0)
-					.createdAt(LocalDateTime.now().minusDays(i * 4))
-					.expiredAt(LocalDateTime.now().minusDays(i * 4).plusDays(7))
-					.isExist(true)
-					.user(null)
-					.build());
+			add(new Ebook(null,
+					uuid,
+					"test_file" + i,
+					EbookType.EPUB2,
+					0,
+					LocalDateTime.now().minusDays(i * 4),
+					LocalDateTime.now().minusDays(i * 4).plusDays(7),
+					true,
+					null)
+			);
 		}
 	}};
 	@Autowired
