@@ -22,3 +22,6 @@ spring:
   web:
     resources:
       add-mappings: false
+jwt:
+  secret:
+    key: ${secret.api.jwt.key}
