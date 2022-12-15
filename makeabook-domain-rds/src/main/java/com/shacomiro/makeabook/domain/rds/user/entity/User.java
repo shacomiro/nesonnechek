@@ -3,14 +3,21 @@ package com.shacomiro.makeabook.domain.rds.user.entity;
 import static java.time.LocalDateTime.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import javax.persistence.AttributeOverride;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -50,14 +57,19 @@ public class User {
 	@Column(name = "created_at")
 	@NotNull(message = "Created Date must be provided")
 	private LocalDateTime createdAt;
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+	@Enumerated(EnumType.STRING)
+	@Column(name = "role")
+	private List<UserRole> roles;
 
 	@Builder(builderClassName = "BySignUpDTO", builderMethodName = "bySignUpDTO")
-	public User(Email email, String password, String username) {
-		this(null, email, password, username, 0, null, now());
+	public User(Email email, String password, String username, List<UserRole> roles) {
+		this(null, email, password, username, 0, null, now(), roles);
 	}
 
 	public User(Long id, Email email, String password, String username, int loginCount, LocalDateTime lastLoginAt,
-			LocalDateTime createdAt) {
+			LocalDateTime createdAt, List<UserRole> roles) {
 		this.id = id;
 		this.email = email;
 		this.password = password;
@@ -65,6 +77,7 @@ public class User {
 		this.loginCount = loginCount;
 		this.lastLoginAt = lastLoginAt;
 		this.createdAt = createdAt;
+		this.roles = roles;
 	}
 
 	public void afterLoginSuccess() {
