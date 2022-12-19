@@ -25,6 +25,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.shacomiro.makeabook.domain.rds.global.validation.annotation.ValidEnumCollection;
+import com.shacomiro.makeabook.domain.rds.user.dto.SignUpDto;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -65,9 +67,10 @@ public class User {
 	@ValidEnumCollection(enumClass = UserRole.class, message = "User role value is invalid")
 	private List<UserRole> roles;
 
-	@Builder(builderClassName = "BySignUpDTO", builderMethodName = "bySignUpDTO")
-	public User(Email email, String password, String username, List<UserRole> roles) {
-		this(null, email, password, username, 0, null, now(), roles);
+	@Builder(builderClassName = "BySignUpDto", builderMethodName = "bySignUpDto")
+	public User(SignUpDto signUpDto, List<UserRole> roles) {
+		this(null, Email.byValue().value(signUpDto.getEmail()).build(), signUpDto.getEncryptedPassword(),
+				signUpDto.getUsername(), 0, null, now(), roles);
 	}
 
 	public User(Long id, Email email, String password, String username, int loginCount, LocalDateTime lastLoginAt,
