@@ -24,6 +24,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.shacomiro.makeabook.domain.rds.global.validation.annotation.ValidEnumCollection;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -61,6 +62,7 @@ public class User {
 	@CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
 	@Enumerated(EnumType.STRING)
 	@Column(name = "role")
+	@ValidEnumCollection(enumClass = UserRole.class, message = "User role value is invalid")
 	private List<UserRole> roles;
 
 	@Builder(builderClassName = "BySignUpDTO", builderMethodName = "bySignUpDTO")
