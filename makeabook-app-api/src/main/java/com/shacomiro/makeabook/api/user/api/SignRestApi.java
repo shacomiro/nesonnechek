@@ -28,6 +28,8 @@ public class SignRestApi {
 	public ResponseEntity<?> singUp(@RequestBody @Valid SignUpRequest signUpRequest) {
 		if (userService.findByEmail(Email.byValue().value(signUpRequest.getEmail()).build()).isPresent()) {
 			throw new RuntimeException("Duplicate email");
+		} else if (userService.findByUsername(signUpRequest.getUsername()).isPresent()) {
+			throw new RuntimeException("Duplicate username");
 		}
 
 		SignUpDto signUpDto = new SignUpDto(

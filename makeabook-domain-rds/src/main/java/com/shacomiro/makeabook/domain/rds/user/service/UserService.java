@@ -25,7 +25,11 @@ public class UserService {
 		return userRepository.findByEmail(email);
 	}
 
-	public User save(SignUpDto signUpDto) {
+	public Optional<User> findByUsername(String username) {
+		return userRepository.findByUsername(username);
+	}
+
+	public User save(@Valid SignUpDto signUpDto) {
 		return userRepository.save(
 				User.bySignUpDto()
 						.signUpDto(signUpDto)

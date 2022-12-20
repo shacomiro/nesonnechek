@@ -9,4 +9,6 @@ import com.shacomiro.makeabook.domain.rds.user.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 	public Optional<User> findByEmail(Email email);
+
+	public Optional<User> findByUsername(String username);
 }
