@@ -61,11 +61,11 @@ public class ApiUtils {
 		return ServletUriComponentsBuilder.fromCurrentServletMapping().toUriString();
 	}
 
-	private static List<Link> errorLinks() {
+	public static List<Link> errorLinks() {
 		return Arrays.asList(Link.of(getCurrentApiRequest()).withSelfRel(), docsLink());
 	}
 
-	private static Link docsLink() {
+	public static Link docsLink() {
 		return Link.of(getCurrentApiServletMapping() + "/api/static/docs/index.html").withRel("docs");
 	}
 
