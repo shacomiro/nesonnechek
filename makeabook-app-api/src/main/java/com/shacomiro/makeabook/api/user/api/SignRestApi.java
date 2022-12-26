@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.shacomiro.makeabook.api.global.error.NotFoundException;
+import com.shacomiro.makeabook.api.user.dto.SignInRequest;
 import com.shacomiro.makeabook.api.user.dto.SignUpRequest;
 import com.shacomiro.makeabook.api.user.dto.model.UserModel;
 import com.shacomiro.makeabook.domain.rds.user.dto.SignUpDto;
@@ -30,7 +32,14 @@ public class SignRestApi {
 	private final PasswordEncoder passwordEncoder;
 
 	@PostMapping(path = "signin")
-	public ResponseEntity<?> signIn() {
+	public ResponseEntity<?> signIn(@RequestBody @Valid SignInRequest signInRequest) {
+		User signInUser = userService.findByEmail(Email.byValue().value(signInRequest.getEmail()).build())
+				.orElseThrow(() -> new NotFoundException("User not found"));
+
+		if (!passwordEncoder.matches(signInRequest.getPassword(), signInUser.getPassword())) {
+			throw new RuntimeException("Password is incorrect");
+		}
+
 		return null;
 	}
 
@@ -54,7 +63,7 @@ public class SignRestApi {
 				.email(signUpUser.getEmail().getValue())
 				.createdAt(signUpUser.getCreatedAt())
 				.build();
-		userModel.add(linkTo(methodOn(SignRestApi.class).signIn()).withRel("signin"));
+		userModel.add(linkTo(methodOn(SignRestApi.class).signIn(null)).withRel("signin"));
 		userModel.add(docsLink());
 
 		return new ResponseEntity<>(userModel, HttpStatus.CREATED);
