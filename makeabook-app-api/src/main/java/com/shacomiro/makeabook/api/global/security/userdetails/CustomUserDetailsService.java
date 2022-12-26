@@ -5,7 +5,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.shacomiro.makeabook.api.global.error.NotFoundException;
 import com.shacomiro.makeabook.domain.rds.user.entity.Email;
 import com.shacomiro.makeabook.domain.rds.user.repository.UserRepository;
 
@@ -20,6 +19,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 	public UserDetails loadUserByUsername(String userUniqueKey) throws UsernameNotFoundException {
 		return userRepository.findByEmail(Email.byValue().value(userUniqueKey).build())
 				.map(CustomUserDetails::new)
-				.orElseThrow(() -> new NotFoundException("User '" + userUniqueKey + "' not found"));
+				.orElseThrow(() -> new UsernameNotFoundException("User '" + userUniqueKey + "' not found"));
 	}
 }
