@@ -14,10 +14,12 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shacomiro.makeabook.api.global.error.JwtException;
+import com.shacomiro.makeabook.api.global.security.policy.AuthenticationScheme;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,27 +35,35 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		String token = jwtProvider.resolveToken(request);
 
 		try {
-			if (token != null) {
+			if (token != null && token.contains(AuthenticationScheme.BEARER.getType())) {
+				token = token.replaceFirst(AuthenticationScheme.BEARER.getType(), "").trim();
 				jwtProvider.verifyToken(token);
+
+				if ((jwtProvider.parseClaims(token).get("typ", String.class).equals("refresh") &&
+						!request.getRequestURI().equals("/api/sign/reissue")) ||
+						(!jwtProvider.parseClaims(token).get("typ", String.class).equals("refresh")
+								&& request.getRequestURI().equals("/api/sign/reissue"))) {
+					throw new JwtException("Invalid JWT token");
+				}
 
 				Authentication authentication = jwtProvider.getAuthentication(token);
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			}
 
 			filterChain.doFilter(request, response);
-		} catch (JwtException e) {
+		} catch (UsernameNotFoundException | JwtException e) {
 			jwtExceptionHandle(request, response, e);
 		}
 	}
 
 	public void jwtExceptionHandle(HttpServletRequest request, HttpServletResponse response,
-			JwtException jwtException) throws IOException {
+			RuntimeException exception) throws IOException {
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		response.setContentType(MediaTypes.HAL_JSON_VALUE);
 		response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
 		response.getWriter()
-				.write(objectMapper.writeValueAsString(error(jwtException.getMessage(), HttpStatus.UNAUTHORIZED)));
+				.write(objectMapper.writeValueAsString(error(exception.getMessage(), HttpStatus.UNAUTHORIZED)));
 		response.getWriter().flush();
 	}
 }
