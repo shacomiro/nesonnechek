@@ -5,22 +5,24 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 import javax.validation.Valid;
 
+import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.shacomiro.makeabook.api.global.error.NotFoundException;
+import com.shacomiro.makeabook.api.global.security.service.SecurityService;
 import com.shacomiro.makeabook.api.user.dto.SignInRequest;
 import com.shacomiro.makeabook.api.user.dto.SignUpRequest;
 import com.shacomiro.makeabook.api.user.dto.model.UserModel;
+import com.shacomiro.makeabook.domain.rds.user.dto.SignInDto;
 import com.shacomiro.makeabook.domain.rds.user.dto.SignUpDto;
-import com.shacomiro.makeabook.domain.rds.user.entity.Email;
 import com.shacomiro.makeabook.domain.rds.user.entity.User;
-import com.shacomiro.makeabook.domain.rds.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,36 +30,30 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping(path = "api/sign")
 @RequiredArgsConstructor
 public class SignRestApi {
-	private final UserService userService;
+	private final SecurityService securityService;
 	private final PasswordEncoder passwordEncoder;
 
 	@PostMapping(path = "signin")
 	public ResponseEntity<?> signIn(@RequestBody @Valid SignInRequest signInRequest) {
-		User signInUser = userService.findByEmail(Email.byValue().value(signInRequest.getEmail()).build())
-				.orElseThrow(() -> new NotFoundException("User not found"));
-
-		if (!passwordEncoder.matches(signInRequest.getPassword(), signInUser.getPassword())) {
-			throw new RuntimeException("Password is incorrect");
-		}
-
-		return null;
+		return new ResponseEntity<>(
+				EntityModel.of(
+						securityService.signIn(new SignInDto(signInRequest.getEmail(), signInRequest.getPassword())),
+						linkTo(methodOn(SignRestApi.class).reissue(null)).withRel("reissue"),
+						docsLink()
+				),
+				HttpStatus.OK
+		);
 	}
 
 	@PostMapping(path = "signup")
 	public ResponseEntity<?> singUp(@RequestBody @Valid SignUpRequest signUpRequest) {
-		if (userService.findByEmail(Email.byValue().value(signUpRequest.getEmail()).build()).isPresent()) {
-			throw new RuntimeException("Duplicate email");
-		} else if (userService.findByUsername(signUpRequest.getUsername()).isPresent()) {
-			throw new RuntimeException("Duplicate username");
-		}
-
-		SignUpDto signUpDto = new SignUpDto(
-				signUpRequest.getEmail(),
-				passwordEncoder.encode(signUpRequest.getPassword()),
-				signUpRequest.getUsername()
+		User signUpUser = securityService.signUp(
+				new SignUpDto(
+						signUpRequest.getEmail(),
+						passwordEncoder.encode(signUpRequest.getPassword()),
+						signUpRequest.getUsername()
+				)
 		);
-
-		User signUpUser = userService.save(signUpDto);
 
 		UserModel userModel = UserModel.builder()
 				.email(signUpUser.getEmail().getValue())
@@ -67,5 +63,16 @@ public class SignRestApi {
 		userModel.add(docsLink());
 
 		return new ResponseEntity<>(userModel, HttpStatus.CREATED);
+	}
+
+	@PostMapping(path = "reissue")
+	public ResponseEntity<?> reissue(@RequestHeader(HttpHeaders.AUTHORIZATION) String refreshToken) {
+		return new ResponseEntity<>(
+				EntityModel.of(
+						securityService.reissue(refreshToken),
+						docsLink()
+				),
+				HttpStatus.OK
+		);
 	}
 }
