@@ -15,6 +15,7 @@ import com.shacomiro.makeabook.api.global.security.JwtAccessDeniedHandler;
 import com.shacomiro.makeabook.api.global.security.JwtAuthenticationEntryPoint;
 import com.shacomiro.makeabook.api.global.security.JwtAuthenticationFilter;
 import com.shacomiro.makeabook.api.global.security.JwtProvider;
+import com.shacomiro.makeabook.domain.redis.token.repository.JwtTokenRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +26,7 @@ public class WebSecurityConfiguration {
 	private final JwtProvider jwtProvider;
 	private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 	private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+	private final JwtTokenRepository jwtTokenRepository;
 	private final ObjectMapper objectMapper;
 
 	@Bean
@@ -45,7 +47,7 @@ public class WebSecurityConfiguration {
 				.authenticationEntryPoint(jwtAuthenticationEntryPoint)
 				.accessDeniedHandler(jwtAccessDeniedHandler)
 				.and()
-				.addFilterBefore(new JwtAuthenticationFilter(jwtProvider, objectMapper),
+				.addFilterBefore(new JwtAuthenticationFilter(jwtProvider, jwtTokenRepository, objectMapper),
 						UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();

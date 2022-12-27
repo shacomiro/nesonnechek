@@ -9,7 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.shacomiro.makeabook.api.global.error.ConflictException;
-import com.shacomiro.makeabook.api.global.error.JwtException;
 import com.shacomiro.makeabook.api.global.error.NotFoundException;
 import com.shacomiro.makeabook.api.global.security.JwtProvider;
 import com.shacomiro.makeabook.api.global.security.dto.TokenResponse;
@@ -20,9 +19,10 @@ import com.shacomiro.makeabook.domain.rds.user.entity.Email;
 import com.shacomiro.makeabook.domain.rds.user.entity.User;
 import com.shacomiro.makeabook.domain.rds.user.entity.UserRole;
 import com.shacomiro.makeabook.domain.rds.user.repository.UserRepository;
-import com.shacomiro.makeabook.domain.redis.token.domain.RefreshToken;
-import com.shacomiro.makeabook.domain.redis.token.repository.RefreshTokenRepository;
+import com.shacomiro.makeabook.domain.redis.token.entity.JwtToken;
+import com.shacomiro.makeabook.domain.redis.token.repository.JwtTokenRepository;
 
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -31,22 +31,35 @@ import lombok.RequiredArgsConstructor;
 public class SecurityService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
-	private final RefreshTokenRepository refreshTokenRepository;
+	private final JwtTokenRepository jwtTokenRepository;
 	private final JwtProvider jwtProvider;
 
 	public TokenResponse signIn(SignInDto signInDto) {
-		User signInUser = userRepository.findByEmail(Email.byValue().value(signInDto.getEmail()).build())
+		String emailValue = signInDto.getEmail();
+		User signInUser = userRepository.findByEmail(Email.byValue().value(emailValue).build())
 				.orElseThrow(() -> new NotFoundException("User not found"));
 
 		if (!passwordEncoder.matches(signInDto.getPassword(), signInUser.getPassword())) {
 			throw new IllegalArgumentException("Password is incorrect");
 		}
 
+		List<JwtToken> storedTokens = jwtTokenRepository.findAllByKey(emailValue);
+
+		if (!storedTokens.isEmpty()) {
+			jwtTokenRepository.deleteAll(storedTokens);
+		}
+
+		List<JwtToken> jwtTokens = saveJwtTokens(
+				emailValue,
+				jwtProvider.createAccessToken(emailValue),
+				jwtProvider.createRefreshToken(emailValue)
+		);
+
 		return new TokenResponse(
 				HttpHeaders.AUTHORIZATION,
 				AuthenticationScheme.BEARER.getType(),
-				jwtProvider.createAccessToken(signInUser.getEmail().getValue()),
-				saveRefreshToken(signInUser.getEmail().getValue()).getToken()
+				jwtTokens.get(0).getToken(),
+				jwtTokens.get(1).getToken()
 		);
 	}
 
@@ -66,28 +79,55 @@ public class SecurityService {
 	}
 
 	public TokenResponse reissue(String token) {
-		String refreshToken = token.replaceFirst(AuthenticationScheme.BEARER.getType(), "").trim();
+		String requestRefreshToken = token.replaceFirst(AuthenticationScheme.BEARER.getType(), "").trim();
+		Claims refreshClaims = jwtProvider.parseClaims(requestRefreshToken);
+		String emailValue = refreshClaims.getSubject();
+		String accessToken = jwtProvider.createAccessToken(emailValue);
 
-		String email = jwtProvider.parseClaims(refreshToken).getSubject();
+		JwtToken jwtAccessToken = saveJwtToken(emailValue, accessToken, 1000L * 60 * 30);
 
-		return refreshTokenRepository.findById(email)
-				.map(redisRefreshToken ->
-						new TokenResponse(
-								HttpHeaders.AUTHORIZATION,
-								AuthenticationScheme.BEARER.getType(),
-								jwtProvider.createAccessToken(redisRefreshToken.getId()),
-								refreshToken
-						)
-				)
-				.orElseThrow(() -> new JwtException("Refresh token not found"));
+		return new TokenResponse(
+				HttpHeaders.AUTHORIZATION,
+				AuthenticationScheme.BEARER.getType(),
+				jwtAccessToken.getToken(),
+				requestRefreshToken
+		);
 	}
 
-	private RefreshToken saveRefreshToken(String emailValue) {
-		return refreshTokenRepository.save(
-				RefreshToken.byAllParameter()
-						.id(emailValue)
-						.token(jwtProvider.createRefreshToken(emailValue))
-						.expiration(1000L * 60 * 60 * 2)
+	private List<JwtToken> saveJwtTokens(String key, String accessToken, String refreshToken) {
+		Claims accessClaims = jwtProvider.parseClaims(accessToken);
+		Claims refreshClaims = jwtProvider.parseClaims(refreshToken);
+
+		return (List<JwtToken>)jwtTokenRepository.saveAll(
+				List.of(
+						JwtToken.byAllParameter()
+								.id(accessClaims.getId())
+								.key(key)
+								.type(accessClaims.get("typ", String.class))
+								.token(accessToken)
+								.expiration(1000L * 60 * 30)
+								.build(),
+						JwtToken.byAllParameter()
+								.id(refreshClaims.getId())
+								.key(key)
+								.type(refreshClaims.get("typ", String.class))
+								.token(refreshToken)
+								.expiration(1000L * 60 * 60 * 2)
+								.build()
+				)
+		);
+	}
+
+	private JwtToken saveJwtToken(String key, String token, long expiration) {
+		Claims claims = jwtProvider.parseClaims(token);
+
+		return jwtTokenRepository.save(
+				JwtToken.byAllParameter()
+						.id(claims.getId())
+						.key(key)
+						.type(claims.get("typ", String.class))
+						.token(token)
+						.expiration(expiration)
 						.build()
 		);
 	}

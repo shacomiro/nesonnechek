@@ -4,6 +4,7 @@ import static com.shacomiro.makeabook.api.global.util.ApiUtils.*;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -20,12 +21,16 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shacomiro.makeabook.api.global.error.JwtException;
 import com.shacomiro.makeabook.api.global.security.policy.AuthenticationScheme;
+import com.shacomiro.makeabook.domain.redis.token.entity.JwtToken;
+import com.shacomiro.makeabook.domain.redis.token.repository.JwtTokenRepository;
 
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private final JwtProvider jwtProvider;
+	private final JwtTokenRepository jwtTokenRepository;
 	private final ObjectMapper objectMapper;
 
 	@Override
@@ -39,11 +44,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				token = token.replaceFirst(AuthenticationScheme.BEARER.getType(), "").trim();
 				jwtProvider.verifyToken(token);
 
+				Claims claims = jwtProvider.parseClaims(token);
+				List<JwtToken> storedTokenList = jwtTokenRepository.findAllByKeyAndType(claims.getSubject(),
+						claims.get("typ", String.class));
+
+				if (storedTokenList.isEmpty()) {
+					throw new JwtException("Expired JWT token");
+				} else if (storedTokenList.size() > 1) {
+					jwtTokenRepository.deleteAll(jwtTokenRepository.findAllByKey(claims.getSubject()));
+					throw new JwtException("Multiple JWT access tokens found. Try sign in again.");
+				}
+
 				if ((jwtProvider.parseClaims(token).get("typ", String.class).equals("refresh") &&
 						!request.getRequestURI().equals("/api/sign/reissue")) ||
 						(!jwtProvider.parseClaims(token).get("typ", String.class).equals("refresh")
 								&& request.getRequestURI().equals("/api/sign/reissue"))) {
-					throw new JwtException("Invalid JWT token");
+					throw new JwtException("Unacceptable JWT token");
 				}
 
 				Authentication authentication = jwtProvider.getAuthentication(token);
