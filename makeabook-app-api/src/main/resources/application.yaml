@@ -2,11 +2,13 @@ spring:
   config:
     import:
       - application-domain-rds.yaml
+      - application-domain-redis.yaml
   profiles:
     group:
       local:
         - app-api-local
         - domain-rds-local
+        - domain-redis-local
     active: ${profile}
 ---
 spring:
