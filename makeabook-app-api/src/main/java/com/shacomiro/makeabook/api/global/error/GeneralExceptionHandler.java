@@ -66,6 +66,15 @@ public class GeneralExceptionHandler {
 	}
 
 	@ExceptionHandler({
+			ConflictException.class
+	})
+	public ResponseEntity<?> handleConflictException(Exception e) {
+		log.debug("Conflict exception occurred: {}", e.getMessage(), e);
+
+		return newResponse(e, HttpStatus.CONFLICT);
+	}
+
+	@ExceptionHandler({
 			Exception.class,
 			RuntimeException.class,
 			FileIOException.class
