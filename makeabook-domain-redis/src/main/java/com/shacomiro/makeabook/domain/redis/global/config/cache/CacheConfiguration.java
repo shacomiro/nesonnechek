@@ -14,23 +14,36 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+
 import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableCaching
 @RequiredArgsConstructor
 public class CacheConfiguration {
+	private final ObjectMapper objectMapper;
 
 	@Bean
 	public CacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory) {
+		ObjectMapper ob = objectMapper
+				.copy()
+				.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY)
+				.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL,
+						JsonTypeInfo.As.WRAPPER_ARRAY);
+
 		RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
 				.disableCachingNullValues()
-				.entryTtl(Duration.ofSeconds(CacheKey.DEFAULT_EXPIRE_SEC))
+				.entryTtl(Duration.ofMillis(CacheKey.DEFAULT_EXPIRE_MILLIS_SEC))
 				.computePrefixWith(CacheKeyPrefix.simple())
 				.serializeKeysWith(RedisSerializationContext.SerializationPair
 						.fromSerializer(new StringRedisSerializer()))
 				.serializeValuesWith(RedisSerializationContext.SerializationPair
-						.fromSerializer(new GenericJackson2JsonRedisSerializer()));
+						.fromSerializer(new GenericJackson2JsonRedisSerializer(ob)));
 
 		return RedisCacheManager.RedisCacheManagerBuilder
 				.fromConnectionFactory(redisConnectionFactory)
