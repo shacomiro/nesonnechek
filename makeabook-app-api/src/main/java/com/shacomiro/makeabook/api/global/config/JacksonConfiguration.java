@@ -14,6 +14,8 @@ public class JacksonConfiguration {
 	@Bean
 	public ObjectMapper objectMapper() {
 		return new ObjectMapper()
+				.findAndRegisterModules()
+				.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 				.registerModule(new SimpleModule()
 						.addDeserializer(SimpleGrantedAuthority.class, new SimpleGrantedAuthorityDeserializer())
 				);
