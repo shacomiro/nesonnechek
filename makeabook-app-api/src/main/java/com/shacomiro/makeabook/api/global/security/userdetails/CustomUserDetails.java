@@ -1,56 +1,75 @@
 package com.shacomiro.makeabook.api.global.security.userdetails;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.shacomiro.makeabook.domain.rds.user.entity.User;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.shacomiro.makeabook.api.global.security.deserializer.SimpleGrantedAuthorityDeserializer;
 
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CustomUserDetails implements UserDetails {
-	private final User user;
+	private String email;
+	private String password;
+	private String username;
+	private Collection<? extends GrantedAuthority> authorities;
+	private boolean accountNonLocked;
+	private boolean accountNonExpired;
+	private boolean credentialsNonExpired;
+	private boolean enabled;
 
-	public CustomUserDetails(User user) {
-		this.user = user;
+	@Builder(builderClassName = "ByAllParameter", builderMethodName = "byAllParameter")
+	public CustomUserDetails(String email, String password, String username,
+			Collection<? extends GrantedAuthority> authorities) {
+		this.email = email;
+		this.password = password;
+		this.username = username;
+		this.authorities = authorities;
+		this.accountNonLocked = true;
+		this.accountNonExpired = true;
+		this.credentialsNonExpired = true;
+		this.enabled = true;
 	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return this.user.getRoles()
-				.stream()
-				.map(role -> new SimpleGrantedAuthority(role.name()))
-				.collect(Collectors.toList());
+		return authorities;
 	}
 
 	@Override
 	public String getPassword() {
-		return user.getPassword();
+		return password;
 	}
 
 	@Override
 	public String getUsername() {
-		return user.getEmail().getValue();
+		return username;
 	}
 
 	@Override
 	public boolean isAccountNonExpired() {
-		return true;
+		return accountNonExpired;
 	}
 
 	@Override
 	public boolean isAccountNonLocked() {
-		return true;
+		return accountNonLocked;
 	}
 
 	@Override
 	public boolean isCredentialsNonExpired() {
-		return true;
+		return credentialsNonExpired;
 	}
 
 	@Override
 	public boolean isEnabled() {
-		return true;
+		return enabled;
 	}
 }
