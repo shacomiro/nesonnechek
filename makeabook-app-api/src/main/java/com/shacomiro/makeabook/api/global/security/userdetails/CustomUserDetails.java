@@ -5,9 +5,6 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.shacomiro.makeabook.api.global.security.deserializer.SimpleGrantedAuthorityDeserializer;
-
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
