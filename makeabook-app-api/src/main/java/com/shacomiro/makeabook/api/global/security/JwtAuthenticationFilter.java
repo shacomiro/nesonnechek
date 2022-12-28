@@ -57,10 +57,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 					throw new JwtException("Expired JWT token");
 				}
 
-				if ((jwtProvider.parseClaims(token).get("typ", String.class).equals("refresh") &&
-						!request.getRequestURI().equals("/api/sign/reissue")) ||
-						(!jwtProvider.parseClaims(token).get("typ", String.class).equals("refresh")
-								&& request.getRequestURI().equals("/api/sign/reissue"))) {
+				boolean isRefreshToken = claims.get("typ", String.class).equals("refresh");
+				boolean isReissueUrl = request.getRequestURI().equals("/api/sign/reissue");
+
+				if ((isRefreshToken && !isReissueUrl) || (!isRefreshToken && isReissueUrl)) {
 					throw new JwtException("Unacceptable JWT token");
 				}
 
