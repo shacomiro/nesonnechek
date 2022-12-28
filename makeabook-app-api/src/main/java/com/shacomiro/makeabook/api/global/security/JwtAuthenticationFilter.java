@@ -45,11 +45,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				jwtProvider.verifyToken(token);
 
 				Claims claims = jwtProvider.parseClaims(token);
-				List<JwtToken> storedTokenList = jwtTokenRepository.findAllByKeyAndType(claims.getSubject(),
-						claims.get("typ", String.class));
+				String subject = claims.getSubject();
+				String type = claims.get("typ", String.class);
+
+				List<JwtToken> storedTokenList = jwtTokenRepository.findAllByKeyAndType(subject, type);
 
 				if (storedTokenList.size() > 1) {
-					jwtTokenRepository.deleteAll(jwtTokenRepository.findAllByKey(claims.getSubject()));
+					jwtTokenRepository.deleteAll(jwtTokenRepository.findAllByKey(subject));
 					throw new JwtException("Multiple JWT access tokens found. Try sign in again.");
 				}
 
@@ -57,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 					throw new JwtException("Expired JWT token");
 				}
 
-				boolean isRefreshToken = claims.get("typ", String.class).equals("refresh");
+				boolean isRefreshToken = type.equals("refresh");
 				boolean isReissueUrl = request.getRequestURI().equals("/api/sign/reissue");
 
 				if ((isRefreshToken && !isReissueUrl) || (!isRefreshToken && isReissueUrl)) {
