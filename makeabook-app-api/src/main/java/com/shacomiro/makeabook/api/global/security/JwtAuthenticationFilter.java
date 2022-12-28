@@ -48,11 +48,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				List<JwtToken> storedTokenList = jwtTokenRepository.findAllByKeyAndType(claims.getSubject(),
 						claims.get("typ", String.class));
 
-				if (storedTokenList.isEmpty()) {
-					throw new JwtException("Expired JWT token");
-				} else if (storedTokenList.size() > 1) {
+				if (storedTokenList.size() > 1) {
 					jwtTokenRepository.deleteAll(jwtTokenRepository.findAllByKey(claims.getSubject()));
 					throw new JwtException("Multiple JWT access tokens found. Try sign in again.");
+				}
+
+				if (storedTokenList.isEmpty() || !storedTokenList.get(0).getToken().equals(token)) {
+					throw new JwtException("Expired JWT token");
 				}
 
 				if ((jwtProvider.parseClaims(token).get("typ", String.class).equals("refresh") &&
