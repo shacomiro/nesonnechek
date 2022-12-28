@@ -21,6 +21,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 	private final UserRepository userRepository;
 
 	@Override
+	@Cacheable(value = CacheKey.SIGN_IN_USER, key = "#userUniqueKey", unless = "#result == null")
 	public UserDetails loadUserByUsername(String userUniqueKey) throws UsernameNotFoundException {
 		return userRepository.findByEmail(Email.byValue().value(userUniqueKey).build())
 				.map(user -> CustomUserDetails.byAllParameter()
