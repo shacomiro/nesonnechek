@@ -1,5 +1,7 @@
 package com.shacomiro.makeabook.domain.redis.token.entity;
 
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
@@ -21,7 +23,7 @@ public class JwtToken {
 	@Indexed
 	private String type;
 	private String token;
-	@TimeToLive
+	@TimeToLive(unit = TimeUnit.MILLISECONDS)
 	private Long expiration;
 
 	@Builder(builderClassName = "ByAllParameter", builderMethodName = "byAllParameter")
