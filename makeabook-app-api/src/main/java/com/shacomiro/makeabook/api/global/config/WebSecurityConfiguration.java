@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shacomiro.makeabook.api.global.security.JwtAccessDeniedHandler;
 import com.shacomiro.makeabook.api.global.security.JwtAuthenticationEntryPoint;
 import com.shacomiro.makeabook.api.global.security.JwtAuthenticationFilter;
+import com.shacomiro.makeabook.api.global.security.JwtLogoutFilter;
 import com.shacomiro.makeabook.api.global.security.JwtProvider;
 import com.shacomiro.makeabook.domain.redis.token.repository.JwtTokenRepository;
 
@@ -40,6 +41,7 @@ public class WebSecurityConfiguration {
 				.httpBasic().disable()
 				.csrf().disable()
 				.formLogin().disable()
+				.logout().disable()
 				.sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 				.and()
@@ -48,6 +50,8 @@ public class WebSecurityConfiguration {
 				.accessDeniedHandler(jwtAccessDeniedHandler)
 				.and()
 				.addFilterBefore(new JwtAuthenticationFilter(jwtProvider, jwtTokenRepository, objectMapper),
+						UsernamePasswordAuthenticationFilter.class)
+				.addFilterAfter(new JwtLogoutFilter(jwtTokenRepository, objectMapper),
 						UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();
