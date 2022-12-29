@@ -6,13 +6,12 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import javax.validation.Valid;
 
 import org.springframework.hateoas.EntityModel;
-import org.springframework.http.HttpHeaders;
+import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,7 +37,8 @@ public class SignRestApi {
 		return new ResponseEntity<>(
 				EntityModel.of(
 						securityService.signIn(new SignInDto(signInRequest.getEmail(), signInRequest.getPassword())),
-						linkTo(methodOn(SignRestApi.class).reissue(null)).withRel("reissue"),
+						Link.of(getCurrentApiServletMapping() + "/api/sign/signout").withRel("signout"),
+						Link.of(getCurrentApiServletMapping() + "/api/sign/reissue").withRel("reissue"),
 						docsLink()
 				),
 				HttpStatus.OK
@@ -63,16 +63,5 @@ public class SignRestApi {
 		userModel.add(docsLink());
 
 		return new ResponseEntity<>(userModel, HttpStatus.CREATED);
-	}
-
-	@PostMapping(path = "reissue")
-	public ResponseEntity<?> reissue(@RequestHeader(HttpHeaders.AUTHORIZATION) String refreshToken) {
-		return new ResponseEntity<>(
-				EntityModel.of(
-						securityService.reissue(refreshToken),
-						docsLink()
-				),
-				HttpStatus.OK
-		);
 	}
 }

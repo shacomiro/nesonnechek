@@ -78,22 +78,6 @@ public class SecurityService {
 		);
 	}
 
-	public TokenResponse reissue(String token) {
-		String requestRefreshToken = token.replaceFirst(AuthenticationScheme.BEARER.getType(), "").trim();
-		Claims refreshClaims = jwtProvider.parseClaims(requestRefreshToken);
-		String emailValue = refreshClaims.getSubject();
-		String accessToken = jwtProvider.createAccessToken(emailValue);
-
-		JwtToken jwtAccessToken = saveJwtToken(emailValue, accessToken, 1000L * 60 * 30);
-
-		return new TokenResponse(
-				HttpHeaders.AUTHORIZATION,
-				AuthenticationScheme.BEARER.getType(),
-				jwtAccessToken.getToken(),
-				requestRefreshToken
-		);
-	}
-
 	private List<JwtToken> saveJwtTokens(String key, String accessToken, String refreshToken) {
 		Claims accessClaims = jwtProvider.parseClaims(accessToken);
 		Claims refreshClaims = jwtProvider.parseClaims(refreshToken);

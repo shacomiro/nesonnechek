@@ -16,6 +16,7 @@ import com.shacomiro.makeabook.api.global.security.JwtAuthenticationEntryPoint;
 import com.shacomiro.makeabook.api.global.security.JwtAuthenticationFilter;
 import com.shacomiro.makeabook.api.global.security.JwtLogoutFilter;
 import com.shacomiro.makeabook.api.global.security.JwtProvider;
+import com.shacomiro.makeabook.api.global.security.JwtReissueFilter;
 import com.shacomiro.makeabook.domain.redis.token.repository.JwtTokenRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -52,8 +53,9 @@ public class WebSecurityConfiguration {
 				.addFilterBefore(new JwtAuthenticationFilter(jwtProvider, jwtTokenRepository, objectMapper),
 						UsernamePasswordAuthenticationFilter.class)
 				.addFilterAfter(new JwtLogoutFilter(jwtTokenRepository, objectMapper),
-						UsernamePasswordAuthenticationFilter.class);
-
+						UsernamePasswordAuthenticationFilter.class)
+				.addFilterAfter(new JwtReissueFilter(jwtProvider, jwtTokenRepository, objectMapper), JwtLogoutFilter.class);
+		
 		return http.build();
 	}
 }
