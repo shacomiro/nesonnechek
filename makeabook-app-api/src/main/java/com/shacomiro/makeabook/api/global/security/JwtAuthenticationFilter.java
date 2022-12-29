@@ -5,6 +5,7 @@ import static com.shacomiro.makeabook.api.global.util.ApiUtils.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -39,9 +40,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			IOException {
 		String token = jwtProvider.resolveToken(request);
 
-		try {
-			if (token != null && token.contains(AuthenticationScheme.BEARER.getType())) {
-				token = token.replaceFirst(AuthenticationScheme.BEARER.getType(), "").trim();
+		if (token != null) {
+			try {
+				token = getVerifiedSchemedToken(token)
+						.orElseThrow((() -> new JwtException("Not supported authentication scheme.")));
 				jwtProvider.verifyToken(token);
 
 				Claims claims = jwtProvider.parseClaims(token);
@@ -68,12 +70,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 				Authentication authentication = jwtProvider.getAuthentication(token);
 				SecurityContextHolder.getContext().setAuthentication(authentication);
-			}
+			} catch (UsernameNotFoundException | JwtException e) {
+				jwtExceptionHandle(request, response, e);
 
-			filterChain.doFilter(request, response);
-		} catch (UsernameNotFoundException | JwtException e) {
-			jwtExceptionHandle(request, response, e);
+				return;
+			}
 		}
+
+		filterChain.doFilter(request, response);
 	}
 
 	public void jwtExceptionHandle(HttpServletRequest request, HttpServletResponse response,
@@ -85,5 +89,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		response.getWriter()
 				.write(objectMapper.writeValueAsString(error(exception.getMessage(), HttpStatus.UNAUTHORIZED)));
 		response.getWriter().flush();
+	}
+
+	private Optional<String> getVerifiedSchemedToken(String token) {
+		Optional<String> pureToken = Optional.empty();
+
+		if (token.contains(AuthenticationScheme.BEARER.getType())) {
+			pureToken = Optional.of(token.replaceFirst(AuthenticationScheme.BEARER.getType(), "").trim());
+		}
+
+		return pureToken;
 	}
 }
