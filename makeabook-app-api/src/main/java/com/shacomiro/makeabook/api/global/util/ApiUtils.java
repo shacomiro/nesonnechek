@@ -22,15 +22,17 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ApiUtils {
 
-	public static <T> ResponseEntity<EntityModel<ApiResult<T>>> success(T response, HttpStatus status) {
-		return new ResponseEntity<>(result(true, response, null), status);
+	public static <T> ResponseEntity<T> success(T response, HttpStatus status) {
+		return new ResponseEntity<>(response, status);
 	}
 
-	public static <T, D extends RepresentationModel<D>> ResponseEntity<EntityModel<ApiResult<D>>> success(
+	public static <T, D extends RepresentationModel<D>> ResponseEntity<D> success(
 			T response,
 			RepresentationModelAssemblerSupport<T, D> representationModelAssembler,
 			HttpStatus status) {
 		return new ResponseEntity<>(representationModelAssembler.toModel(response).add(docsLink()), status);
+
+		// return new ResponseEntity<>(result(true, representationModelAssembler.toModel(response), null), status);
 	}
 
 	public static <T, D extends RepresentationModel<D>> ResponseEntity<CollectionModel<D>> success(
@@ -49,16 +51,16 @@ public class ApiUtils {
 				status);
 	}
 
-	public static <T> EntityModel<ApiResult<T>> result(boolean success, T response, ApiError error) {
-		return EntityModel.of(new ApiResult<>(success, response, error), docsLink());
+	public static <T> EntityModel<ApiResponse<T>> response(boolean success, T result, ApiError error) {
+		return EntityModel.of(new ApiResponse<>(success, result, error), docsLink());
 	}
 
-	public static <T> EntityModel<ApiResult<T>> error(Throwable throwable, HttpStatus status) {
-		return EntityModel.of(new ApiResult<>(false, null, new ApiError(throwable, status)), docsLink());
+	public static <T> EntityModel<ApiResponse<T>> error(Throwable throwable, HttpStatus status) {
+		return EntityModel.of(new ApiResponse<>(false, null, new ApiError(throwable, status)), docsLink());
 	}
 
-	public static <T> EntityModel<ApiResult<T>> error(String message, HttpStatus status) {
-		return EntityModel.of(new ApiResult<>(false, null, new ApiError(message, status)), docsLink());
+	public static <T> EntityModel<ApiResponse<T>> error(String message, HttpStatus status) {
+		return EntityModel.of(new ApiResponse<>(false, null, new ApiError(message, status)), docsLink());
 	}
 
 	public static String getCurrentApiRequest() {
@@ -95,14 +97,14 @@ public class ApiUtils {
 
 	@ToString
 	@Getter
-	public static class ApiResult<T> {
+	public static class ApiResponse<T> {
 		private final boolean success;
-		private final T response;
+		private final T result;
 		private final ApiError error;
 
-		ApiResult(boolean success, T response, ApiError error) {
+		ApiResponse(boolean success, T result, ApiError error) {
 			this.success = success;
-			this.response = response;
+			this.result = result;
 			this.error = error;
 		}
 	}
