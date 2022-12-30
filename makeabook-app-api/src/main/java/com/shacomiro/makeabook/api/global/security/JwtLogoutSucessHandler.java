@@ -1,7 +1,5 @@
 package com.shacomiro.makeabook.api.global.security;
 
-import static com.shacomiro.makeabook.api.global.util.ApiUtils.*;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
@@ -28,7 +26,7 @@ public class JwtLogoutSucessHandler implements LogoutSuccessHandler {
 		response.setContentType(MediaTypes.HAL_JSON_VALUE);
 		response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
-		response.getWriter().write(objectMapper.writeValueAsString(result(true, "Signing out successfully.", null)));
+		response.getWriter().write(objectMapper.writeValueAsString("Signing out successfully."));
 		response.getWriter().flush();
 	}
 }

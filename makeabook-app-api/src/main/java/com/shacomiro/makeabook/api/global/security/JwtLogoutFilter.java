@@ -66,7 +66,7 @@ public class JwtLogoutFilter extends OncePerRequestFilter {
 		response.setContentType(MediaTypes.HAL_JSON_VALUE);
 		response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
-		String errorMessage = objectMapper.writeValueAsString(error("sign out error", HttpStatus.UNAUTHORIZED));
+		String errorMessage = objectMapper.writeValueAsString(error("Sign out error", HttpStatus.UNAUTHORIZED));
 
 		response.getWriter().write(errorMessage);
 		response.getWriter().flush();

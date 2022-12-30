@@ -105,9 +105,8 @@ public class JwtReissueFilter extends OncePerRequestFilter {
 		response.setContentType(MediaTypes.HAL_JSON_VALUE);
 		response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
-		response.getWriter().write(objectMapper.writeValueAsString(result(true, tokenResponse, null)));
+		response.getWriter().write(objectMapper.writeValueAsString(tokenResponse));
 		response.getWriter().flush();
-		System.out.println("DONE!!");
 	}
 
 	public void jwtReissueExceptionHandle(HttpServletRequest request, HttpServletResponse response,
@@ -116,7 +115,7 @@ public class JwtReissueFilter extends OncePerRequestFilter {
 		response.setContentType(MediaTypes.HAL_JSON_VALUE);
 		response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
-		String errorMessage = objectMapper.writeValueAsString(error("sign out error", HttpStatus.UNAUTHORIZED));
+		String errorMessage = objectMapper.writeValueAsString(error("Reissue error", HttpStatus.UNAUTHORIZED));
 
 		response.getWriter().write(errorMessage);
 		response.getWriter().flush();
