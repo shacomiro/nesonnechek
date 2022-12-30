@@ -4,7 +4,6 @@ import static com.shacomiro.makeabook.api.global.util.ApiUtils.*;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.FilterChain;
@@ -22,7 +21,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shacomiro.makeabook.api.global.error.JwtException;
 import com.shacomiro.makeabook.api.global.security.policy.AuthenticationScheme;
-import com.shacomiro.makeabook.domain.redis.token.entity.JwtToken;
 import com.shacomiro.makeabook.domain.redis.token.repository.JwtTokenRepository;
 
 import io.jsonwebtoken.Claims;
@@ -47,26 +45,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				jwtProvider.verifyToken(token);
 
 				Claims claims = jwtProvider.parseClaims(token);
-				String subject = claims.getSubject();
 				String type = claims.get("typ", String.class);
 
-				List<JwtToken> storedTokenList = jwtTokenRepository.findAllByKeyAndType(subject, type);
-
-				if (storedTokenList.size() > 1) {
-					jwtTokenRepository.deleteAll(jwtTokenRepository.findAllByKey(subject));
-					throw new JwtException("Multiple JWT access tokens found. Try sign in again.");
-				}
-
-				if (storedTokenList.isEmpty() || !storedTokenList.get(0).getToken().equals(token)) {
-					throw new JwtException("Expired JWT token");
-				}
-
-				boolean isRefreshToken = type.equals("refresh");
-				boolean isReissueUrl = request.getRequestURI().equals("/api/sign/reissue");
-
-				if ((isRefreshToken && !isReissueUrl) || (!isRefreshToken && isReissueUrl)) {
-					throw new JwtException("Unacceptable JWT token");
-				}
+				verifyJwtTokenRequest(type, request.getRequestURI());
 
 				Authentication authentication = jwtProvider.getAuthentication(token);
 				SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -99,5 +80,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 
 		return pureToken;
+	}
+
+	private void verifyJwtTokenRequest(String type, String requestUri) {
+		boolean isRefreshToken = type.equals("refresh");
+		boolean isReissueUrl = requestUri.equals("/api/sign/reissue");
+
+		if ((isRefreshToken && !isReissueUrl) || (!isRefreshToken && isReissueUrl)) {
+			throw new JwtException("Unacceptable JWT token");
+		}
 	}
 }

@@ -8,13 +8,13 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shacomiro.makeabook.api.global.security.JwtAccessDeniedHandler;
 import com.shacomiro.makeabook.api.global.security.JwtAuthenticationEntryPoint;
 import com.shacomiro.makeabook.api.global.security.JwtAuthenticationFilter;
-import com.shacomiro.makeabook.api.global.security.JwtLogoutFilter;
 import com.shacomiro.makeabook.api.global.security.JwtProvider;
 import com.shacomiro.makeabook.api.global.security.JwtReissueFilter;
 import com.shacomiro.makeabook.domain.redis.token.repository.JwtTokenRepository;
@@ -52,9 +52,8 @@ public class WebSecurityConfiguration {
 				.and()
 				.addFilterBefore(new JwtAuthenticationFilter(jwtProvider, jwtTokenRepository, objectMapper),
 						UsernamePasswordAuthenticationFilter.class)
-				.addFilterAfter(new JwtLogoutFilter(jwtTokenRepository, objectMapper),
-						FilterSecurityInterceptor.class)
-				.addFilterAfter(new JwtReissueFilter(jwtProvider, jwtTokenRepository, objectMapper), JwtLogoutFilter.class);
+				.addFilterAfter(new JwtReissueFilter(jwtProvider, jwtTokenRepository, objectMapper),
+						FilterSecurityInterceptor.class);
 
 		return http.build();
 	}

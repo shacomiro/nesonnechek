@@ -65,27 +65,30 @@ public class JwtReissueFilter extends OncePerRequestFilter {
 					throw new JwtException("User Authentication info not found.");
 				}
 
-				String accessToken = jwtProvider.createAccessToken(emailValue);
-				String refreshToken = jwtTokenRepository.findByKeyAndType(emailValue, "refresh")
-						.map(JwtToken::getToken)
-						.orElseThrow(() -> new JwtException("JWT refresh token is already expired."));
-				Claims claims = jwtProvider.parseClaims(accessToken);
+				jwtTokenRepository.delete(
+						jwtTokenRepository.findByKeyAndType(emailValue, "refresh")
+								.orElseThrow(() -> new JwtException("JWT refresh token already expired."))
+				);
 
-				String savedAccessToken = jwtTokenRepository.save(
+				String accessToken = jwtProvider.createAccessToken(emailValue);
+				String refreshToken = jwtProvider.createRefreshToken(emailValue);
+				Claims refreshClaims = jwtProvider.parseClaims(refreshToken);
+
+				JwtToken jwtRefreshToken = jwtTokenRepository.save(
 						JwtToken.byAllParameter()
-								.id(claims.getId())
+								.id(refreshClaims.getId())
 								.key(emailValue)
-								.type(claims.get("typ", String.class))
-								.token(accessToken)
+								.type(refreshClaims.get("typ", String.class))
+								.token(refreshToken)
 								.expiration(1000L * 60 * 60 * 2)
 								.build()
-				).getToken();
+				);
 
 				TokenResponse tokenResponse = new TokenResponse(
 						HttpHeaders.AUTHORIZATION,
 						AuthenticationScheme.BEARER.getType(),
-						savedAccessToken,
-						refreshToken
+						accessToken,
+						jwtRefreshToken.getToken()
 				);
 
 				jwtReissueSuccessHandle(request, response, tokenResponse);
@@ -115,7 +118,7 @@ public class JwtReissueFilter extends OncePerRequestFilter {
 		response.setContentType(MediaTypes.HAL_JSON_VALUE);
 		response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
-		String errorMessage = objectMapper.writeValueAsString(error("Reissue error", HttpStatus.UNAUTHORIZED));
+		String errorMessage = objectMapper.writeValueAsString(error(exception.getMessage(), HttpStatus.UNAUTHORIZED));
 
 		response.getWriter().write(errorMessage);
 		response.getWriter().flush();

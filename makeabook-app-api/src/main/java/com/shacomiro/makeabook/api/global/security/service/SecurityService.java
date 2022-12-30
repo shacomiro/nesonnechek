@@ -43,23 +43,16 @@ public class SecurityService {
 			throw new IllegalArgumentException("Password is incorrect");
 		}
 
-		List<JwtToken> storedTokens = jwtTokenRepository.findAllByKey(emailValue);
+		String accessToken = jwtProvider.createAccessToken(emailValue);
+		String refreshToken = jwtProvider.createRefreshToken(emailValue);
 
-		if (!storedTokens.isEmpty()) {
-			jwtTokenRepository.deleteAll(storedTokens);
-		}
-
-		List<JwtToken> jwtTokens = saveJwtTokens(
-				emailValue,
-				jwtProvider.createAccessToken(emailValue),
-				jwtProvider.createRefreshToken(emailValue)
-		);
+		saveJwtToken(emailValue, refreshToken, 1000L * 60 * 60 * 2);
 
 		return new TokenResponse(
 				HttpHeaders.AUTHORIZATION,
 				AuthenticationScheme.BEARER.getType(),
-				jwtTokens.get(0).getToken(),
-				jwtTokens.get(1).getToken()
+				accessToken,
+				refreshToken
 		);
 	}
 
