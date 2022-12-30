@@ -53,9 +53,9 @@ public class WebSecurityConfiguration {
 				.addFilterBefore(new JwtAuthenticationFilter(jwtProvider, jwtTokenRepository, objectMapper),
 						UsernamePasswordAuthenticationFilter.class)
 				.addFilterAfter(new JwtLogoutFilter(jwtTokenRepository, objectMapper),
-						UsernamePasswordAuthenticationFilter.class)
+						FilterSecurityInterceptor.class)
 				.addFilterAfter(new JwtReissueFilter(jwtProvider, jwtTokenRepository, objectMapper), JwtLogoutFilter.class);
-		
+
 		return http.build();
 	}
 }
