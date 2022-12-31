@@ -14,6 +14,4 @@ public interface JwtRedisRepository extends CrudRepository<Jwt, String> {
 	public Optional<Jwt> findByKeyAndType(String key, String type);
 
 	public List<Jwt> findAllByKeyAndType(String key, String type);
-
-	public void deleteByKeyAndType(String key, String type);
 }

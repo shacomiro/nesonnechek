@@ -38,7 +38,8 @@ public class JwtService {
 	}
 
 	public JwtDto issueJwt(String emailValue, String authScheme) {
-		jwtRedisService.deleteByKeyAndType(emailValue, "refresh");
+		jwtRedisService.findByKeyAndType(emailValue, "refresh").ifPresent(jwtRedisService::delete);
+
 		String accessToken = jwtProvider.createAccessToken(emailValue);
 		String refreshToken = jwtProvider.createRefreshToken(emailValue);
 		saveJwt(emailValue, refreshToken, 1000L * 60 * 60 * 2);

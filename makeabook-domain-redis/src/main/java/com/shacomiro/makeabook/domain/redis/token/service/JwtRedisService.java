@@ -27,8 +27,4 @@ public class JwtRedisService {
 	public void delete(Jwt jwt) {
 		jwtRedisRepository.delete(jwt);
 	}
-
-	public void deleteByKeyAndType(String key, String type) {
-		jwtRedisRepository.deleteByKeyAndType(key, type);
-	}
 }
