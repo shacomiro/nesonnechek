@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.api.global.security.userdetails;
+package com.shacomiro.makeabook.domain.user.vo;
 
 import java.util.Collection;
 
@@ -6,13 +6,15 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CustomUserDetails implements UserDetails {
+@AllArgsConstructor
+public class UserPrincipal implements UserDetails {
 	private String email;
 	private String password;
 	private String username;
@@ -22,17 +24,10 @@ public class CustomUserDetails implements UserDetails {
 	private boolean credentialsNonExpired;
 	private boolean enabled;
 
-	@Builder(builderClassName = "ByAllParameter", builderMethodName = "byAllParameter")
-	public CustomUserDetails(String email, String password, String username,
+	@Builder(builderClassName = "ByUserInfos", builderMethodName = "byUserInfos")
+	public UserPrincipal(String email, String password, String username,
 			Collection<? extends GrantedAuthority> authorities) {
-		this.email = email;
-		this.password = password;
-		this.username = username;
-		this.authorities = authorities;
-		this.accountNonLocked = true;
-		this.accountNonExpired = true;
-		this.credentialsNonExpired = true;
-		this.enabled = true;
+		this(email, password, username, authorities, true, true, true, true);
 	}
 
 	@Override
@@ -70,3 +65,4 @@ public class CustomUserDetails implements UserDetails {
 		return enabled;
 	}
 }
+

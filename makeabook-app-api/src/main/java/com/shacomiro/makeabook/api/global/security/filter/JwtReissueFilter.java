@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.api.global.security;
+package com.shacomiro.makeabook.api.global.security.filter;
 
 import static com.shacomiro.makeabook.api.global.util.ApiUtils.*;
 
@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.core.log.LogMessage;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,28 +21,21 @@ import org.springframework.util.Assert;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.shacomiro.makeabook.api.global.error.JwtException;
-import com.shacomiro.makeabook.api.global.security.dto.TokenResponse;
 import com.shacomiro.makeabook.api.global.security.policy.AuthenticationScheme;
-import com.shacomiro.makeabook.api.global.security.userdetails.CustomUserDetails;
-import com.shacomiro.makeabook.domain.redis.token.entity.JwtToken;
-import com.shacomiro.makeabook.domain.redis.token.repository.JwtTokenRedisRepository;
-
-import io.jsonwebtoken.Claims;
+import com.shacomiro.makeabook.domain.token.dto.JwtDto;
+import com.shacomiro.makeabook.domain.token.exception.JwtException;
+import com.shacomiro.makeabook.domain.token.service.JwtService;
+import com.shacomiro.makeabook.domain.user.vo.UserPrincipal;
 
 public class JwtReissueFilter extends OncePerRequestFilter {
-	private final JwtProvider jwtProvider;
-	private final JwtTokenRedisRepository jwtTokenRedisRepository;
+	private final JwtService jwtService;
 	private final ObjectMapper objectMapper;
 	private RequestMatcher reissueRequestMatcher;
 
-	public JwtReissueFilter(JwtProvider jwtProvider, JwtTokenRedisRepository jwtTokenRedisRepository,
-			ObjectMapper objectMapper) {
-		this.jwtProvider = jwtProvider;
-		this.jwtTokenRedisRepository = jwtTokenRedisRepository;
+	public JwtReissueFilter(JwtService jwtService, ObjectMapper objectMapper) {
+		this.jwtService = jwtService;
 		this.objectMapper = objectMapper;
 		setFilterProcessesUrl("/api/sign/reissue");
-
 	}
 
 	@Override
@@ -52,47 +44,18 @@ public class JwtReissueFilter extends OncePerRequestFilter {
 			IOException {
 		if (requiresReissue(request, response)) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
 			if (this.logger.isDebugEnabled()) {
 				this.logger.debug(LogMessage.format("Reissuing [%s]", auth));
 			}
-
 			try {
 				String emailValue;
-
 				if (auth != null) {
-					emailValue = ((CustomUserDetails)auth.getPrincipal()).getEmail();
+					emailValue = ((UserPrincipal)auth.getPrincipal()).getEmail();
 				} else {
 					throw new JwtException("User Authentication info not found.");
 				}
-
-				jwtTokenRedisRepository.delete(
-						jwtTokenRedisRepository.findByKeyAndType(emailValue, "refresh")
-								.orElseThrow(() -> new JwtException("JWT refresh token already expired."))
-				);
-
-				String accessToken = jwtProvider.createAccessToken(emailValue);
-				String refreshToken = jwtProvider.createRefreshToken(emailValue);
-				Claims refreshClaims = jwtProvider.parseClaims(refreshToken);
-
-				JwtToken jwtRefreshToken = jwtTokenRedisRepository.save(
-						JwtToken.byAllParameter()
-								.id(refreshClaims.getId())
-								.key(emailValue)
-								.type(refreshClaims.get("typ", String.class))
-								.token(refreshToken)
-								.expiration(1000L * 60 * 60 * 2)
-								.build()
-				);
-
-				TokenResponse tokenResponse = new TokenResponse(
-						HttpHeaders.AUTHORIZATION,
-						AuthenticationScheme.BEARER.getType(),
-						accessToken,
-						jwtRefreshToken.getToken()
-				);
-
-				jwtReissueSuccessHandle(request, response, tokenResponse);
+				JwtDto jwtDto = jwtService.reissueJwt(emailValue, AuthenticationScheme.BEARER.getType());
+				jwtReissueSuccessHandle(request, response, jwtDto);
 			} catch (RuntimeException e) {
 				jwtReissueExceptionHandle(request, response, e);
 			}
@@ -104,12 +67,12 @@ public class JwtReissueFilter extends OncePerRequestFilter {
 	}
 
 	public void jwtReissueSuccessHandle(HttpServletRequest request, HttpServletResponse response,
-			TokenResponse tokenResponse) throws IOException {
+			JwtDto jwtDto) throws IOException {
 		response.setStatus(HttpServletResponse.SC_CREATED);
 		response.setContentType(MediaTypes.HAL_JSON_VALUE);
 		response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
-		response.getWriter().write(objectMapper.writeValueAsString(tokenResponse));
+		response.getWriter().write(objectMapper.writeValueAsString(jwtDto));
 		response.getWriter().flush();
 	}
 
@@ -119,9 +82,7 @@ public class JwtReissueFilter extends OncePerRequestFilter {
 		response.setContentType(MediaTypes.HAL_JSON_VALUE);
 		response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
-		String errorMessage = objectMapper.writeValueAsString(error(exception.getMessage(), HttpStatus.UNAUTHORIZED));
-
-		response.getWriter().write(errorMessage);
+		response.getWriter().write(objectMapper.writeValueAsString(error(exception.getMessage(), HttpStatus.UNAUTHORIZED)));
 		response.getWriter().flush();
 	}
 

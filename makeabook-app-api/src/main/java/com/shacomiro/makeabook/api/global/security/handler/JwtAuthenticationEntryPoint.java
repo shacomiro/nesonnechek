@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.api.global.security;
+package com.shacomiro.makeabook.api.global.security.handler;
 
 import static com.shacomiro.makeabook.api.global.util.ApiUtils.*;
 

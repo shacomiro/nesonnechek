@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.api.global.security.dto;
+package com.shacomiro.makeabook.domain.token.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TokenResponse {
+public class JwtDto {
 	private String reqHeaders;
 	private String authScheme;
 	private String accessToken;

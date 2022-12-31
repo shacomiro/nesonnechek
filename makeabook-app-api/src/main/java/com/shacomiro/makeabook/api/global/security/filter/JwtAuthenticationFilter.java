@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.api.global.security;
+package com.shacomiro.makeabook.api.global.security.filter;
 
 import static com.shacomiro.makeabook.api.global.util.ApiUtils.*;
 
@@ -19,41 +19,35 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.shacomiro.makeabook.api.global.error.JwtException;
 import com.shacomiro.makeabook.api.global.security.policy.AuthenticationScheme;
-import com.shacomiro.makeabook.domain.redis.token.repository.JwtTokenRedisRepository;
+import com.shacomiro.makeabook.domain.token.exception.JwtException;
+import com.shacomiro.makeabook.domain.token.service.JwtService;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-	private final JwtProvider jwtProvider;
-	private final JwtTokenRedisRepository jwtTokenRedisRepository;
+	private final JwtService jwtService;
 	private final ObjectMapper objectMapper;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws
 			ServletException,
 			IOException {
-		String token = jwtProvider.resolveToken(request);
+		String token = jwtService.resolveJwtFromRequest(request);
 
 		if (token != null) {
 			try {
 				token = getVerifiedSchemedToken(token)
 						.orElseThrow((() -> new JwtException("Not supported authentication scheme.")));
-				jwtProvider.verifyToken(token);
+				Claims claims = jwtService.getVerifiedJwtClaims(token);
+				verifyJwtTokenRequest(claims.get("typ", String.class), request.getRequestURI());
 
-				Claims claims = jwtProvider.parseClaims(token);
-				String type = claims.get("typ", String.class);
-
-				verifyJwtTokenRequest(type, request.getRequestURI());
-
-				Authentication authentication = jwtProvider.getAuthentication(token);
+				Authentication authentication = jwtService.getAuthenticationFromJwt(token);
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			} catch (UsernameNotFoundException | JwtException e) {
 				jwtExceptionHandle(request, response, e);
-
 				return;
 			}
 		}
@@ -67,8 +61,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		response.setContentType(MediaTypes.HAL_JSON_VALUE);
 		response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
-		response.getWriter()
-				.write(objectMapper.writeValueAsString(error(exception.getMessage(), HttpStatus.UNAUTHORIZED)));
+		response.getWriter().write(objectMapper.writeValueAsString(error(exception.getMessage(), HttpStatus.UNAUTHORIZED)));
 		response.getWriter().flush();
 	}
 

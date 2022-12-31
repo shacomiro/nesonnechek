@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.ebook.error;
+package com.shacomiro.makeabook.core.global.exception;
 
 public class FileIOException extends RuntimeException {
 

@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.api.global.error;
+package com.shacomiro.makeabook.api.global.exception.handler;
 
 import static com.shacomiro.makeabook.api.global.util.ApiUtils.*;
 
@@ -14,8 +14,10 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import com.shacomiro.makeabook.api.global.exception.NotFoundException;
+import com.shacomiro.makeabook.core.global.exception.FileIOException;
 import com.shacomiro.makeabook.domain.rds.ebook.exception.EbookExpiredException;
-import com.shacomiro.makeabook.ebook.error.FileIOException;
+import com.shacomiro.makeabook.domain.user.exception.UserConflictException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -66,7 +68,7 @@ public class GeneralExceptionHandler {
 	}
 
 	@ExceptionHandler({
-			ConflictException.class
+			UserConflictException.class
 	})
 	public ResponseEntity<?> handleConflictException(Exception e) {
 		log.debug("Conflict exception occurred: {}", e.getMessage(), e);

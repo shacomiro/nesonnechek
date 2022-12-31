@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 
 import org.apache.commons.io.FilenameUtils;
@@ -14,6 +15,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.shacomiro.makeabook.core.global.exception.FileIOException;
 import com.shacomiro.makeabook.core.util.IOUtils;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookType;
@@ -21,17 +23,19 @@ import com.shacomiro.makeabook.domain.rds.ebook.service.EbookRdsService;
 import com.shacomiro.makeabook.ebook.EbookManager;
 import com.shacomiro.makeabook.ebook.domain.ContentTempFileInfo;
 import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
-import com.shacomiro.makeabook.ebook.error.FileIOException;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 @Transactional
 public class EbookService {
 	private static final String RESOURCES_DIR = "./files";
 	private final EbookRdsService ebookRdsService;
-	private final EbookManager ebookManager;
+	private EbookManager ebookManager;
 
-	public EbookService(EbookRdsService ebookRdsService) {
-		this.ebookRdsService = ebookRdsService;
+	@PostConstruct
+	public void initialize() {
 		this.ebookManager = new EbookManager(RESOURCES_DIR);
 	}
 

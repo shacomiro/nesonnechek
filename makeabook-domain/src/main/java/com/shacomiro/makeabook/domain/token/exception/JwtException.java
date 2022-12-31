@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.api.global.error;
+package com.shacomiro.makeabook.domain.token.exception;
 
 public class JwtException extends RuntimeException {
 

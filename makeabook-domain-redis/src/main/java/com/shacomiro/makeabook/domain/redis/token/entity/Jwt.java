@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @RedisHash("jwtToken")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class JwtToken {
+public class Jwt {
 	@Id
 	private String id;
 	@Indexed
@@ -27,7 +27,7 @@ public class JwtToken {
 	private Long expiration;
 
 	@Builder(builderClassName = "ByAllParameter", builderMethodName = "byAllParameter")
-	public JwtToken(String id, String key, String type, String token, Long expiration) {
+	public Jwt(String id, String key, String type, String token, Long expiration) {
 		this.id = id;
 		this.key = key;
 		this.type = type;
