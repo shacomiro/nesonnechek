@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.shacomiro.makeabook.domain.rds.user.entity.Email;
-import com.shacomiro.makeabook.domain.rds.user.repository.UserRepository;
+import com.shacomiro.makeabook.domain.rds.user.repository.UserRdsRepository;
 import com.shacomiro.makeabook.domain.redis.global.config.cache.CacheKey;
 
 import lombok.RequiredArgsConstructor;
@@ -18,12 +18,12 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
-	private final UserRepository userRepository;
+	private final UserRdsRepository userRdsRepository;
 
 	@Override
 	@Cacheable(value = CacheKey.SIGN_IN_USER, key = "#userUniqueKey", unless = "#result == null")
 	public UserDetails loadUserByUsername(String userUniqueKey) throws UsernameNotFoundException {
-		return userRepository.findByEmail(Email.byValue().value(userUniqueKey).build())
+		return userRdsRepository.findByEmail(Email.byValue().value(userUniqueKey).build())
 				.map(user -> CustomUserDetails.byAllParameter()
 						.email(user.getEmail().getValue())
 						.password(user.getPassword())

@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
 
-public interface EbookRepository extends JpaRepository<Ebook, Long> {
+public interface EbookRdsRepository extends JpaRepository<Ebook, Long> {
 	Optional<Ebook> findByUuid(String uuid);
 }

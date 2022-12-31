@@ -16,6 +16,7 @@ public class JacksonConfiguration {
 		return new ObjectMapper()
 				.findAndRegisterModules()
 				.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+				.enable(SerializationFeature.INDENT_OUTPUT)
 				.registerModule(new SimpleModule()
 						.addDeserializer(SimpleGrantedAuthority.class, new SimpleGrantedAuthorityDeserializer())
 				);

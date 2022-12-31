@@ -19,8 +19,8 @@ import com.shacomiro.makeabook.api.global.security.service.SecurityService;
 import com.shacomiro.makeabook.api.user.dto.SignInRequest;
 import com.shacomiro.makeabook.api.user.dto.SignUpRequest;
 import com.shacomiro.makeabook.api.user.dto.model.UserModel;
-import com.shacomiro.makeabook.domain.rds.user.dto.SignInDto;
-import com.shacomiro.makeabook.domain.rds.user.dto.SignUpDto;
+import com.shacomiro.makeabook.domain.user.dto.SignInDto;
+import com.shacomiro.makeabook.domain.user.dto.SignUpDto;
 import com.shacomiro.makeabook.domain.rds.user.entity.User;
 
 import lombok.RequiredArgsConstructor;

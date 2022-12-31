@@ -21,7 +21,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shacomiro.makeabook.api.global.error.JwtException;
 import com.shacomiro.makeabook.api.global.security.policy.AuthenticationScheme;
-import com.shacomiro.makeabook.domain.redis.token.repository.JwtTokenRepository;
+import com.shacomiro.makeabook.domain.redis.token.repository.JwtTokenRedisRepository;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private final JwtProvider jwtProvider;
-	private final JwtTokenRepository jwtTokenRepository;
+	private final JwtTokenRedisRepository jwtTokenRedisRepository;
 	private final ObjectMapper objectMapper;
 
 	@Override

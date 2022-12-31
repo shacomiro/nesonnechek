@@ -27,19 +27,20 @@ import com.shacomiro.makeabook.api.global.security.dto.TokenResponse;
 import com.shacomiro.makeabook.api.global.security.policy.AuthenticationScheme;
 import com.shacomiro.makeabook.api.global.security.userdetails.CustomUserDetails;
 import com.shacomiro.makeabook.domain.redis.token.entity.JwtToken;
-import com.shacomiro.makeabook.domain.redis.token.repository.JwtTokenRepository;
+import com.shacomiro.makeabook.domain.redis.token.repository.JwtTokenRedisRepository;
 
 import io.jsonwebtoken.Claims;
 
 public class JwtReissueFilter extends OncePerRequestFilter {
 	private final JwtProvider jwtProvider;
-	private final JwtTokenRepository jwtTokenRepository;
+	private final JwtTokenRedisRepository jwtTokenRedisRepository;
 	private final ObjectMapper objectMapper;
 	private RequestMatcher reissueRequestMatcher;
 
-	public JwtReissueFilter(JwtProvider jwtProvider, JwtTokenRepository jwtTokenRepository, ObjectMapper objectMapper) {
+	public JwtReissueFilter(JwtProvider jwtProvider, JwtTokenRedisRepository jwtTokenRedisRepository,
+			ObjectMapper objectMapper) {
 		this.jwtProvider = jwtProvider;
-		this.jwtTokenRepository = jwtTokenRepository;
+		this.jwtTokenRedisRepository = jwtTokenRedisRepository;
 		this.objectMapper = objectMapper;
 		setFilterProcessesUrl("/api/sign/reissue");
 
@@ -65,8 +66,8 @@ public class JwtReissueFilter extends OncePerRequestFilter {
 					throw new JwtException("User Authentication info not found.");
 				}
 
-				jwtTokenRepository.delete(
-						jwtTokenRepository.findByKeyAndType(emailValue, "refresh")
+				jwtTokenRedisRepository.delete(
+						jwtTokenRedisRepository.findByKeyAndType(emailValue, "refresh")
 								.orElseThrow(() -> new JwtException("JWT refresh token already expired."))
 				);
 
@@ -74,7 +75,7 @@ public class JwtReissueFilter extends OncePerRequestFilter {
 				String refreshToken = jwtProvider.createRefreshToken(emailValue);
 				Claims refreshClaims = jwtProvider.parseClaims(refreshToken);
 
-				JwtToken jwtRefreshToken = jwtTokenRepository.save(
+				JwtToken jwtRefreshToken = jwtTokenRedisRepository.save(
 						JwtToken.byAllParameter()
 								.id(refreshClaims.getId())
 								.key(emailValue)

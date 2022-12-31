@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.domain.rds.user.dto;
+package com.shacomiro.makeabook.domain.user.dto;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;

@@ -21,9 +21,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.shacomiro.makeabook.api.global.assembers.EbookResponseModelAssembler;
 import com.shacomiro.makeabook.api.global.error.NotFoundException;
+import com.shacomiro.makeabook.domain.ebook.service.EbookService;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookType;
-import com.shacomiro.makeabook.domain.rds.ebook.service.EbookService;
 
 import lombok.extern.slf4j.Slf4j;
 

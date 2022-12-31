@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.domain.rds.ebook.service;
+package com.shacomiro.makeabook.domain.ebook.service;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.shacomiro.makeabook.core.util.IOUtils;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookType;
-import com.shacomiro.makeabook.domain.rds.ebook.repository.EbookRepository;
+import com.shacomiro.makeabook.domain.rds.ebook.service.EbookRdsService;
 import com.shacomiro.makeabook.ebook.EbookManager;
 import com.shacomiro.makeabook.ebook.domain.ContentTempFileInfo;
 import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
@@ -27,11 +27,11 @@ import com.shacomiro.makeabook.ebook.error.FileIOException;
 @Transactional
 public class EbookService {
 	private static final String RESOURCES_DIR = "./files";
+	private final EbookRdsService ebookRdsService;
 	private final EbookManager ebookManager;
-	private final EbookRepository ebookRepository;
 
-	public EbookService(EbookRepository ebookRepository) {
-		this.ebookRepository = ebookRepository;
+	public EbookService(EbookRdsService ebookRdsService) {
+		this.ebookRdsService = ebookRdsService;
 		this.ebookManager = new EbookManager(RESOURCES_DIR);
 	}
 
@@ -45,7 +45,7 @@ public class EbookService {
 		if (ebookType.equals(EbookType.EPUB2)) {
 			epubFileInfo = ebookManager.translateTxtToEpub2(uuid, file.getOriginalFilename(), contentTempFileInfo);
 
-			ebook = Optional.of(ebookRepository
+			ebook = Optional.of(ebookRdsService
 					.save(Ebook.byEbookCreationResult()
 							.uuid(uuid)
 							.name(epubFileInfo.getFileName())
@@ -64,7 +64,7 @@ public class EbookService {
 	}
 
 	public Optional<Ebook> findEbookByUuid(String uuid) {
-		return ebookRepository.findByUuid(uuid);
+		return ebookRdsService.findByUuid(uuid);
 	}
 
 	public Optional<ByteArrayResource> getEbookResource(Ebook ebook) {
@@ -74,7 +74,7 @@ public class EbookService {
 		if (Files.exists(path)) {
 			try {
 				ebook.addDownloadCount();
-				ebookRepository.save(ebook);
+				ebookRdsService.save(ebook);
 
 				return Optional.of(new ByteArrayResource(Files.readAllBytes(path), ebook.getName()));
 			} catch (IOException e) {

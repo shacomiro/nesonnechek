@@ -17,7 +17,7 @@ import com.shacomiro.makeabook.api.global.security.JwtAuthenticationEntryPoint;
 import com.shacomiro.makeabook.api.global.security.JwtAuthenticationFilter;
 import com.shacomiro.makeabook.api.global.security.JwtProvider;
 import com.shacomiro.makeabook.api.global.security.JwtReissueFilter;
-import com.shacomiro.makeabook.domain.redis.token.repository.JwtTokenRepository;
+import com.shacomiro.makeabook.domain.redis.token.repository.JwtTokenRedisRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,7 +28,7 @@ public class WebSecurityConfiguration {
 	private final JwtProvider jwtProvider;
 	private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 	private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
-	private final JwtTokenRepository jwtTokenRepository;
+	private final JwtTokenRedisRepository jwtTokenRedisRepository;
 	private final ObjectMapper objectMapper;
 
 	@Bean
@@ -50,9 +50,9 @@ public class WebSecurityConfiguration {
 				.authenticationEntryPoint(jwtAuthenticationEntryPoint)
 				.accessDeniedHandler(jwtAccessDeniedHandler)
 				.and()
-				.addFilterBefore(new JwtAuthenticationFilter(jwtProvider, jwtTokenRepository, objectMapper),
+				.addFilterBefore(new JwtAuthenticationFilter(jwtProvider, jwtTokenRedisRepository, objectMapper),
 						UsernamePasswordAuthenticationFilter.class)
-				.addFilterAfter(new JwtReissueFilter(jwtProvider, jwtTokenRepository, objectMapper),
+				.addFilterAfter(new JwtReissueFilter(jwtProvider, jwtTokenRedisRepository, objectMapper),
 						FilterSecurityInterceptor.class);
 
 		return http.build();
