@@ -14,9 +14,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+    implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
     implementation 'commons-io:commons-io:2.11.0'
-    implementation project(':makeabook-domain-rds')
+    api project(':makeabook-domain-rds')
     implementation project(':makeabook-domain-redis')
     implementation project(':makeabook-ebook')
     implementation project(':makeabook-core')
