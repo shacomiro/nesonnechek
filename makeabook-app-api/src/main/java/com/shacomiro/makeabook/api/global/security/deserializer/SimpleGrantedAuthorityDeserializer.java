@@ -7,14 +7,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
-public class SimpleGrantedAuthorityDeserializer extends StdDeserializer<SimpleGrantedAuthority> {
-
-	public SimpleGrantedAuthorityDeserializer() {
-		super(SimpleGrantedAuthority.class);
-	}
+public class SimpleGrantedAuthorityDeserializer extends JsonDeserializer<SimpleGrantedAuthority> {
 
 	@Override
 	public SimpleGrantedAuthority deserialize(JsonParser p, DeserializationContext ctxt) throws
