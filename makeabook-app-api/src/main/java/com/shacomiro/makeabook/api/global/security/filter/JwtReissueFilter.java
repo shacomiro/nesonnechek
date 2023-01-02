@@ -21,9 +21,9 @@ import org.springframework.util.Assert;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.shacomiro.makeabook.api.global.security.policy.AuthenticationScheme;
 import com.shacomiro.makeabook.domain.token.dto.JwtDto;
 import com.shacomiro.makeabook.domain.token.exception.JwtException;
+import com.shacomiro.makeabook.domain.token.policy.AuthenticationScheme;
 import com.shacomiro.makeabook.domain.token.service.JwtService;
 import com.shacomiro.makeabook.domain.user.vo.UserPrincipal;
 
@@ -54,6 +54,8 @@ public class JwtReissueFilter extends OncePerRequestFilter {
 				} else {
 					throw new JwtException("User Authentication info not found.");
 				}
+				String token = jwtService.getBearerToken(jwtService.resolveJwtFromRequest(request));
+				jwtService.verifyRefreshJwt(emailValue, token);
 				JwtDto jwtDto = jwtService.reissueJwt(emailValue, AuthenticationScheme.BEARER.getType());
 				jwtReissueSuccessHandle(request, response, jwtDto);
 			} catch (RuntimeException e) {

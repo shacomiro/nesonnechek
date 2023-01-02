@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.api.global.security.policy;
+package com.shacomiro.makeabook.domain.token.policy;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

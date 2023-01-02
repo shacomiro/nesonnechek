@@ -4,7 +4,6 @@ import static com.shacomiro.makeabook.api.global.util.ApiUtils.*;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -19,7 +18,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.shacomiro.makeabook.api.global.security.policy.AuthenticationScheme;
 import com.shacomiro.makeabook.domain.token.exception.JwtException;
 import com.shacomiro.makeabook.domain.token.service.JwtService;
 
@@ -39,8 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 		if (token != null) {
 			try {
-				token = getVerifiedSchemedToken(token)
-						.orElseThrow((() -> new JwtException("Not supported authentication scheme.")));
+				token = jwtService.getBearerToken(token);
 				Claims claims = jwtService.getVerifiedJwtClaims(token);
 				verifyJwtTokenRequest(claims.get("typ", String.class), request.getRequestURI());
 
@@ -63,16 +60,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 		response.getWriter().write(objectMapper.writeValueAsString(error(exception.getMessage(), HttpStatus.UNAUTHORIZED)));
 		response.getWriter().flush();
-	}
-
-	private Optional<String> getVerifiedSchemedToken(String token) {
-		Optional<String> pureToken = Optional.empty();
-
-		if (token.contains(AuthenticationScheme.BEARER.getType())) {
-			pureToken = Optional.of(token.replaceFirst(AuthenticationScheme.BEARER.getType(), "").trim());
-		}
-
-		return pureToken;
 	}
 
 	private void verifyJwtTokenRequest(String type, String requestUri) {

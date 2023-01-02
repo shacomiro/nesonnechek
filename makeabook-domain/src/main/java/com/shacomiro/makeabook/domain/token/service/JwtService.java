@@ -11,6 +11,7 @@ import com.shacomiro.makeabook.domain.redis.token.entity.Jwt;
 import com.shacomiro.makeabook.domain.redis.token.service.JwtRedisService;
 import com.shacomiro.makeabook.domain.token.dto.JwtDto;
 import com.shacomiro.makeabook.domain.token.exception.JwtException;
+import com.shacomiro.makeabook.domain.token.policy.AuthenticationScheme;
 import com.shacomiro.makeabook.domain.token.provider.JwtProvider;
 
 import io.jsonwebtoken.Claims;
@@ -25,6 +26,10 @@ public class JwtService {
 
 	public String resolveJwtFromRequest(HttpServletRequest request) {
 		return jwtProvider.resolveToken(request);
+	}
+
+	public String getBearerToken(String token) {
+		return jwtProvider.removeAuthenticationScheme(token, AuthenticationScheme.BEARER.getType());
 	}
 
 	public Claims getVerifiedJwtClaims(String token) {
@@ -47,20 +52,29 @@ public class JwtService {
 		return new JwtDto(HttpHeaders.AUTHORIZATION, authScheme, accessToken, refreshToken);
 	}
 
-	public JwtDto reissueJwt(String emailValue, String authScheme) {
+	public JwtDto reissueJwt(String emailValue, String token) {
 		deleteExistRefreshJwt(emailValue);
 		String accessToken = jwtProvider.createAccessToken(emailValue);
 		String refreshToken = jwtProvider.createRefreshToken(emailValue);
 		Jwt savedRefreshJwt = saveJwt(emailValue, refreshToken, 1000L * 60 * 60 * 2);
 
-		return new JwtDto(HttpHeaders.AUTHORIZATION, authScheme, accessToken, savedRefreshJwt.getToken());
+		return new JwtDto(HttpHeaders.AUTHORIZATION, AuthenticationScheme.BEARER.getType(),
+				accessToken, savedRefreshJwt.getToken());
+	}
+
+	public void verifyRefreshJwt(String emailValue, String reqToken) {
+		if (!reqToken.equals(findRefreshJwtByEmailValue(emailValue).getToken())) {
+			throw new JwtException("Expired refresh token.");
+		}
 	}
 
 	private void deleteExistRefreshJwt(String emailValue) {
-		Jwt existRefreshToken = jwtRedisService.findByKeyAndType(emailValue, "refresh")
-				.orElseThrow(() -> new JwtException("JWT refresh token already expired."));
+		jwtRedisService.delete(findRefreshJwtByEmailValue(emailValue));
+	}
 
-		jwtRedisService.delete(existRefreshToken);
+	private Jwt findRefreshJwtByEmailValue(String emailValue) {
+		return jwtRedisService.findByKeyAndType(emailValue, "refresh")
+				.orElseThrow(() -> new JwtException("Expired refresh token."));
 	}
 
 	private Jwt saveJwt(String key, String token, long expiration) {

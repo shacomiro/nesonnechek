@@ -2,6 +2,7 @@ package com.shacomiro.makeabook.domain.token.provider;
 
 import java.util.Date;
 import java.util.UUID;
+import java.util.regex.PatternSyntaxException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -80,6 +81,14 @@ public class JwtProvider {
 	//HTTP 요청의 헤더에서 토큰 파싱 -> "X-AUTH-TOKEN: jwt" -> Authorization 속성으로 변경
 	public String resolveToken(HttpServletRequest request) {
 		return request.getHeader(HttpHeaders.AUTHORIZATION);
+	}
+
+	public String removeAuthenticationScheme(String token, String scheme) {
+		try {
+			return token.replaceFirst(scheme, "").trim();
+		} catch (PatternSyntaxException e) {
+			throw new JwtException("Authentication scheme '" + scheme + "' not found from current request");
+		}
 	}
 
 	//JWT 토큰의 유효성 및 만료일자 검증
