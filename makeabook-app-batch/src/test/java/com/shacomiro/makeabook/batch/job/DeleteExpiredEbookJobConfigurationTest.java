@@ -25,7 +25,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.shacomiro.makeabook.batch.config.TestBatchConfig;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookType;
-import com.shacomiro.makeabook.domain.rds.ebook.repository.EbookRepository;
+import com.shacomiro.makeabook.domain.rds.ebook.repository.EbookRdsRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -52,11 +52,11 @@ public class DeleteExpiredEbookJobConfigurationTest {
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
 	@Autowired
-	private EbookRepository ebookRepository;
+	private EbookRdsRepository ebookRdsRepository;
 
 	@After
 	public void tearDown() {
-		ebookRepository.deleteAllInBatch(TEST_EBOOKS);
+		ebookRdsRepository.deleteAllInBatch(TEST_EBOOKS);
 	}
 
 	@Test
@@ -64,7 +64,7 @@ public class DeleteExpiredEbookJobConfigurationTest {
 	@DisplayName("만료된 전자책 파일 삭제 성공")
 	public void deleteExpiredEbookJobSuccess() throws Exception {
 		//given
-		ebookRepository.saveAll(TEST_EBOOKS);
+		ebookRdsRepository.saveAll(TEST_EBOOKS);
 
 		JobParameters jobParameters = new JobParametersBuilder()
 				.addLong("date", System.currentTimeMillis())

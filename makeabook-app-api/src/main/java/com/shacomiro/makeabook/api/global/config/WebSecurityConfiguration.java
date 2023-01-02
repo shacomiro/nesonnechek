@@ -5,19 +5,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.shacomiro.makeabook.api.global.security.JwtAccessDeniedHandler;
-import com.shacomiro.makeabook.api.global.security.JwtAuthenticationEntryPoint;
-import com.shacomiro.makeabook.api.global.security.JwtAuthenticationFilter;
-import com.shacomiro.makeabook.api.global.security.JwtProvider;
-import com.shacomiro.makeabook.api.global.security.JwtReissueFilter;
-import com.shacomiro.makeabook.domain.redis.token.repository.JwtTokenRepository;
+import com.shacomiro.makeabook.api.global.security.filter.JwtAuthenticationFilter;
+import com.shacomiro.makeabook.api.global.security.filter.JwtReissueFilter;
+import com.shacomiro.makeabook.api.global.security.handler.JwtAccessDeniedHandler;
+import com.shacomiro.makeabook.api.global.security.handler.JwtAuthenticationEntryPoint;
+import com.shacomiro.makeabook.domain.token.service.JwtService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,16 +22,10 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfiguration {
-	private final JwtProvider jwtProvider;
 	private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 	private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
-	private final JwtTokenRepository jwtTokenRepository;
+	private final JwtService jwtService;
 	private final ObjectMapper objectMapper;
-
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -50,10 +41,9 @@ public class WebSecurityConfiguration {
 				.authenticationEntryPoint(jwtAuthenticationEntryPoint)
 				.accessDeniedHandler(jwtAccessDeniedHandler)
 				.and()
-				.addFilterBefore(new JwtAuthenticationFilter(jwtProvider, jwtTokenRepository, objectMapper),
+				.addFilterBefore(new JwtAuthenticationFilter(jwtService, objectMapper),
 						UsernamePasswordAuthenticationFilter.class)
-				.addFilterAfter(new JwtReissueFilter(jwtProvider, jwtTokenRepository, objectMapper),
-						FilterSecurityInterceptor.class);
+				.addFilterAfter(new JwtReissueFilter(jwtService, objectMapper), FilterSecurityInterceptor.class);
 
 		return http.build();
 	}

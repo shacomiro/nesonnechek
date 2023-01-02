@@ -20,9 +20,9 @@ import java.util.Objects;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import com.shacomiro.makeabook.core.global.exception.FileIOException;
 import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
 import com.shacomiro.makeabook.ebook.domain.Section;
-import com.shacomiro.makeabook.ebook.error.FileIOException;
 import com.shacomiro.makeabook.ebook.grammar.EbookGrammar;
 
 import nl.siegmann.epublib.domain.Author;
@@ -36,6 +36,12 @@ public class Epub2Translator {
 	private final String epub2ContentsBasePath;
 	private final String epub2EbookBasePath;
 
+	public Epub2Translator(String contentsBasePath, String ebookBasePath) {
+		this.epub2ContentsBasePath = contentsBasePath + "/epub2";
+		this.epub2EbookBasePath = ebookBasePath + "/epub2";
+		initEpub2BaseDirectory();
+	}
+
 	private static Resource getResource(Path path, String href) {
 		Resource resource;
 
@@ -46,12 +52,6 @@ public class Epub2Translator {
 		}
 
 		return resource;
-	}
-
-	public Epub2Translator(String contentsBasePath, String ebookBasePath) {
-		this.epub2ContentsBasePath = contentsBasePath + "/epub2";
-		this.epub2EbookBasePath = ebookBasePath + "/epub2";
-		initEpub2BaseDirectory();
 	}
 
 	public EpubFileInfo createEpub2(String uuid, String fileName, List<String> lines) {

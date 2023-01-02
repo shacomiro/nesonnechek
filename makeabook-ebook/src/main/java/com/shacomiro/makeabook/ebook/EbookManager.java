@@ -14,10 +14,10 @@ import java.util.Optional;
 
 import org.mozilla.universalchardet.UniversalDetector;
 
+import com.shacomiro.makeabook.core.global.exception.FileIOException;
 import com.shacomiro.makeabook.core.util.IOUtils;
 import com.shacomiro.makeabook.ebook.domain.ContentTempFileInfo;
 import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
-import com.shacomiro.makeabook.ebook.error.FileIOException;
 import com.shacomiro.makeabook.ebook.extention.epub2.Epub2Translator;
 
 public class EbookManager {
