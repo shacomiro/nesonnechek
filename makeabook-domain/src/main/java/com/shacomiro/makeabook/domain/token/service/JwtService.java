@@ -42,17 +42,17 @@ public class JwtService {
 		return jwtProvider.getAuthentication(token);
 	}
 
-	public JwtDto issueJwt(String emailValue, String authScheme) {
+	public JwtDto issueJwt(String emailValue) {
 		jwtRedisService.findByKeyAndType(emailValue, "refresh").ifPresent(jwtRedisService::delete);
 
 		String accessToken = jwtProvider.createAccessToken(emailValue);
 		String refreshToken = jwtProvider.createRefreshToken(emailValue);
 		saveJwt(emailValue, refreshToken, 1000L * 60 * 60 * 2);
 
-		return new JwtDto(HttpHeaders.AUTHORIZATION, authScheme, accessToken, refreshToken);
+		return new JwtDto(HttpHeaders.AUTHORIZATION, AuthenticationScheme.BEARER.getType(), accessToken, refreshToken);
 	}
 
-	public JwtDto reissueJwt(String emailValue, String token) {
+	public JwtDto reissueJwt(String emailValue) {
 		deleteExistRefreshJwt(emailValue);
 		String accessToken = jwtProvider.createAccessToken(emailValue);
 		String refreshToken = jwtProvider.createRefreshToken(emailValue);

@@ -19,7 +19,6 @@ import com.shacomiro.makeabook.api.user.dto.SignInRequest;
 import com.shacomiro.makeabook.api.user.dto.SignUpRequest;
 import com.shacomiro.makeabook.api.user.dto.model.UserModel;
 import com.shacomiro.makeabook.domain.rds.user.entity.User;
-import com.shacomiro.makeabook.domain.token.policy.AuthenticationScheme;
 import com.shacomiro.makeabook.domain.token.service.JwtService;
 import com.shacomiro.makeabook.domain.user.dto.SignUpDto;
 import com.shacomiro.makeabook.domain.user.service.UserService;
@@ -43,7 +42,7 @@ public class SignRestApi {
 
 		return new ResponseEntity<>(
 				EntityModel.of(
-						jwtService.issueJwt(emailValue, AuthenticationScheme.BEARER.getType()),
+						jwtService.issueJwt(emailValue),
 						Link.of(getCurrentApiServletMapping() + "/api/sign/signout").withRel("signout"),
 						Link.of(getCurrentApiServletMapping() + "/api/sign/reissue").withRel("reissue"),
 						docsLink()

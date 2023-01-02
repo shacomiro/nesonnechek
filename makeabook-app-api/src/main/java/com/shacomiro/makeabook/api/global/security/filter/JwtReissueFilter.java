@@ -23,7 +23,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shacomiro.makeabook.domain.token.dto.JwtDto;
 import com.shacomiro.makeabook.domain.token.exception.JwtException;
-import com.shacomiro.makeabook.domain.token.policy.AuthenticationScheme;
 import com.shacomiro.makeabook.domain.token.service.JwtService;
 import com.shacomiro.makeabook.domain.user.vo.UserPrincipal;
 
@@ -56,7 +55,7 @@ public class JwtReissueFilter extends OncePerRequestFilter {
 				}
 				String token = jwtService.getBearerToken(jwtService.resolveJwtFromRequest(request));
 				jwtService.verifyRefreshJwt(emailValue, token);
-				JwtDto jwtDto = jwtService.reissueJwt(emailValue, AuthenticationScheme.BEARER.getType());
+				JwtDto jwtDto = jwtService.reissueJwt(emailValue);
 				jwtReissueSuccessHandle(request, response, jwtDto);
 			} catch (RuntimeException e) {
 				jwtReissueExceptionHandle(request, response, e);
