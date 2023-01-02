@@ -18,7 +18,7 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.12.0'
     implementation 'commons-io:commons-io:2.11.0'
     api project(':makeabook-domain-rds')
-    implementation project(':makeabook-domain-redis')
+    api project(':makeabook-domain-redis')
     implementation project(':makeabook-ebook')
     implementation project(':makeabook-core')
 }
