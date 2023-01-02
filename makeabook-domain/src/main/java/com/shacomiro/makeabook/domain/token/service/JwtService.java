@@ -53,7 +53,8 @@ public class JwtService {
 	}
 
 	public JwtDto reissueJwt(String key) {
-		deleteExistRefreshJwt(key);
+		jwtRedisService.findByKeyAndType(key, "refresh").ifPresent(jwtRedisService::delete);
+
 		String accessToken = jwtProvider.createAccessToken(key);
 		String refreshToken = jwtProvider.createRefreshToken(key);
 		Jwt savedRefreshJwt = saveJwt(key, refreshToken, 1000L * 60 * 60 * 2);
@@ -63,18 +64,12 @@ public class JwtService {
 	}
 
 	public void verifyRefreshJwt(String key, String reqToken) {
-		if (!reqToken.equals(findRefreshJwtByEmailValue(key).getToken())) {
-			throw new JwtException("Expired refresh token.");
-		}
-	}
-
-	private void deleteExistRefreshJwt(String key) {
-		jwtRedisService.delete(findRefreshJwtByEmailValue(key));
-	}
-
-	private Jwt findRefreshJwtByEmailValue(String key) {
-		return jwtRedisService.findByKeyAndType(key, "refresh")
-				.orElseThrow(() -> new JwtException("Expired refresh token."));
+		jwtRedisService.findByKeyAndType(key, "refresh")
+				.ifPresent(refreshJwt -> {
+					if (!refreshJwt.getToken().equals(reqToken)) {
+						throw new JwtException("Expired refresh token.");
+					}
+				});
 	}
 
 	private Jwt saveJwt(String key, String token, long expiration) {
