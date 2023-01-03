@@ -47,7 +47,7 @@ public class JwtService {
 
 		String accessToken = jwtProvider.createAccessToken(key);
 		String refreshToken = jwtProvider.createRefreshToken(key);
-		saveJwt(key, refreshToken, 1000L * 60 * 60 * 2);
+		saveRefreshJwt(key, refreshToken);
 
 		return new JwtDto(HttpHeaders.AUTHORIZATION, AuthenticationScheme.BEARER.getType(), accessToken, refreshToken);
 	}
@@ -57,7 +57,7 @@ public class JwtService {
 
 		String accessToken = jwtProvider.createAccessToken(key);
 		String refreshToken = jwtProvider.createRefreshToken(key);
-		Jwt savedRefreshJwt = saveJwt(key, refreshToken, 1000L * 60 * 60 * 2);
+		Jwt savedRefreshJwt = saveRefreshJwt(key, refreshToken);
 
 		return new JwtDto(HttpHeaders.AUTHORIZATION, AuthenticationScheme.BEARER.getType(),
 				accessToken, savedRefreshJwt.getToken());
@@ -70,6 +70,10 @@ public class JwtService {
 						throw new JwtException("Expired refresh token.");
 					}
 				});
+	}
+
+	private Jwt saveRefreshJwt(String key, String token) {
+		return saveJwt(key, token, 1000L * 60 * 60 * 2);
 	}
 
 	private Jwt saveJwt(String key, String token, long expiration) {
