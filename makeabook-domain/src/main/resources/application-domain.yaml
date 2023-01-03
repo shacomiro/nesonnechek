@@ -16,4 +16,7 @@ spring:
       on-profile: domain-local
 jwt:
   secret:
-    key: ${secret.api.jwt.key}
+    key: ${secret.jwt.key}
+    valid-milliseconds:
+      access: ${secret.jwt.valid-milliseconds.access}
+      refresh: ${secret.jwt.valid-milliseconds.refresh}
