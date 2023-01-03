@@ -1,10 +1,12 @@
 package com.shacomiro.makeabook.domain.token.service;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import com.shacomiro.makeabook.domain.redis.token.entity.Jwt;
@@ -22,11 +24,8 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class JwtService {
 	private final JwtRedisService jwtRedisService;
+	private final UserDetailsService userDetailsService;
 	private final JwtProvider jwtProvider;
-
-	public String resolveJwtFromRequest(HttpServletRequest request) {
-		return jwtProvider.resolveToken(request);
-	}
 
 	public String getBearerToken(String token) {
 		return jwtProvider.removeAuthenticationScheme(token, AuthenticationScheme.BEARER.getType());
@@ -39,7 +38,9 @@ public class JwtService {
 	}
 
 	public Authentication getAuthenticationFromJwt(String token) {
-		return jwtProvider.getAuthentication(token);
+		UserDetails userDetails = userDetailsService.loadUserByUsername(jwtProvider.parseClaims(token).getSubject());
+
+		return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 	}
 
 	public JwtDto issueJwt(String key) {
@@ -73,7 +74,7 @@ public class JwtService {
 	}
 
 	private Jwt saveRefreshJwt(String key, String token) {
-		return saveJwt(key, token, 1000L * 60 * 60 * 2);
+		return saveJwt(key, token, jwtProvider.getRefreshTokenValidMilleSeconds());
 	}
 
 	private Jwt saveJwt(String key, String token, long expiration) {

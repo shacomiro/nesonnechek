@@ -4,16 +4,6 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.regex.PatternSyntaxException;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.stereotype.Component;
-
 import com.shacomiro.makeabook.domain.token.exception.JwtException;
 
 import io.jsonwebtoken.Claims;
@@ -23,26 +13,34 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
-import lombok.RequiredArgsConstructor;
 
-@Component
-@RequiredArgsConstructor
 public class JwtProvider {
-	private final UserDetailsService userDetailsService;
-	@Value("jwt.secret.key")
-	private String secretKey;
-	//TODO 임시 유효시간을 YAML 구성 파일에서 불러오도록 수정하기
-	private long tempAccessTokenValidTime = 1000L * 60 * 30; //임시 액세스 토큰 유효시간(30분)
-	private long tempRefreshTokenValidTime = 1000L * 60 * 60 * 2; //임시 리프레시 토큰 유효시간(2시간)
+	private final String secretKey;
+	private final long accessTokenValidMilleSeconds;
+	private final long refreshTokenValidMilleSeconds;
+
+	public JwtProvider(String secretKey, long accessTokenValidMilleSeconds, long refreshTokenValidMilleSeconds) {
+		this.secretKey = secretKey;
+		this.accessTokenValidMilleSeconds = accessTokenValidMilleSeconds;
+		this.refreshTokenValidMilleSeconds = refreshTokenValidMilleSeconds;
+	}
+
+	public long getAccessTokenValidMilleSeconds() {
+		return accessTokenValidMilleSeconds;
+	}
+
+	public long getRefreshTokenValidMilleSeconds() {
+		return refreshTokenValidMilleSeconds;
+	}
 
 	//JWT 액세스 토큰 생성
 	public String createAccessToken(String uniqueKey) {
-		return createToken(uniqueKey, "access", tempAccessTokenValidTime);
+		return createToken(uniqueKey, "access", accessTokenValidMilleSeconds);
 	}
 
 	//JWT 리프래시 토큰 생성
 	public String createRefreshToken(String uniqueKey) {
-		return createToken(uniqueKey, "refresh", tempRefreshTokenValidTime);
+		return createToken(uniqueKey, "refresh", refreshTokenValidMilleSeconds);
 	}
 
 	//JWT 토큰 생성
@@ -71,18 +69,6 @@ public class JwtProvider {
 				.getBody();
 	}
 
-	//JWT 토큰에서 인증 정보 조회
-	public Authentication getAuthentication(String token) {
-		UserDetails userDetails = userDetailsService.loadUserByUsername(parseClaims(token).getSubject());
-
-		return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-	}
-
-	//HTTP 요청의 헤더에서 토큰 파싱 -> "X-AUTH-TOKEN: jwt" -> Authorization 속성으로 변경
-	public String resolveToken(HttpServletRequest request) {
-		return request.getHeader(HttpHeaders.AUTHORIZATION);
-	}
-
 	public String removeAuthenticationScheme(String token, String scheme) {
 		try {
 			return token.replaceFirst(scheme, "").trim();
@@ -95,10 +81,6 @@ public class JwtProvider {
 	public void verifyToken(String token) {
 		try {
 			Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-
-			Claims claims = parseClaims(token);
-			//TODO 뭐 바꾸려고 했는데 뭐였더라
-
 		} catch (SecurityException | SignatureException e) {
 			throw new JwtException("Invalid JWT signature");
 		} catch (MalformedJwtException e) {

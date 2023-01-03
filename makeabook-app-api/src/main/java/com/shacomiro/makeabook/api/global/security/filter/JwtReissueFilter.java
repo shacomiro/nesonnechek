@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.core.log.LogMessage;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -53,7 +54,7 @@ public class JwtReissueFilter extends OncePerRequestFilter {
 				} else {
 					throw new JwtException("User Authentication info not found.");
 				}
-				String token = jwtService.getBearerToken(jwtService.resolveJwtFromRequest(request));
+				String token = jwtService.getBearerToken(request.getHeader(HttpHeaders.AUTHORIZATION));
 				jwtService.verifyRefreshJwt(emailValue, token);
 				JwtDto jwtDto = jwtService.reissueJwt(emailValue);
 				jwtReissueSuccessHandle(request, response, jwtDto);
