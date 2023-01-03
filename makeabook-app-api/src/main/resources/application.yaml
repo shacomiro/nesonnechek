@@ -1,14 +1,12 @@
 spring:
   config:
     import:
-      - application-domain-rds.yaml
-      - application-domain-redis.yaml
+      - application-domain.yaml
   profiles:
     group:
       local:
         - app-api-local
-        - domain-rds-local
-        - domain-redis-local
+        - domains-local
     active: ${profile}
 ---
 spring:
@@ -24,6 +22,3 @@ spring:
   web:
     resources:
       add-mappings: false
-jwt:
-  secret:
-    key: ${secret.api.jwt.key}

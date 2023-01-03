@@ -1,0 +1,19 @@
+spring:
+  config:
+    import:
+      - application-domain-rds.yaml
+      - application-domain-redis.yaml
+  profiles:
+    group:
+      domains-local:
+        - domain-local
+        - domain-rds-local
+        - domain-redis-local
+---
+spring:
+  config:
+    activate:
+      on-profile: domain-local
+jwt:
+  secret:
+    key: ${secret.api.jwt.key}
