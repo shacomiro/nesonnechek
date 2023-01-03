@@ -6,33 +6,31 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.fasterxml.jackson.annotation.JsonRootName;
+
 import lombok.AccessLevel;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ApiUtils {
-
-	public static <T> ResponseEntity<T> success(T response, HttpStatus status) {
-		return new ResponseEntity<>(response, status);
-	}
 
 	public static <T, D extends RepresentationModel<D>> ResponseEntity<D> success(
 			T response,
 			RepresentationModelAssemblerSupport<T, D> representationModelAssembler,
 			HttpStatus status) {
 		return new ResponseEntity<>(representationModelAssembler.toModel(response).add(docsLink()), status);
-
-		// return new ResponseEntity<>(result(true, representationModelAssembler.toModel(response), null), status);
 	}
 
 	public static <T, D extends RepresentationModel<D>> ResponseEntity<CollectionModel<D>> success(
@@ -51,16 +49,20 @@ public class ApiUtils {
 				status);
 	}
 
-	public static <T> EntityModel<ApiResponse<T>> response(boolean success, T result, ApiError error) {
-		return EntityModel.of(new ApiResponse<>(success, result, error), docsLink());
+	public static ApiError error(Throwable throwable, HttpStatus status) {
+		return ApiError.byThrowable()
+				.throwable(throwable)
+				.status(status)
+				.build()
+				.add(docsLink());
 	}
 
-	public static <T> EntityModel<ApiResponse<T>> error(Throwable throwable, HttpStatus status) {
-		return EntityModel.of(new ApiResponse<>(false, null, new ApiError(throwable, status)), docsLink());
-	}
-
-	public static <T> EntityModel<ApiResponse<T>> error(String message, HttpStatus status) {
-		return EntityModel.of(new ApiResponse<>(false, null, new ApiError(message, status)), docsLink());
+	public static ApiError error(String message, HttpStatus status) {
+		return ApiError.byMessage()
+				.message(message)
+				.status(status)
+				.build()
+				.add(docsLink());
 	}
 
 	public static String getCurrentApiRequest() {
@@ -79,33 +81,24 @@ public class ApiUtils {
 		return Link.of(getCurrentApiServletMapping() + "/api/static/docs/index.html").withRel("docs");
 	}
 
-	@ToString
-	@Getter
-	public static class ApiError {
-		private final String message;
-		private final int status;
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@EqualsAndHashCode(callSuper = false)
+	@JsonRootName(value = "error")
+	@Relation(collectionRelation = "errors", itemRelation = "error")
+	public static class ApiError extends RepresentationModel<ApiError> {
+		private String message;
+		private int status;
 
+		@Builder(builderClassName = "ByThrowable", builderMethodName = "byThrowable")
 		ApiError(Throwable throwable, HttpStatus status) {
 			this(throwable.getMessage(), status);
 		}
 
+		@Builder(builderClassName = "ByMessage", builderMethodName = "byMessage")
 		ApiError(String message, HttpStatus status) {
-			this.message = message;
-			this.status = status.value();
-		}
-	}
-
-	@ToString
-	@Getter
-	public static class ApiResponse<T> {
-		private final boolean success;
-		private final T result;
-		private final ApiError error;
-
-		ApiResponse(boolean success, T result, ApiError error) {
-			this.success = success;
-			this.result = result;
-			this.error = error;
+			this(message, status.value());
 		}
 	}
 }
