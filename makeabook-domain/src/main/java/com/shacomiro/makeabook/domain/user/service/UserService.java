@@ -6,7 +6,6 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -26,23 +25,20 @@ import lombok.RequiredArgsConstructor;
 @Validated
 public class UserService {
 	private final UserRdsService userRdsService;
-	private final PasswordEncoder passwordEncoder;
 
-	public Optional<User> findUserByEmail(Email email) {
-		return userRdsService.findByEmail(email);
+	public Optional<User> findUserByEmail(String emailValue) {
+		return userRdsService.findByEmail(Email.byValue().value(emailValue).build());
 	}
 
 	public Optional<User> findUserByUsername(String username) {
 		return userRdsService.findByUsername(username);
 	}
 
-	public void verifySignedInUser(String emailValue, String password) {
+	public String getSignInUserEncryptedPassword(String emailValue) {
 		User signedInUser = userRdsService.findByEmail(Email.byValue().value(emailValue).build())
 				.orElseThrow(() -> new UserNotFoundException("User not found"));
 
-		if (!passwordEncoder.matches(password, signedInUser.getPassword())) {
-			throw new IllegalArgumentException("Password is incorrect");
-		}
+		return signedInUser.getPassword();
 	}
 
 	public User signUpUser(@Valid SignUpDto signUpDto) {

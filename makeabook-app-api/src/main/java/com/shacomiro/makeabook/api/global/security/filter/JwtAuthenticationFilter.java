@@ -10,39 +10,38 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.shacomiro.makeabook.api.global.security.token.JwtAuthenticationToken;
 import com.shacomiro.makeabook.domain.token.exception.JwtException;
-import com.shacomiro.makeabook.domain.token.service.JwtService;
+import com.shacomiro.makeabook.domain.token.policy.AuthenticationScheme;
 
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-	private final JwtService jwtService;
+	private final AuthenticationManager authenticationManager;
 	private final ObjectMapper objectMapper;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws
 			ServletException,
 			IOException {
-		String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+		String token = resolveToken(request);
 
 		if (token != null) {
 			try {
-				token = jwtService.getBearerToken(token);
-				Claims claims = jwtService.getVerifiedJwtClaims(token);
-				verifyJwtTokenRequest(claims.get("typ", String.class), request.getRequestURI());
-
-				Authentication authentication = jwtService.getAuthenticationFromJwt(token);
+				Authentication jwtAuthenticationToken = JwtAuthenticationToken.unauthenticated(token);
+				Authentication authentication = authenticationManager.authenticate(jwtAuthenticationToken);
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			} catch (UsernameNotFoundException | JwtException e) {
 				jwtExceptionHandle(request, response, e);
@@ -61,6 +60,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 		response.getWriter().write(objectMapper.writeValueAsString(error(exception.getMessage(), HttpStatus.UNAUTHORIZED)));
 		response.getWriter().flush();
+	}
+
+	private String resolveToken(HttpServletRequest request) {
+		String rawToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+		if (StringUtils.isEmpty(rawToken)) {
+			return null;
+		}
+
+		if (rawToken.startsWith(AuthenticationScheme.BEARER.getType() + " ")) {
+			return rawToken.replaceFirst(AuthenticationScheme.BEARER.getType() + " ", "");
+		}
+
+		return null;
 	}
 
 	private void verifyJwtTokenRequest(String type, String requestUri) {

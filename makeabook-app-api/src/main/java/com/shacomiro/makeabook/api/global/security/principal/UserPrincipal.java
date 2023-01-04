@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.domain.user.vo;
+package com.shacomiro.makeabook.api.global.security.principal;
 
 import java.util.Collection;
 

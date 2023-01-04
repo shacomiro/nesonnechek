@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.core.log.LogMessage;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,10 +21,11 @@ import org.springframework.util.Assert;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.shacomiro.makeabook.api.global.security.principal.UserPrincipal;
+import com.shacomiro.makeabook.api.global.security.token.JwtAuthenticationToken;
 import com.shacomiro.makeabook.domain.token.dto.JwtDto;
 import com.shacomiro.makeabook.domain.token.exception.JwtException;
 import com.shacomiro.makeabook.domain.token.service.JwtService;
-import com.shacomiro.makeabook.domain.user.vo.UserPrincipal;
 
 public class JwtReissueFilter extends OncePerRequestFilter {
 	private final JwtService jwtService;
@@ -48,14 +48,17 @@ public class JwtReissueFilter extends OncePerRequestFilter {
 				this.logger.debug(LogMessage.format("Reissuing [%s]", auth));
 			}
 			try {
-				String emailValue;
-				if (auth != null) {
-					emailValue = ((UserPrincipal)auth.getPrincipal()).getEmail();
-				} else {
+				if (auth == null) {
 					throw new JwtException("User Authentication info not found.");
 				}
-				String token = jwtService.getBearerToken(request.getHeader(HttpHeaders.AUTHORIZATION));
-				jwtService.verifyRefreshJwt(emailValue, token);
+				String type = ((JwtAuthenticationToken)auth).getType();
+				if (!type.equals("refresh")) {
+					throw new JwtException("Unacceptable JWT token");
+				}
+				String jwt = ((JwtAuthenticationToken)auth).getJwt();
+				String emailValue = ((UserPrincipal)auth.getPrincipal()).getEmail();
+
+				jwtService.verifyRefreshJwt(emailValue, jwt);
 				JwtDto jwtDto = jwtService.reissueJwt(emailValue);
 				jwtReissueSuccessHandle(request, response, jwtDto);
 			} catch (RuntimeException e) {

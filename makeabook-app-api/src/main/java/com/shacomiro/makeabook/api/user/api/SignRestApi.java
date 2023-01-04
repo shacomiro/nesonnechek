@@ -38,7 +38,9 @@ public class SignRestApi {
 		String emailValue = signInRequest.getEmail();
 		String password = signInRequest.getPassword();
 
-		userService.verifySignedInUser(emailValue, password);
+		if (!passwordEncoder.matches(password, userService.getSignInUserEncryptedPassword(emailValue))) {
+			throw new IllegalArgumentException("Password is incorrect");
+		}
 
 		return new ResponseEntity<>(
 				EntityModel.of(
