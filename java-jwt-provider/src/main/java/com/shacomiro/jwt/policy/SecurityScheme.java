@@ -5,9 +5,10 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum AuthenticationScheme {
-	BEARER("Bearer");
+public enum SecurityScheme {
+	BEARER_AUTH("Bearer", "Bearer ");
 
-	private final String type;
+	private final String scheme;
+	private final String prefix;
 }
 

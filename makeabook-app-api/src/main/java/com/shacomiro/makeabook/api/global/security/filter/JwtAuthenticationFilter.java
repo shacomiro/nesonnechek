@@ -21,7 +21,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.shacomiro.jwt.policy.AuthenticationScheme;
+import com.shacomiro.jwt.policy.SecurityScheme;
 import com.shacomiro.makeabook.api.global.security.token.JwtAuthenticationToken;
 
 import io.jsonwebtoken.JwtException;
@@ -69,8 +69,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			return null;
 		}
 
-		if (rawToken.startsWith(AuthenticationScheme.BEARER.getType() + " ")) {
-			return rawToken.replaceFirst(AuthenticationScheme.BEARER.getType() + " ", "");
+		if (rawToken.startsWith(SecurityScheme.BEARER_AUTH.getPrefix())) {
+			return rawToken.replaceFirst(SecurityScheme.BEARER_AUTH.getPrefix(), "");
 		}
 
 		return null;

@@ -5,7 +5,7 @@ import javax.transaction.Transactional;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
-import com.shacomiro.jwt.policy.AuthenticationScheme;
+import com.shacomiro.jwt.policy.SecurityScheme;
 import com.shacomiro.jwt.provider.JwtProvider;
 import com.shacomiro.makeabook.domain.redis.token.entity.Jwt;
 import com.shacomiro.makeabook.domain.redis.token.service.JwtRedisService;
@@ -29,7 +29,7 @@ public class JwtService {
 		String refreshToken = jwtProvider.createRefreshToken(key);
 		saveRefreshJwt(key, refreshToken);
 
-		return new JwtDto(HttpHeaders.AUTHORIZATION, AuthenticationScheme.BEARER.getType(), accessToken, refreshToken);
+		return new JwtDto(HttpHeaders.AUTHORIZATION, SecurityScheme.BEARER_AUTH.getScheme(), accessToken, refreshToken);
 	}
 
 	public JwtDto reissueJwt(String key) {
@@ -39,7 +39,7 @@ public class JwtService {
 		String refreshToken = jwtProvider.createRefreshToken(key);
 		Jwt savedRefreshJwt = saveRefreshJwt(key, refreshToken);
 
-		return new JwtDto(HttpHeaders.AUTHORIZATION, AuthenticationScheme.BEARER.getType(),
+		return new JwtDto(HttpHeaders.AUTHORIZATION, SecurityScheme.BEARER_AUTH.getScheme(),
 				accessToken, savedRefreshJwt.getToken());
 	}
 
