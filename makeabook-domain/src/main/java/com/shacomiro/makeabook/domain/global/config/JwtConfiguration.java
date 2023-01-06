@@ -17,6 +17,14 @@ public class JwtConfiguration {
 
 	@Bean
 	public JwtProvider jwtProvider() {
-		return new JwtProvider(secretKey, accessTokenValidMilleSeconds, refreshTokenValidMilleSeconds);
+		return new JwtProvider(secretKey);
+	}
+
+	public long getAccessTokenValidMilleSeconds() {
+		return accessTokenValidMilleSeconds;
+	}
+
+	public long getRefreshTokenValidMilleSeconds() {
+		return refreshTokenValidMilleSeconds;
 	}
 }
