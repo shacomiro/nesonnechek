@@ -4,10 +4,9 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.regex.PatternSyntaxException;
 
-import com.shacomiro.makeabook.domain.token.exception.JwtException;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;

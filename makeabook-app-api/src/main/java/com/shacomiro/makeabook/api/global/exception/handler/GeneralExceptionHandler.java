@@ -19,6 +19,7 @@ import com.shacomiro.makeabook.core.global.exception.FileIOException;
 import com.shacomiro.makeabook.domain.rds.ebook.exception.EbookExpiredException;
 import com.shacomiro.makeabook.domain.user.exception.UserConflictException;
 
+import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -41,6 +42,13 @@ public class GeneralExceptionHandler {
 	})
 	public ResponseEntity<?> handleNotFoundException(Exception e) {
 		return newResponse(e, HttpStatus.NOT_FOUND);
+	}
+
+	@ExceptionHandler({
+			JwtException.class
+	})
+	public ResponseEntity<?> handleUnauthorizedException(Exception e) {
+		return newResponse(e, HttpStatus.UNAUTHORIZED);
 	}
 
 	@ExceptionHandler({

@@ -24,8 +24,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shacomiro.makeabook.api.global.security.principal.UserPrincipal;
 import com.shacomiro.makeabook.api.global.security.token.JwtAuthenticationToken;
 import com.shacomiro.makeabook.domain.token.dto.JwtDto;
-import com.shacomiro.makeabook.domain.token.exception.JwtException;
 import com.shacomiro.makeabook.domain.token.service.JwtService;
+
+import io.jsonwebtoken.JwtException;
 
 public class JwtReissueFilter extends OncePerRequestFilter {
 	private final JwtService jwtService;

@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 import com.shacomiro.makeabook.domain.redis.token.entity.Jwt;
 import com.shacomiro.makeabook.domain.redis.token.service.JwtRedisService;
 import com.shacomiro.makeabook.domain.token.dto.JwtDto;
-import com.shacomiro.makeabook.domain.token.exception.JwtException;
 import com.shacomiro.makeabook.domain.token.policy.AuthenticationScheme;
 import com.shacomiro.makeabook.domain.token.provider.JwtProvider;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 
 @Service
