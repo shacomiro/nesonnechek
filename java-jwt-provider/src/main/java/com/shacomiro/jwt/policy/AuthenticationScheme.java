@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.domain.token.policy;
+package com.shacomiro.jwt.policy;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,3 +10,4 @@ public enum AuthenticationScheme {
 
 	private final String type;
 }
+

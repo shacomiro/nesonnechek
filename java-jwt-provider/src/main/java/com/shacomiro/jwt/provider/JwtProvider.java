@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.domain.token.provider;
+package com.shacomiro.jwt.provider;
 
 import java.util.Date;
 import java.util.UUID;

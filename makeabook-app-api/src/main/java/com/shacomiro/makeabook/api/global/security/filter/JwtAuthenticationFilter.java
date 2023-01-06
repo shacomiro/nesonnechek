@@ -21,8 +21,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.shacomiro.jwt.policy.AuthenticationScheme;
 import com.shacomiro.makeabook.api.global.security.token.JwtAuthenticationToken;
-import com.shacomiro.makeabook.domain.token.policy.AuthenticationScheme;
 
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;

@@ -7,8 +7,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
+import com.shacomiro.jwt.provider.JwtProvider;
 import com.shacomiro.makeabook.api.global.security.token.JwtAuthenticationToken;
-import com.shacomiro.makeabook.domain.token.provider.JwtProvider;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
