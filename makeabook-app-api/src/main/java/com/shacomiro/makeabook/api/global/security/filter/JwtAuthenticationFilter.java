@@ -42,6 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			try {
 				Authentication jwtAuthenticationToken = JwtAuthenticationToken.unauthenticated(token);
 				Authentication authentication = authenticationManager.authenticate(jwtAuthenticationToken);
+				verifyJwtTokenRequest(((JwtAuthenticationToken)authentication).getType(), request.getRequestURI());
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			} catch (UsernameNotFoundException | JwtException e) {
 				jwtExceptionHandle(request, response, e);

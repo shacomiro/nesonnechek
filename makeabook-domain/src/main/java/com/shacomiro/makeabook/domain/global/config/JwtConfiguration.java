@@ -11,20 +11,20 @@ public class JwtConfiguration {
 	@Value("${jwt.secret.key}")
 	private String secretKey;
 	@Value("${jwt.secret.valid-milliseconds.access}")
-	private long accessTokenValidMilleSeconds;
+	private long accessTokenValidMilliseconds;
 	@Value("${jwt.secret.valid-milliseconds.refresh}")
-	private long refreshTokenValidMilleSeconds;
+	private long refreshTokenValidMilliseconds;
 
 	@Bean
 	public JwtProvider jwtProvider() {
 		return new JwtProvider(secretKey);
 	}
 
-	public long getAccessTokenValidMilleSeconds() {
-		return accessTokenValidMilleSeconds;
+	public long getAccessTokenValidMilliseconds() {
+		return accessTokenValidMilliseconds;
 	}
 
-	public long getRefreshTokenValidMilleSeconds() {
-		return refreshTokenValidMilleSeconds;
+	public long getRefreshTokenValidMilliseconds() {
+		return refreshTokenValidMilliseconds;
 	}
 }

@@ -1,5 +1,6 @@
 package com.shacomiro.makeabook.domain.token.service;
 
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -32,11 +33,12 @@ public class JwtService {
 	public JwtDto issueJwt(String key) {
 		jwtRedisService.findByKeyAndType(key, "refresh").ifPresent(jwtRedisService::delete);
 
-		String accessToken = jwtProvider.createToken(createClaims(key, "access"),
-				jwtConfiguration.getAccessTokenValidMilleSeconds());
-		String refreshToken = jwtProvider.createToken(createClaims(key, "refresh"),
-				jwtConfiguration.getRefreshTokenValidMilleSeconds());
-		saveRefreshJwt(key, refreshToken);
+		Date now = new Date();
+		Claims accessClaims = createClaims(key, "access", now, jwtConfiguration.getAccessTokenValidMilliseconds());
+		Claims refreshClaims = createClaims(key, "refresh", now, jwtConfiguration.getRefreshTokenValidMilliseconds());
+		String accessToken = jwtProvider.createToken(accessClaims);
+		String refreshToken = jwtProvider.createToken(refreshClaims);
+		saveRefreshJwt(key, refreshToken, refreshClaims);
 
 		return new JwtDto(HttpHeaders.AUTHORIZATION, SecurityScheme.BEARER_AUTH.getScheme(), accessToken, refreshToken);
 	}
@@ -44,11 +46,12 @@ public class JwtService {
 	public JwtDto reissueJwt(String key) {
 		jwtRedisService.findByKeyAndType(key, "refresh").ifPresent(jwtRedisService::delete);
 
-		String accessToken = jwtProvider.createToken(createClaims(key, "access"),
-				jwtConfiguration.getAccessTokenValidMilleSeconds());
-		String refreshToken = jwtProvider.createToken(createClaims(key, "refresh"),
-				jwtConfiguration.getRefreshTokenValidMilleSeconds());
-		Jwt savedRefreshJwt = saveRefreshJwt(key, refreshToken);
+		Date now = new Date();
+		Claims accessClaims = createClaims(key, "access", now, jwtConfiguration.getAccessTokenValidMilliseconds());
+		Claims refreshClaims = createClaims(key, "refresh", now, jwtConfiguration.getRefreshTokenValidMilliseconds());
+		String accessToken = jwtProvider.createToken(accessClaims);
+		String refreshToken = jwtProvider.createToken(refreshClaims);
+		Jwt savedRefreshJwt = saveRefreshJwt(key, refreshToken, refreshClaims);
 
 		return new JwtDto(HttpHeaders.AUTHORIZATION, SecurityScheme.BEARER_AUTH.getScheme(),
 				accessToken, savedRefreshJwt.getToken());
@@ -63,30 +66,35 @@ public class JwtService {
 				});
 	}
 
-	private Jwt saveRefreshJwt(String key, String token) {
-		return saveJwt(key, token, jwtConfiguration.getRefreshTokenValidMilleSeconds());
+	private Jwt saveRefreshJwt(String key, String token, Claims claims) {
+		return saveJwt(key, token, claims);
 	}
 
-	private Jwt saveJwt(String key, String token, long expiration) {
-		Claims claims = jwtProvider.parseClaims(token);
-
+	private Jwt saveJwt(String key, String token, Claims claims) {
 		return jwtRedisService.save(
 				Jwt.byAllParameter()
 						.id(claims.getId())
 						.key(key)
 						.type(claims.get("typ", String.class))
 						.token(token)
-						.expiration(expiration)
+						.expiration(claims.getExpiration().getTime())
 						.build()
 		);
 	}
 
-	private Claims createClaims(String subject, String type) {
+	private Claims createClaims(String subject, String type, Date now, long validTime) {
 		Map<String, Object> jwtMap = new LinkedHashMap<>();
 		jwtMap.put(ClaimName.ID.getName(), UUID.randomUUID().toString());
 		jwtMap.put(ClaimName.ISSUER.getName(), "makeabook");
 		jwtMap.put(ClaimName.SUBJECT.getName(), subject);
 		jwtMap.put(ClaimName.TYPE.getName(), type);
+		jwtMap.put(ClaimName.ISSUED_AT.getName(), jwtProvider.getSecondsFromDate(now));
+		jwtMap.put(ClaimName.EXPIRATION.getName(), jwtProvider.getSecondsFromDate(new Date(now.getTime() + validTime)));
+		if (type.equals("refresh")) {
+			jwtMap.put(ClaimName.NOT_BEFORE.getName(),
+					jwtProvider.getSecondsFromDate(
+							new Date(now.getTime() + jwtConfiguration.getAccessTokenValidMilliseconds())));
+		}
 
 		return jwtProvider.createClaims(jwtMap);
 	}

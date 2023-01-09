@@ -52,10 +52,6 @@ public class JwtReissueFilter extends OncePerRequestFilter {
 				if (auth == null) {
 					throw new JwtException("User Authentication info not found.");
 				}
-				String type = ((JwtAuthenticationToken)auth).getType();
-				if (!type.equals("refresh")) {
-					throw new JwtException("Unacceptable JWT token");
-				}
 				String jwt = ((JwtAuthenticationToken)auth).getJwt();
 				String emailValue = ((UserPrincipal)auth.getPrincipal()).getEmail();
 
