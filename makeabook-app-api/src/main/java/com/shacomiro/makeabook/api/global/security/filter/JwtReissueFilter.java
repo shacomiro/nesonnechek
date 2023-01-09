@@ -21,10 +21,10 @@ import org.springframework.util.Assert;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.shacomiro.makeabook.api.global.security.dto.JwtDto;
 import com.shacomiro.makeabook.api.global.security.principal.UserPrincipal;
 import com.shacomiro.makeabook.api.global.security.service.JwtProvisionService;
 import com.shacomiro.makeabook.api.global.security.token.JwtAuthenticationToken;
-import com.shacomiro.makeabook.cache.token.dto.JwtDto;
 import com.shacomiro.makeabook.cache.token.exception.JwtCacheExpiredException;
 
 import io.jsonwebtoken.JwtException;
