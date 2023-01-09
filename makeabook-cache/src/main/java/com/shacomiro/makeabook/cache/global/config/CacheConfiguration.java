@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.domain.redis.global.config.cache;
+package com.shacomiro.makeabook.cache.global.config;
 
 import java.time.Duration;
 

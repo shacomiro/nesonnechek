@@ -7,7 +7,8 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 @ComponentScan({
 		"com.shacomiro.makeabook.api",
-		"com.shacomiro.makeabook.domain"
+		"com.shacomiro.makeabook.domain",
+		"com.shacomiro.makeabook.cache"
 })
 public class ApiApplication {
 

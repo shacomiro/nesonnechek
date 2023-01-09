@@ -23,8 +23,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shacomiro.makeabook.api.global.security.principal.UserPrincipal;
 import com.shacomiro.makeabook.api.global.security.token.JwtAuthenticationToken;
-import com.shacomiro.makeabook.domain.token.dto.JwtDto;
-import com.shacomiro.makeabook.domain.token.service.JwtService;
+import com.shacomiro.makeabook.cache.jwt.dto.JwtDto;
+import com.shacomiro.makeabook.cache.jwt.service.JwtService;
 
 import io.jsonwebtoken.JwtException;
 

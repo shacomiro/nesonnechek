@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.domain.global.config;
+package com.shacomiro.makeabook.cache.global.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

@@ -1,22 +1,21 @@
-package com.shacomiro.makeabook.domain.token.service;
+package com.shacomiro.makeabook.cache.jwt.service;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.transaction.Transactional;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.shacomiro.jwt.policy.ClaimName;
 import com.shacomiro.jwt.policy.SecurityScheme;
 import com.shacomiro.jwt.provider.JwtProvider;
-import com.shacomiro.makeabook.domain.global.config.JwtConfiguration;
+import com.shacomiro.makeabook.cache.global.config.JwtConfiguration;
+import com.shacomiro.makeabook.cache.jwt.dto.JwtDto;
 import com.shacomiro.makeabook.domain.redis.token.entity.Jwt;
 import com.shacomiro.makeabook.domain.redis.token.service.JwtRedisService;
-import com.shacomiro.makeabook.domain.token.dto.JwtDto;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
