@@ -14,8 +14,4 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-json'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     api project(':makeabook-domain-redis')
-
-    //제거 예정
-    implementation 'io.jsonwebtoken:jjwt:0.9.1'
-    implementation project(':java-jwt-provider')
 }

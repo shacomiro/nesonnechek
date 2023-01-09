@@ -19,7 +19,7 @@ import com.shacomiro.makeabook.api.global.security.filter.JwtReissueFilter;
 import com.shacomiro.makeabook.api.global.security.handler.JwtAccessDeniedHandler;
 import com.shacomiro.makeabook.api.global.security.handler.JwtAuthenticationEntryPoint;
 import com.shacomiro.makeabook.api.global.security.provider.JwtAuthenticationProvider;
-import com.shacomiro.makeabook.domain.token.service.JwtService;
+import com.shacomiro.makeabook.api.global.security.service.JwtProvisionService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class WebSecurityConfiguration {
 	private final JwtAuthenticationProvider jwtAuthenticationProvider;
-	private final JwtService jwtService;
+	private final JwtProvisionService jwtProvisionService;
 	private final ObjectMapper objectMapper;
 
 	@Bean
@@ -60,7 +60,7 @@ public class WebSecurityConfiguration {
 				.and()
 				.addFilterBefore(new JwtAuthenticationFilter(authenticationManager, objectMapper),
 						UsernamePasswordAuthenticationFilter.class)
-				.addFilterAfter(new JwtReissueFilter(jwtService, objectMapper), FilterSecurityInterceptor.class);
+				.addFilterAfter(new JwtReissueFilter(jwtProvisionService, objectMapper), FilterSecurityInterceptor.class);
 
 		return http.build();
 	}

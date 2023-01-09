@@ -21,16 +21,16 @@ public class Jwt {
 	@Indexed
 	private String key;
 	@Indexed
-	private String type;
+	private String purpose;
 	private String token;
 	@TimeToLive(unit = TimeUnit.MILLISECONDS)
 	private Long expiration;
 
 	@Builder(builderClassName = "ByAllParameter", builderMethodName = "byAllParameter")
-	public Jwt(String id, String key, String type, String token, Long expiration) {
+	public Jwt(String id, String key, String purpose, String token, Long expiration) {
 		this.id = id;
 		this.key = key;
-		this.type = type;
+		this.purpose = purpose;
 		this.token = token;
 		this.expiration = expiration;
 	}

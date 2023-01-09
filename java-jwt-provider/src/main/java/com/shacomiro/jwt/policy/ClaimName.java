@@ -10,7 +10,7 @@ public enum ClaimName {
 	NOT_BEFORE(Claims.NOT_BEFORE),
 	ISSUED_AT(Claims.ISSUED_AT),
 	ID(Claims.ID),
-	TYPE("typ");
+	PURPOSE("pur");
 
 	private final String name;
 

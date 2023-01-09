@@ -7,27 +7,28 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
-import com.shacomiro.jwt.provider.JwtProvider;
+import com.shacomiro.jwt.policy.ClaimName;
+import com.shacomiro.makeabook.api.global.security.service.JwtProvisionService;
 import com.shacomiro.makeabook.api.global.security.token.JwtAuthenticationToken;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationProvider implements AuthenticationProvider {
 	private final UserDetailsService userDetailsService;
-	private final JwtProvider jwtProvider;
+	private final JwtProvisionService jwtProvisionService;
 
 	@Override
-	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+	public Authentication authenticate(Authentication authentication) throws AuthenticationException, JwtException {
 		String jwt = ((JwtAuthenticationToken)authentication).getJwt();
-		jwtProvider.verifyToken(jwt);
-		Claims claims = jwtProvider.parseClaims(jwt);
-		String type = claims.get("typ", String.class);
+		Claims claims = jwtProvisionService.parseClaims(jwt);
+		String purpose = claims.get(ClaimName.PURPOSE.getName(), String.class);
 		UserDetails userDetails = userDetailsService.loadUserByUsername(claims.getSubject());
 
-		return JwtAuthenticationToken.authenticated(userDetails, null, userDetails.getAuthorities(), jwt, type);
+		return JwtAuthenticationToken.authenticated(userDetails, null, userDetails.getAuthorities(), jwt, purpose);
 	}
 
 	@Override

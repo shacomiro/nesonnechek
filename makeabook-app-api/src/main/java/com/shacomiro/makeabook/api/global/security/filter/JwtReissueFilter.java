@@ -22,19 +22,20 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shacomiro.makeabook.api.global.security.principal.UserPrincipal;
+import com.shacomiro.makeabook.api.global.security.service.JwtProvisionService;
 import com.shacomiro.makeabook.api.global.security.token.JwtAuthenticationToken;
-import com.shacomiro.makeabook.cache.jwt.dto.JwtDto;
-import com.shacomiro.makeabook.cache.jwt.service.JwtService;
+import com.shacomiro.makeabook.cache.token.dto.JwtDto;
+import com.shacomiro.makeabook.cache.token.exception.JwtCacheExpiredException;
 
 import io.jsonwebtoken.JwtException;
 
 public class JwtReissueFilter extends OncePerRequestFilter {
-	private final JwtService jwtService;
+	private final JwtProvisionService jwtProvisionService;
 	private final ObjectMapper objectMapper;
 	private RequestMatcher reissueRequestMatcher;
 
-	public JwtReissueFilter(JwtService jwtService, ObjectMapper objectMapper) {
-		this.jwtService = jwtService;
+	public JwtReissueFilter(JwtProvisionService jwtProvisionService, ObjectMapper objectMapper) {
+		this.jwtProvisionService = jwtProvisionService;
 		this.objectMapper = objectMapper;
 		setFilterProcessesUrl("/api/sign/reissue");
 	}
@@ -54,11 +55,9 @@ public class JwtReissueFilter extends OncePerRequestFilter {
 				}
 				String jwt = ((JwtAuthenticationToken)auth).getJwt();
 				String emailValue = ((UserPrincipal)auth.getPrincipal()).getEmail();
-
-				jwtService.verifyRefreshJwt(emailValue, jwt);
-				JwtDto jwtDto = jwtService.reissueJwt(emailValue);
+				JwtDto jwtDto = jwtProvisionService.reissueJwt(emailValue, jwt);
 				jwtReissueSuccessHandle(request, response, jwtDto);
-			} catch (RuntimeException e) {
+			} catch (JwtException | JwtCacheExpiredException e) {
 				jwtReissueExceptionHandle(request, response, e);
 			}
 

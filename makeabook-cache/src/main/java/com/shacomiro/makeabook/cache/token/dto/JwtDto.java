@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.cache.jwt.dto;
+package com.shacomiro.makeabook.cache.token.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

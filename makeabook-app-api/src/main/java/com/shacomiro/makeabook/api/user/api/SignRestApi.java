@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.shacomiro.makeabook.api.global.security.service.JwtProvisionService;
 import com.shacomiro.makeabook.api.user.dto.SignInRequest;
 import com.shacomiro.makeabook.api.user.dto.SignUpRequest;
 import com.shacomiro.makeabook.api.user.dto.model.UserModel;
-import com.shacomiro.makeabook.cache.jwt.service.JwtService;
 import com.shacomiro.makeabook.domain.rds.user.entity.User;
 import com.shacomiro.makeabook.domain.user.dto.SignUpDto;
 import com.shacomiro.makeabook.domain.user.service.UserService;
@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SignRestApi {
 	private final UserService userService;
-	private final JwtService jwtService;
+	private final JwtProvisionService jwtProvisionService;
 	private final PasswordEncoder passwordEncoder;
 
 	@PostMapping(path = "signin")
@@ -44,7 +44,7 @@ public class SignRestApi {
 
 		return new ResponseEntity<>(
 				EntityModel.of(
-						jwtService.issueJwt(emailValue),
+						jwtProvisionService.issueJwt(emailValue),
 						Link.of(getCurrentApiServletMapping() + "/api/sign/signout").withRel("signout"),
 						Link.of(getCurrentApiServletMapping() + "/api/sign/reissue").withRel("reissue"),
 						docsLink()

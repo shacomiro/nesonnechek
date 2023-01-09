@@ -20,8 +20,8 @@ public class JwtRedisService {
 		return jwtRedisRepository.save(jwt);
 	}
 
-	public Optional<Jwt> findByKeyAndType(String key, String type) {
-		return jwtRedisRepository.findByKeyAndType(key, type);
+	public Optional<Jwt> findByKeyAndPurpose(String key, String purpose) {
+		return jwtRedisRepository.findByKeyAndPurpose(key, purpose);
 	}
 
 	public void delete(Jwt jwt) {

@@ -9,10 +9,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.shacomiro.makeabook.cache.global.config.CacheKey;
 import com.shacomiro.makeabook.domain.rds.user.entity.Email;
 import com.shacomiro.makeabook.domain.rds.user.entity.User;
 import com.shacomiro.makeabook.domain.rds.user.repository.UserRdsRepository;
-import com.shacomiro.makeabook.domain.redis.global.config.cache.CacheKey;
 
 import lombok.RequiredArgsConstructor;
 
