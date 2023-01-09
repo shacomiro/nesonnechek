@@ -45,7 +45,6 @@ public class SignRestApi {
 		return new ResponseEntity<>(
 				EntityModel.of(
 						jwtProvisionService.issueJwt(emailValue),
-						Link.of(getCurrentApiServletMapping() + "/api/sign/signout").withRel("signout"),
 						Link.of(getCurrentApiServletMapping() + "/api/sign/reissue").withRel("reissue"),
 						docsLink()
 				),
