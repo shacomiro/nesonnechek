@@ -62,19 +62,19 @@ public class JwtProvisionService {
 	}
 
 	private Claims createClaims(String subject, String type, Date now, long validTime) {
-		Map<String, Object> jwtMap = new LinkedHashMap<>();
-		jwtMap.put(ClaimName.ID.getName(), UUID.randomUUID().toString());
-		jwtMap.put(ClaimName.ISSUER.getName(), "makeabook");
-		jwtMap.put(ClaimName.SUBJECT.getName(), subject);
-		jwtMap.put(ClaimName.PURPOSE.getName(), type);
-		jwtMap.put(ClaimName.ISSUED_AT.getName(), jwtProvider.getSecondsFromDate(now));
-		jwtMap.put(ClaimName.EXPIRATION.getName(), jwtProvider.getSecondsFromDate(new Date(now.getTime() + validTime)));
+		Map<String, Object> map = new LinkedHashMap<>();
+		map.put(ClaimName.ID.getName(), UUID.randomUUID().toString());
+		map.put(ClaimName.ISSUER.getName(), "makeabook");
+		map.put(ClaimName.SUBJECT.getName(), subject);
+		map.put(ClaimName.PURPOSE.getName(), type);
+		map.put(ClaimName.ISSUED_AT.getName(), jwtProvider.getSecondsFromDate(now));
+		map.put(ClaimName.EXPIRATION.getName(), jwtProvider.getSecondsFromDate(new Date(now.getTime() + validTime)));
 		if (type.equals(TokenPurpose.REFRESH.getValue())) {
-			jwtMap.put(ClaimName.NOT_BEFORE.getName(),
+			map.put(ClaimName.NOT_BEFORE.getName(),
 					jwtProvider.getSecondsFromDate(
-							new Date(now.getTime() + jwtConfiguration.getRefreshTokenValidMilliseconds())));
+							new Date(now.getTime() + jwtConfiguration.getAccessTokenValidMilliseconds())));
 		}
 
-		return jwtProvider.createClaims(jwtMap);
+		return jwtProvider.createClaims(map);
 	}
 }

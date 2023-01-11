@@ -1,9 +1,11 @@
 package com.shacomiro.jwt.provider;
 
+import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
-import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
+
+import javax.crypto.SecretKey;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -13,22 +15,22 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.PrematureJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
-import io.jsonwebtoken.impl.JwtMap;
+import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 
 public class JwtProvider {
-	private final String base64EncodedSecretKey;
+	private final SecretKey secretKey;
 
-	public JwtProvider(String secretKey) {
-		this.base64EncodedSecretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
+	public JwtProvider(String secretString) {
+		this.secretKey = Keys.hmacShaKeyFor(secretString.getBytes(StandardCharsets.UTF_8));
 	}
 
 	public String createToken(Claims claims) {
 		return Jwts.builder()
 				.setHeaderParam(Header.TYPE, Header.JWT_TYPE)
 				.setClaims(claims)
-				.signWith(SignatureAlgorithm.HS256, base64EncodedSecretKey)
+				.signWith(secretKey, SignatureAlgorithm.HS256)
 				.compact();
 	}
 
@@ -37,19 +39,20 @@ public class JwtProvider {
 	}
 
 	public Claims createClaims(Map<String, Object> map) {
-		return Jwts.claims(new JwtMap(map));
+		return Jwts.claims(map);
 	}
 
 	public Claims parseClaims(String token) {
-		return Jwts.parser()
-				.setSigningKey(base64EncodedSecretKey)
+		return Jwts.parserBuilder()
+				.setSigningKey(secretKey)
+				.build()
 				.parseClaimsJws(token)
 				.getBody();
 	}
 
 	public void verifyToken(String token) {
 		try {
-			Jwts.parser().setSigningKey(base64EncodedSecretKey).parseClaimsJws(token);
+			Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
 		} catch (SecurityException | SignatureException e) {
 			throw new JwtException("Invalid JWT signature");
 		} catch (MalformedJwtException e) {
