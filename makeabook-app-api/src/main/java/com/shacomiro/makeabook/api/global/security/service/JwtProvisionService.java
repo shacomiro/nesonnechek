@@ -63,7 +63,7 @@ public class JwtProvisionService {
 	private Claims createClaims(String subject, String type, Date now, long validTime) {
 		Map<String, Object> map = new LinkedHashMap<>();
 		map.put(ClaimName.ID.getName(), UUID.randomUUID().toString());
-		map.put(ClaimName.ISSUER.getName(), "makeabook");
+		map.put(ClaimName.ISSUER.getName(), jwtConfiguration.getJwtIssuer());
 		map.put(ClaimName.SUBJECT.getName(), subject);
 		map.put(ClaimName.PURPOSE.getName(), type);
 		map.put(ClaimName.ISSUED_AT.getName(), jwtProvider.getSecondsFromDate(now));
