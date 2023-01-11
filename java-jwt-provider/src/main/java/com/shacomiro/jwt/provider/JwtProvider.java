@@ -3,6 +3,7 @@ package com.shacomiro.jwt.provider;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 
 import javax.crypto.SecretKey;
 
@@ -13,19 +14,27 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParserBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Deserializer;
 import io.jsonwebtoken.security.Keys;
 
 public class JwtProvider {
 	private final SecretKey secretKey;
 	private final SignatureAlgorithm signatureAlgorithm;
+	private final Set<Deserializer<Map<String, ?>>> deserializers;
 
 	public JwtProvider(String secretString) {
-		this(secretString, SignatureAlgorithm.HS256);
+		this(secretString, SignatureAlgorithm.HS256, null);
 	}
 
 	public JwtProvider(String secretString, SignatureAlgorithm signatureAlgorithm) {
+		this(secretString, signatureAlgorithm, null);
+	}
+
+	public JwtProvider(String secretString, SignatureAlgorithm signatureAlgorithm,
+			Set<Deserializer<Map<String, ?>>> deserializers) {
 		this.secretKey = Keys.hmacShaKeyFor(secretString.getBytes(StandardCharsets.UTF_8));
 		this.signatureAlgorithm = signatureAlgorithm;
+		this.deserializers = deserializers;
 	}
 
 	public JwtBuilder initializeJwtBuilder(Claims claims) {
@@ -54,8 +63,15 @@ public class JwtProvider {
 	}
 
 	public Claims parseClaims(String token) throws JwtException, IllegalArgumentException {
-		return Jwts.parserBuilder()
-				.setSigningKey(secretKey)
+		JwtParserBuilder jwtParserBuilder = Jwts.parserBuilder()
+				.setSigningKey(secretKey);
+		if (deserializers != null && !deserializers.isEmpty()) {
+			for (Deserializer<Map<String, ?>> deserializer : deserializers) {
+				jwtParserBuilder.deserializeJsonWith(deserializer);
+			}
+		}
+
+		return jwtParserBuilder
 				.build()
 				.parseClaimsJws(token)
 				.getBody();
@@ -64,6 +80,11 @@ public class JwtProvider {
 	public Claims parseClaims(String token, Map<String, Object> requires) throws JwtException, IllegalArgumentException {
 		JwtParserBuilder jwtParserBuilder = Jwts.parserBuilder()
 				.setSigningKey(secretKey);
+		if (deserializers != null && !deserializers.isEmpty()) {
+			for (Deserializer<Map<String, ?>> deserializer : deserializers) {
+				jwtParserBuilder.deserializeJsonWith(deserializer);
+			}
+		}
 		for (Map.Entry<String, Object> require : requires.entrySet()) {
 			jwtParserBuilder.require(require.getKey(), require.getValue());
 		}
