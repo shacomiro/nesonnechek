@@ -32,8 +32,7 @@ public class JwtProvisionService {
 	private final JwtCacheService jwtCacheService;
 	private final JwtProvider jwtProvider;
 
-	public Claims parseClaims(String jwt) throws JwtException {
-		jwtProvider.verifyToken(jwt);
+	public Claims parseClaims(String jwt) throws JwtException, IllegalArgumentException {
 		return jwtProvider.parseClaims(jwt);
 	}
 
