@@ -3,5 +3,5 @@ spring:
     activate:
       on-profile: domain-redis-local
   redis:
-    port: 6379
-    host: localhost
+    port: ${ext-config.redis.secret.port}
+    host: ${ext-config.redis.secret.host}
