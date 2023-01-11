@@ -32,7 +32,12 @@ public class JwtProvider {
 
 	public JwtProvider(String secretString, SignatureAlgorithm signatureAlgorithm,
 			Set<Deserializer<Map<String, ?>>> deserializers) {
-		this.secretKey = Keys.hmacShaKeyFor(secretString.getBytes(StandardCharsets.UTF_8));
+		if (signatureAlgorithm.isHmac()) {
+			this.secretKey = Keys.hmacShaKeyFor(secretString.getBytes(StandardCharsets.UTF_8));
+		} else {
+			this.secretKey = null;
+			throw new RuntimeException("ECDSA or RSA signing algorithm not supported.");
+		}
 		this.signatureAlgorithm = signatureAlgorithm;
 		this.deserializers = deserializers;
 	}
@@ -90,7 +95,6 @@ public class JwtProvider {
 		}
 
 		return jwtParserBuilder
-				.setSigningKey(secretKey)
 				.build()
 				.parseClaimsJws(token)
 				.getBody();
