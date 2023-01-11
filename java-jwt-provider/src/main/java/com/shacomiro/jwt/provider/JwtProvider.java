@@ -61,7 +61,7 @@ public class JwtProvider {
 				.getBody();
 	}
 
-	public Claims parseClaims(String token, Map<String, Object> requires) {
+	public Claims parseClaims(String token, Map<String, Object> requires) throws JwtException, IllegalArgumentException {
 		JwtParserBuilder jwtParserBuilder = Jwts.parserBuilder()
 				.setSigningKey(secretKey);
 		for (Map.Entry<String, Object> require : requires.entrySet()) {
