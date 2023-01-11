@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 
 import com.shacomiro.jwt.provider.JwtProvider;
 
+import io.jsonwebtoken.SignatureAlgorithm;
+
 @Configuration
 public class JwtConfiguration {
 	private final String jwtIssuer;
@@ -22,7 +24,7 @@ public class JwtConfiguration {
 
 	@Bean
 	public JwtProvider jwtProvider(@Value("${ext-config.jwt.secret.key}") String secretKey) {
-		return new JwtProvider(secretKey);
+		return new JwtProvider(secretKey, SignatureAlgorithm.HS256);
 	}
 
 	public String getJwtIssuer() {

@@ -1,6 +1,7 @@
 package com.shacomiro.makeabook.api.global.security.service;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -33,7 +34,10 @@ public class JwtProvisionService {
 	private final JwtProvider jwtProvider;
 
 	public Claims parseClaims(String jwt) throws JwtException, IllegalArgumentException {
-		return jwtProvider.parseClaims(jwt);
+		Map<String, Object> requires = new HashMap<>();
+		requires.put(ClaimName.ISSUER.getName(), jwtConfiguration.getJwtIssuer());
+
+		return jwtProvider.parseClaims(jwt, requires);
 	}
 
 	public JwtDto issueJwt(String key) throws JwtException {
@@ -43,8 +47,8 @@ public class JwtProvisionService {
 				jwtConfiguration.getAccessTokenValidMilliseconds());
 		Claims refreshClaims = createClaims(key, TokenPurpose.REFRESH.getValue(), now,
 				jwtConfiguration.getRefreshTokenValidMilliseconds());
-		String accessToken = jwtProvider.createToken(accessClaims);
-		String refreshToken = jwtProvider.createToken(refreshClaims);
+		String accessToken = jwtProvider.buildToken(jwtProvider.initializeJwtBuilder(accessClaims));
+		String refreshToken = jwtProvider.buildToken(jwtProvider.initializeJwtBuilder(refreshClaims));
 
 		JwtCacheDto jwtCacheDto = new JwtCacheDto(refreshClaims.getId(), key,
 				refreshClaims.get(ClaimName.PURPOSE.getName(), String.class), refreshToken,

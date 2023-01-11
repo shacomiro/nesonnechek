@@ -15,8 +15,10 @@ import com.shacomiro.makeabook.api.global.security.token.JwtAuthenticationToken;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.IncorrectClaimException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.MissingClaimException;
 import io.jsonwebtoken.PrematureJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -61,6 +63,12 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 					.toInstant()
 					.atZone(ZoneId.systemDefault())
 					.toLocalDateTime() + ".");
+		} catch (MissingClaimException e) {
+			throw new JwtException("Missing JWT claim. Claim " + e.getClaimName() + " is not found.");
+		} catch (IncorrectClaimException e) {
+			throw new JwtException(
+					"Incorrect JWT claim. Expect " +
+							e.getClaimName() + " is " + e.getClaimValue() + ", not " + e.getClaims().getIssuer());
 		} catch (IllegalArgumentException e) {
 			throw new JwtException("JWT token compact of handler are invalid");
 		}
