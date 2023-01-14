@@ -1,5 +1,7 @@
 package com.shacomiro.makeabook.api.global.assembers;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 import org.springframework.stereotype.Component;
@@ -18,6 +20,8 @@ public class UserResponseModelAssembler extends RepresentationModelAssemblerSupp
 	@Override
 	public UserModel toModel(User entity) {
 		UserModel userModel = instantiateModel(entity);
+
+		userModel.add(linkTo(methodOn(UserRestApi.class).getAccount()).withSelfRel());
 
 		userModel.setEmail(entity.getEmail().getValue());
 		userModel.setUsername(entity.getUsername());
