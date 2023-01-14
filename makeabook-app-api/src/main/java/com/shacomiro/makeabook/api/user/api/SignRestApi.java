@@ -26,7 +26,7 @@ import com.shacomiro.makeabook.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping(path = "api/sign")
+@RequestMapping(path = "api/v1/sign")
 @RequiredArgsConstructor
 public class SignRestApi {
 	private final UserService userService;

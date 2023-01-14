@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping(path = "api/ebooks")
+@RequestMapping(path = "api/v1/ebooks")
 public class EbookRestApi {
 	private final EbookService ebookService;
 	private final EbookResponseModelAssembler ebookResponseModelAssembler;
