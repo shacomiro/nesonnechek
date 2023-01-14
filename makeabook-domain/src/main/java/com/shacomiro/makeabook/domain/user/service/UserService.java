@@ -14,6 +14,7 @@ import com.shacomiro.makeabook.domain.rds.user.entity.User;
 import com.shacomiro.makeabook.domain.rds.user.entity.UserRole;
 import com.shacomiro.makeabook.domain.rds.user.service.UserRdsService;
 import com.shacomiro.makeabook.domain.user.dto.SignUpDto;
+import com.shacomiro.makeabook.domain.user.dto.UpdateUserDto;
 import com.shacomiro.makeabook.domain.user.exception.UserConflictException;
 import com.shacomiro.makeabook.domain.user.exception.UserNotFoundException;
 
@@ -58,4 +59,18 @@ public class UserService {
 		);
 	}
 
+	public User updateUser(@Valid UpdateUserDto updateUserDto) {
+		if (userRdsService.findByUsername(updateUserDto.getUsername()).isPresent()) {
+			throw new UserConflictException("Duplicate username");
+		}
+
+		return userRdsService.findByEmail(Email.byValue().value(updateUserDto.getEmail()).build())
+				.map(currentUser -> userRdsService.save(User.byUpdateUserInfos()
+						.currentUser(currentUser)
+						.encryptedPassword(updateUserDto.getEncryptedPassword())
+						.username(updateUserDto.getUsername())
+						.build())
+				)
+				.orElseThrow(() -> new UserNotFoundException("Fail to find user '" + updateUserDto.getEmail() + "'."));
+	}
 }
