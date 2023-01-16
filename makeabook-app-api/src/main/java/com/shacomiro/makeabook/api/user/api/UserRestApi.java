@@ -5,6 +5,8 @@ import static com.shacomiro.makeabook.api.global.util.ApiUtils.*;
 import javax.validation.Valid;
 
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,10 +18,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.shacomiro.makeabook.api.global.assembers.EbookResponseModelAssembler;
 import com.shacomiro.makeabook.api.global.assembers.UserResponseModelAssembler;
 import com.shacomiro.makeabook.api.global.security.principal.UserPrincipal;
 import com.shacomiro.makeabook.api.user.dto.DeleteUserRequest;
 import com.shacomiro.makeabook.api.user.dto.UpdateUserRequest;
+import com.shacomiro.makeabook.cache.global.config.CacheKey;
+import com.shacomiro.makeabook.domain.ebook.service.EbookService;
+import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
 import com.shacomiro.makeabook.domain.user.dto.UpdateUserDto;
 import com.shacomiro.makeabook.domain.user.service.UserService;
 
@@ -31,8 +37,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserRestApi {
 	private final UserService userService;
-	private final UserResponseModelAssembler userResponseModelAssembler;
+	private final EbookService ebookService;
 	private final PasswordEncoder passwordEncoder;
+	private final UserResponseModelAssembler userResponseModelAssembler;
+	private final EbookResponseModelAssembler ebookResponseModelAssembler;
 
 	@GetMapping(path = "account")
 	public ResponseEntity<?> getAccount(@AuthenticationPrincipal @NonNull UserPrincipal userPrincipal) {
@@ -72,5 +80,17 @@ public class UserRestApi {
 		userService.deleteUser(userPrincipal.getEmail());
 
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@GetMapping(path = "account/ebooks")
+	public ResponseEntity<?> getAccountEbooks(@AuthenticationPrincipal @NonNull UserPrincipal userPrincipal,
+			Pageable pageable, PagedResourcesAssembler<Ebook> assembler) {
+
+		return success(
+				ebookService.findEbooksByUserId(pageable, userService.findUserByEmail(userPrincipal.getEmail()).getId()),
+				ebookResponseModelAssembler,
+				assembler,
+				HttpStatus.OK
+		);
 	}
 }

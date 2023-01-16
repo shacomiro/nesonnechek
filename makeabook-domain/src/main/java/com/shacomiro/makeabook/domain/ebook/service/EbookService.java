@@ -12,6 +12,8 @@ import javax.transaction.Transactional;
 
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -65,6 +67,10 @@ public class EbookService {
 		}
 
 		return ebook;
+	}
+
+	public Page<Ebook> findEbooksByUserId(Pageable pageable, Long userId) {
+		return ebookRdsService.findAllByUserId(pageable, userId);
 	}
 
 	public Optional<Ebook> findEbookByUuid(String uuid) {

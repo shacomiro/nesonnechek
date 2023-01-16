@@ -4,6 +4,8 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
@@ -20,6 +22,10 @@ public class EbookRdsService {
 
 	public Ebook save(Ebook ebook) {
 		return ebookRdsRepository.save(ebook);
+	}
+
+	public Page<Ebook> findAllByUserId(Pageable pageable, Long userId) {
+		return ebookRdsRepository.findAllByUserId(pageable, userId);
 	}
 
 	public Optional<Ebook> findByUuid(String uuid) {
