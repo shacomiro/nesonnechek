@@ -33,7 +33,7 @@ public class SignRestApi {
 	private final JwtProvisionService jwtProvisionService;
 	private final PasswordEncoder passwordEncoder;
 
-	@PostMapping(path = "signin")
+	@PostMapping(path = "sign-in")
 	public ResponseEntity<?> signIn(@RequestBody @Valid SignInRequest signInRequest) {
 		String emailValue = signInRequest.getEmail();
 		String password = signInRequest.getPassword();
@@ -52,7 +52,7 @@ public class SignRestApi {
 		);
 	}
 
-	@PostMapping(path = "signup")
+	@PostMapping(path = "sign-up")
 	public ResponseEntity<?> singUp(@RequestBody @Valid SignUpRequest signUpRequest) {
 		User signUpUser = userService.signUpUser(
 				new SignUpDto(
