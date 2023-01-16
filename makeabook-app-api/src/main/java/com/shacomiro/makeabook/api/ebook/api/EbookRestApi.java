@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,10 +22,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.shacomiro.makeabook.api.global.assembers.EbookResponseModelAssembler;
 import com.shacomiro.makeabook.api.global.exception.NotFoundException;
+import com.shacomiro.makeabook.api.global.security.principal.UserPrincipal;
 import com.shacomiro.makeabook.domain.ebook.service.EbookService;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookType;
 
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -41,6 +44,7 @@ public class EbookRestApi {
 
 	@PostMapping(path = "txt-ebook")
 	public ResponseEntity<?> createTxtEbook(
+			@AuthenticationPrincipal @NonNull UserPrincipal userPrincipal,
 			@RequestParam(name = "type", defaultValue = "epub2") EbookType ebookType,
 			@RequestBody @RequestParam(name = "file") MultipartFile file) {
 		if (file.isEmpty()) {
@@ -50,7 +54,7 @@ public class EbookRestApi {
 		}
 
 		return success(
-				ebookService.createEbook(file, ebookType)
+				ebookService.createEbook(file, ebookType, userPrincipal.getEmail())
 						.orElseThrow(() -> new NullPointerException("Fail to create ebook")),
 				ebookResponseModelAssembler,
 				HttpStatus.CREATED

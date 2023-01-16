@@ -22,6 +22,9 @@ import com.shacomiro.makeabook.core.util.IOUtils;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookType;
 import com.shacomiro.makeabook.domain.rds.ebook.service.EbookRdsService;
+import com.shacomiro.makeabook.domain.rds.user.entity.Email;
+import com.shacomiro.makeabook.domain.rds.user.service.UserRdsService;
+import com.shacomiro.makeabook.domain.user.exception.UserNotFoundException;
 import com.shacomiro.makeabook.ebook.EbookManager;
 import com.shacomiro.makeabook.ebook.domain.ContentTempFileInfo;
 import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
@@ -34,6 +37,7 @@ import lombok.RequiredArgsConstructor;
 public class EbookService {
 	private static final String RESOURCES_DIR = "./files";
 	private final EbookRdsService ebookRdsService;
+	private final UserRdsService userRdsService;
 	private EbookManager ebookManager;
 
 	@PostConstruct
@@ -41,7 +45,7 @@ public class EbookService {
 		this.ebookManager = new EbookManager(RESOURCES_DIR);
 	}
 
-	public Optional<Ebook> createEbook(MultipartFile file, EbookType ebookType) {
+	public Optional<Ebook> createEbook(MultipartFile file, EbookType ebookType, String emailValue) {
 		Optional<Ebook> ebook = Optional.empty();
 		String uuid = UUID.randomUUID().toString();
 		EpubFileInfo epubFileInfo;
@@ -56,6 +60,9 @@ public class EbookService {
 							.uuid(uuid)
 							.name(epubFileInfo.getFileName())
 							.type(EbookType.EPUB2)
+							.user(userRdsService.findByEmail(Email.byValue().value(emailValue).build())
+									.orElseThrow(() -> new UserNotFoundException("Could not find user '" + emailValue + "'."))
+							)
 							.build())
 			);
 		}
