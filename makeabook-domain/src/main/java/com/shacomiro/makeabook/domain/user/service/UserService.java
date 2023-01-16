@@ -27,8 +27,9 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 	private final UserRdsService userRdsService;
 
-	public Optional<User> findUserByEmail(String emailValue) {
-		return userRdsService.findByEmail(Email.byValue().value(emailValue).build());
+	public User findUserByEmail(String emailValue) {
+		return userRdsService.findByEmail(Email.byValue().value(emailValue).build())
+				.orElseThrow(() -> new UserNotFoundException("Could not find user '" + emailValue + "'."));
 	}
 
 	public Optional<User> findUserByUsername(String username) {
@@ -71,7 +72,9 @@ public class UserService {
 						.username(updateUserDto.getUsername())
 						.build())
 				)
-				.orElseThrow(() -> new UserNotFoundException("Fail to find user '" + updateUserDto.getEmail() + "'."));
+				.orElseThrow(() -> new UserNotFoundException("Could not find user '" + updateUserDto.getEmail() + "'."));
+	}
+
 	public void deleteUser(String emailValue) {
 		User currentUser = userRdsService.findByEmail(Email.byValue().value(emailValue).build())
 				.orElseThrow(() -> new UserNotFoundException("Could not find user '" + emailValue + "'."));
