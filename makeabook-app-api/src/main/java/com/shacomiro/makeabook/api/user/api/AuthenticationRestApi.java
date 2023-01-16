@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.shacomiro.makeabook.api.global.security.dto.JwtDto;
 import com.shacomiro.makeabook.api.global.security.service.JwtProvisionService;
 import com.shacomiro.makeabook.api.user.dto.SignInRequest;
 import com.shacomiro.makeabook.api.user.dto.SignUpRequest;
@@ -41,10 +42,13 @@ public class AuthenticationRestApi {
 		if (!passwordEncoder.matches(password, userService.getSignInUserEncryptedPassword(emailValue))) {
 			throw new IllegalArgumentException("Password is incorrect");
 		}
-		
+
+		JwtDto jwtDto = jwtProvisionService.issueJwt(emailValue);
+		userService.updateLoginCount(emailValue);
+
 		return new ResponseEntity<>(
 				EntityModel.of(
-						jwtProvisionService.issueJwt(emailValue),
+						jwtDto,
 						Link.of(getCurrentApiServletMapping() + "/api/sign/reissue").withRel("reissue"),
 						docsLink()
 				),

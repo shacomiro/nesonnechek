@@ -75,6 +75,14 @@ public class UserService {
 				.orElseThrow(() -> new UserNotFoundException("Could not find user '" + updateUserDto.getEmail() + "'."));
 	}
 
+	public void updateLoginCount(String emailValue) {
+		User currentUser = userRdsService.findByEmail(Email.byValue().value(emailValue).build())
+				.orElseThrow(() -> new UserNotFoundException("Could not find user '" + emailValue + "'."));
+
+		currentUser.afterLoginSuccess();
+		userRdsService.save(currentUser);
+	}
+
 	public void deleteUser(String emailValue) {
 		User currentUser = userRdsService.findByEmail(Email.byValue().value(emailValue).build())
 				.orElseThrow(() -> new UserNotFoundException("Could not find user '" + emailValue + "'."));
