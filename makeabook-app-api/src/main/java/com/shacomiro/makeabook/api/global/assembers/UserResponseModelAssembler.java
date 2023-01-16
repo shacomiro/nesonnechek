@@ -6,6 +6,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 import org.springframework.stereotype.Component;
 
+import com.shacomiro.makeabook.api.user.api.AuthenticationRestApi;
 import com.shacomiro.makeabook.api.user.api.UserRestApi;
 import com.shacomiro.makeabook.api.user.dto.model.UserModel;
 import com.shacomiro.makeabook.domain.rds.user.entity.User;
@@ -22,6 +23,9 @@ public class UserResponseModelAssembler extends RepresentationModelAssemblerSupp
 		UserModel userModel = instantiateModel(entity);
 
 		userModel.add(linkTo(methodOn(UserRestApi.class).getAccount(null)).withSelfRel());
+		if (entity.getLoginCount() == 0) {
+			userModel.add(linkTo(methodOn(AuthenticationRestApi.class).signIn(null)).withRel("sign-in"));
+		}
 
 		userModel.setEmail(entity.getEmail().getValue());
 		userModel.setUsername(entity.getUsername());
