@@ -1,7 +1,6 @@
 package com.shacomiro.makeabook.api.user.api;
 
 import static com.shacomiro.makeabook.api.global.util.ApiUtils.*;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 import javax.validation.Valid;
 
@@ -15,11 +14,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.shacomiro.makeabook.api.global.assembers.UserResponseModelAssembler;
 import com.shacomiro.makeabook.api.global.security.dto.JwtDto;
 import com.shacomiro.makeabook.api.global.security.service.JwtProvisionService;
 import com.shacomiro.makeabook.api.user.dto.SignInRequest;
 import com.shacomiro.makeabook.api.user.dto.SignUpRequest;
-import com.shacomiro.makeabook.api.user.dto.model.UserModel;
 import com.shacomiro.makeabook.domain.rds.user.entity.User;
 import com.shacomiro.makeabook.domain.user.dto.SignUpDto;
 import com.shacomiro.makeabook.domain.user.service.UserService;
@@ -33,6 +32,7 @@ public class AuthenticationRestApi {
 	private final UserService userService;
 	private final JwtProvisionService jwtProvisionService;
 	private final PasswordEncoder passwordEncoder;
+	private final UserResponseModelAssembler userResponseModelAssembler;
 
 	@PostMapping(path = "sign-in")
 	public ResponseEntity<?> signIn(@RequestBody @Valid SignInRequest signInRequest) {
@@ -66,13 +66,8 @@ public class AuthenticationRestApi {
 				)
 		);
 
-		UserModel userModel = UserModel.builder()
-				.email(signUpUser.getEmail().getValue())
-				.createdAt(signUpUser.getCreatedAt())
-				.build();
-		userModel.add(linkTo(methodOn(AuthenticationRestApi.class).signIn(null)).withRel("sign-in"));
-		userModel.add(docsLink());
-
-		return new ResponseEntity<>(userModel, HttpStatus.CREATED);
+		return success(signUpUser,
+				userResponseModelAssembler,
+				HttpStatus.CREATED);
 	}
 }
