@@ -21,8 +21,7 @@ public class UserResponseModelAssembler extends RepresentationModelAssemblerSupp
 	public UserModel toModel(User entity) {
 		UserModel userModel = instantiateModel(entity);
 
-		userModel.add(linkTo(methodOn(UserRestApi.class).getAccount()).withSelfRel());
-		userModel.add(linkTo(methodOn(UserRestApi.class).updateAccount(null)).withRel("update"));
+		userModel.add(linkTo(methodOn(UserRestApi.class).getAccount(null)).withSelfRel());
 
 		userModel.setEmail(entity.getEmail().getValue());
 		userModel.setUsername(entity.getUsername());
