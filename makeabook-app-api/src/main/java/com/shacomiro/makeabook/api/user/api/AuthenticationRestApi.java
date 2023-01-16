@@ -26,9 +26,9 @@ import com.shacomiro.makeabook.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping(path = "api/v1/sign")
+@RequestMapping(path = "api/v1/auth")
 @RequiredArgsConstructor
-public class SignRestApi {
+public class AuthenticationRestApi {
 	private final UserService userService;
 	private final JwtProvisionService jwtProvisionService;
 	private final PasswordEncoder passwordEncoder;
@@ -41,7 +41,7 @@ public class SignRestApi {
 		if (!passwordEncoder.matches(password, userService.getSignInUserEncryptedPassword(emailValue))) {
 			throw new IllegalArgumentException("Password is incorrect");
 		}
-
+		
 		return new ResponseEntity<>(
 				EntityModel.of(
 						jwtProvisionService.issueJwt(emailValue),
@@ -66,7 +66,7 @@ public class SignRestApi {
 				.email(signUpUser.getEmail().getValue())
 				.createdAt(signUpUser.getCreatedAt())
 				.build();
-		userModel.add(linkTo(methodOn(SignRestApi.class).signIn(null)).withRel("signin"));
+		userModel.add(linkTo(methodOn(AuthenticationRestApi.class).signIn(null)).withRel("sign-in"));
 		userModel.add(docsLink());
 
 		return new ResponseEntity<>(userModel, HttpStatus.CREATED);
