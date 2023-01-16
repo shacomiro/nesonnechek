@@ -44,6 +44,7 @@ public class UserRestApi {
 	}
 
 	@PutMapping(path = "account")
+	@CacheEvict(value = CacheKey.SIGN_IN_USER, key = "#userPrincipal.email")
 	public ResponseEntity<?> updateAccount(@AuthenticationPrincipal @NonNull UserPrincipal userPrincipal,
 			@RequestBody UpdateUserRequest updateUserRequest) {
 		return success(
