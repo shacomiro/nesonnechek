@@ -53,7 +53,8 @@ public class UserRestApi {
 
 	@PutMapping(path = "account")
 	@CacheEvict(value = CacheKey.SIGN_IN_USER, key = "#userPrincipal.email")
-	public ResponseEntity<?> updateAccount(@AuthenticationPrincipal @NonNull UserPrincipal userPrincipal,
+	public ResponseEntity<?> updateAccount(
+			@AuthenticationPrincipal @NonNull UserPrincipal userPrincipal,
 			@RequestBody UpdateUserRequest updateUserRequest) {
 		return success(
 				userService.updateUser(
@@ -71,7 +72,8 @@ public class UserRestApi {
 
 	@DeleteMapping(path = "account")
 	@CacheEvict(value = CacheKey.SIGN_IN_USER, key = "#userPrincipal.email")
-	public ResponseEntity<?> deleteAccount(@AuthenticationPrincipal @NonNull UserPrincipal userPrincipal,
+	public ResponseEntity<?> deleteAccount(
+			@AuthenticationPrincipal @NonNull UserPrincipal userPrincipal,
 			@RequestBody @Valid DeleteUserRequest deleteUserRequest) {
 		if (!passwordEncoder.matches(deleteUserRequest.getPassword(),
 				userService.getSignInUserEncryptedPassword(userPrincipal.getEmail()))) {
@@ -83,7 +85,8 @@ public class UserRestApi {
 	}
 
 	@GetMapping(path = "account/ebooks")
-	public ResponseEntity<?> getAccountEbooks(@AuthenticationPrincipal @NonNull UserPrincipal userPrincipal,
+	public ResponseEntity<?> getAccountEbooks(
+			@AuthenticationPrincipal @NonNull UserPrincipal userPrincipal,
 			Pageable pageable, PagedResourcesAssembler<Ebook> assembler) {
 
 		return success(
