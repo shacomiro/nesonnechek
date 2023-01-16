@@ -72,5 +72,10 @@ public class UserService {
 						.build())
 				)
 				.orElseThrow(() -> new UserNotFoundException("Fail to find user '" + updateUserDto.getEmail() + "'."));
+	public void deleteUser(String emailValue) {
+		User currentUser = userRdsService.findByEmail(Email.byValue().value(emailValue).build())
+				.orElseThrow(() -> new UserNotFoundException("Could not find user '" + emailValue + "'."));
+
+		userRdsService.delete(currentUser);
 	}
 }

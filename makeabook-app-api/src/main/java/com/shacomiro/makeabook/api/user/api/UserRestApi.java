@@ -2,10 +2,14 @@ package com.shacomiro.makeabook.api.user.api;
 
 import static com.shacomiro.makeabook.api.global.util.ApiUtils.*;
 
+import javax.validation.Valid;
+
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.shacomiro.makeabook.api.global.assembers.UserResponseModelAssembler;
 import com.shacomiro.makeabook.api.global.security.principal.UserPrincipal;
-import com.shacomiro.makeabook.api.global.security.token.JwtAuthenticationToken;
+import com.shacomiro.makeabook.api.user.dto.DeleteUserRequest;
 import com.shacomiro.makeabook.api.user.dto.UpdateUserRequest;
 import com.shacomiro.makeabook.domain.user.dto.UpdateUserDto;
 import com.shacomiro.makeabook.domain.user.service.UserService;
@@ -54,5 +58,18 @@ public class UserRestApi {
 				userResponseModelAssembler,
 				HttpStatus.OK
 		);
+	}
+
+	@DeleteMapping(path = "account")
+	@CacheEvict(value = CacheKey.SIGN_IN_USER, key = "#userPrincipal.email")
+	public ResponseEntity<?> deleteAccount(@AuthenticationPrincipal @NonNull UserPrincipal userPrincipal,
+			@RequestBody @Valid DeleteUserRequest deleteUserRequest) {
+		if (!passwordEncoder.matches(deleteUserRequest.getPassword(),
+				userService.getSignInUserEncryptedPassword(userPrincipal.getEmail()))) {
+			throw new IllegalArgumentException("Password is incorrect");
+		}
+		userService.deleteUser(userPrincipal.getEmail());
+
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }
