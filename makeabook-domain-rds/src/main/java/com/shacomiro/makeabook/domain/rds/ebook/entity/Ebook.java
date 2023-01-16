@@ -81,11 +81,11 @@ public class Ebook {
 		this.user = user;
 	}
 
-	public String getOriginalFileName() {
+	public String getOriginalFilename() {
 		return uuid + type.getExtension();
 	}
 
-	public String getEbookFileName() {
+	public String getEbookFilename() {
 		return name + type.getExtension();
 	}
 

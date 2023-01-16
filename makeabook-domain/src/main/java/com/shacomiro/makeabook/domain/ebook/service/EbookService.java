@@ -101,7 +101,7 @@ public class EbookService {
 		currentEbook.addDownloadCount();
 		ebookRdsService.save(currentEbook);
 
-		Path path = ebookManager.getEpubFilePath(currentEbook.getType().getValue(), currentEbook.getOriginalFileName());
+		Path path = ebookManager.getEpubFilePath(currentEbook.getType().getValue(), currentEbook.getOriginalFilename());
 		if (Files.notExists(path)) {
 			throw new FileIOException("Ebook resource not found.");
 		}
@@ -113,7 +113,7 @@ public class EbookService {
 			throw new FileIOException("Fail to load file", e);
 		}
 
-		return new EbookResourceDto(ebookResource, currentEbook.getEbookFileName());
+		return new EbookResourceDto(ebookResource, currentEbook.getEbookFilename());
 	}
 
 	private ContentTempFileInfo saveUploadToTempFile(MultipartFile txtFile) {
