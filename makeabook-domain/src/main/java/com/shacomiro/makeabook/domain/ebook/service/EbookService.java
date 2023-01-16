@@ -19,10 +19,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.shacomiro.makeabook.core.global.exception.FileIOException;
 import com.shacomiro.makeabook.core.util.IOUtils;
+import com.shacomiro.makeabook.domain.ebook.dto.EbookResourceDto;
+import com.shacomiro.makeabook.domain.ebook.exception.EbookNotFoundException;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookType;
 import com.shacomiro.makeabook.domain.rds.ebook.service.EbookRdsService;
 import com.shacomiro.makeabook.domain.rds.user.entity.Email;
+import com.shacomiro.makeabook.domain.rds.user.entity.User;
 import com.shacomiro.makeabook.domain.rds.user.service.UserRdsService;
 import com.shacomiro.makeabook.domain.user.exception.UserNotFoundException;
 import com.shacomiro.makeabook.ebook.EbookManager;
@@ -80,26 +83,37 @@ public class EbookService {
 		return ebookRdsService.findAllByUserId(pageable, userId);
 	}
 
-	public Optional<Ebook> findEbookByUuid(String uuid) {
-		return ebookRdsService.findByUuid(uuid);
+	public Ebook findEbookByUuidAndEmail(String uuid, String emailValue) {
+		User currentUser = userRdsService.findByEmail(Email.byValue().value(emailValue).build())
+				.orElseThrow(() -> new UserNotFoundException("Could not find user '" + emailValue + "'."));
+
+		return ebookRdsService.findByUuidAndUser(uuid, currentUser)
+				.orElseThrow(() -> new EbookNotFoundException("Could not find Ebook with UUID '" + uuid + "'."));
 	}
 
-	public Optional<ByteArrayResource> getEbookResource(Ebook ebook) {
-		ebook.verifyExpiration();
-		Path path = ebookManager.getEpubFilePath(ebook.getType().getValue(), ebook.getOriginalFileName());
+	public EbookResourceDto getEbookResourceByUuidAndEmail(String uuid, String emailValue) {
+		User currentUser = userRdsService.findByEmail(Email.byValue().value(emailValue).build())
+				.orElseThrow(() -> new UserNotFoundException("Could not find user '" + emailValue + "'."));
+		Ebook currentEbook = ebookRdsService.findByUuidAndUser(uuid, currentUser)
+				.orElseThrow(() -> new EbookNotFoundException("Could not find Ebook with UUID '" + uuid + "'."));
 
-		if (Files.exists(path)) {
-			try {
-				ebook.addDownloadCount();
-				ebookRdsService.save(ebook);
+		currentEbook.verifyExpiration();
+		currentEbook.addDownloadCount();
+		ebookRdsService.save(currentEbook);
 
-				return Optional.of(new ByteArrayResource(Files.readAllBytes(path), ebook.getName()));
-			} catch (IOException e) {
-				throw new FileIOException("Fail to load file", e);
-			}
-		} else {
-			return Optional.empty();
+		Path path = ebookManager.getEpubFilePath(currentEbook.getType().getValue(), currentEbook.getOriginalFileName());
+		if (Files.notExists(path)) {
+			throw new FileIOException("Ebook resource not found.");
 		}
+
+		ByteArrayResource ebookResource;
+		try {
+			ebookResource = new ByteArrayResource(Files.readAllBytes(path));
+		} catch (IOException e) {
+			throw new FileIOException("Fail to load file", e);
+		}
+
+		return new EbookResourceDto(ebookResource, currentEbook.getEbookFileName());
 	}
 
 	private ContentTempFileInfo saveUploadToTempFile(MultipartFile txtFile) {

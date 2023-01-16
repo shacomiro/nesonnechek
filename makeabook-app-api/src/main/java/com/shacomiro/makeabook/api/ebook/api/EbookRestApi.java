@@ -21,8 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.shacomiro.makeabook.api.global.assembers.EbookResponseModelAssembler;
-import com.shacomiro.makeabook.api.global.exception.NotFoundException;
 import com.shacomiro.makeabook.api.global.security.principal.UserPrincipal;
+import com.shacomiro.makeabook.domain.ebook.dto.EbookResourceDto;
 import com.shacomiro.makeabook.domain.ebook.service.EbookService;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookType;
@@ -72,33 +72,28 @@ public class EbookRestApi {
 	}
 
 	@GetMapping(path = "{uuid}")
-	public ResponseEntity<?> getEbook(@PathVariable String uuid) {
+	public ResponseEntity<?> getEbook(@AuthenticationPrincipal @NonNull UserPrincipal userPrincipal, @PathVariable String uuid) {
 		return success(
-				ebookService.findEbookByUuid(uuid)
-						.orElseThrow(() -> new NotFoundException("Ebook is not found")),
+				ebookService.findEbookByUuidAndEmail(uuid, userPrincipal.getEmail()),
 				ebookResponseModelAssembler,
 				HttpStatus.OK
 		);
 	}
 
 	@GetMapping(path = "{uuid}/file", produces = "application/epub+zip")
-	public ResponseEntity<Resource> downloadEbook(@PathVariable String uuid) {
-		return ebookService.findEbookByUuid(uuid)
-				.map(ebook -> ebookService.getEbookResource(ebook)
-						.map(resource -> {
-							HttpHeaders headers = new HttpHeaders();
-							headers.add(HttpHeaders.CONTENT_DISPOSITION,
-									ContentDisposition.builder("attachment")
-											.filename(ebook.getEbookFileName(), StandardCharsets.UTF_8)
-											.build()
-											.toString());
-							headers.add(HttpHeaders.CONTENT_TYPE, "application/epub+zip");
-							headers.add(HttpHeaders.CONTENT_LENGTH,
-									Long.toString(resource.getByteArray().length));
+	public ResponseEntity<Resource> downloadEbook(
+			@AuthenticationPrincipal @NonNull UserPrincipal userPrincipal, @PathVariable String uuid) {
+		EbookResourceDto ebookResourceDto = ebookService.getEbookResourceByUuidAndEmail(uuid, userPrincipal.getEmail());
 
-							return new ResponseEntity<>((Resource)resource, headers, HttpStatus.OK);
-						})
-						.orElseThrow(() -> new NotFoundException("Fail to load ebook resource")))
-				.orElseThrow(() -> new NotFoundException("Ebook does not exist"));
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.CONTENT_DISPOSITION,
+				ContentDisposition.builder("attachment")
+						.filename(ebookResourceDto.getEbookFilename(), StandardCharsets.UTF_8)
+						.build()
+						.toString());
+		headers.add(HttpHeaders.CONTENT_TYPE, "application/epub+zip");
+		headers.add(HttpHeaders.CONTENT_LENGTH, Long.toString(ebookResourceDto.getEbookResource().getByteArray().length));
+
+		return new ResponseEntity<>(ebookResourceDto.getEbookResource(), headers, HttpStatus.OK);
 	}
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
 import com.shacomiro.makeabook.domain.rds.ebook.repository.EbookRdsRepository;
+import com.shacomiro.makeabook.domain.rds.user.entity.User;
 
 @Service
 @Transactional
@@ -24,11 +25,11 @@ public class EbookRdsService {
 		return ebookRdsRepository.save(ebook);
 	}
 
-	public Page<Ebook> findAllByUserId(Pageable pageable, Long userId) {
-		return ebookRdsRepository.findAllByUserId(pageable, userId);
+	public Optional<Ebook> findByUuidAndUser(String uuid, User user) {
+		return ebookRdsRepository.findByUuidAndUser(uuid, user);
 	}
 
-	public Optional<Ebook> findByUuid(String uuid) {
-		return ebookRdsRepository.findByUuid(uuid);
+	public Page<Ebook> findAllByUserId(Pageable pageable, Long userId) {
+		return ebookRdsRepository.findAllByUserId(pageable, userId);
 	}
 }

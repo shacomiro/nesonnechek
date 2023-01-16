@@ -9,10 +9,12 @@ import org.springframework.stereotype.Component;
 
 import com.shacomiro.makeabook.api.ebook.api.EbookRestApi;
 import com.shacomiro.makeabook.api.ebook.dto.model.EbookModel;
+import com.shacomiro.makeabook.api.global.security.principal.UserPrincipal;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
 
 @Component
 public class EbookResponseModelAssembler extends RepresentationModelAssemblerSupport<Ebook, EbookModel> {
+	private static final UserPrincipal emptyUserPrincipal = UserPrincipal.byUserInfos().build();
 
 	public EbookResponseModelAssembler() {
 		super(EbookRestApi.class, EbookModel.class);
@@ -22,9 +24,9 @@ public class EbookResponseModelAssembler extends RepresentationModelAssemblerSup
 	public EbookModel toModel(Ebook entity) {
 		EbookModel ebookModel = instantiateModel(entity);
 
-		ebookModel.add(linkTo(methodOn(EbookRestApi.class).getEbook(entity.getUuid())).withSelfRel());
+		ebookModel.add(linkTo(methodOn(EbookRestApi.class).getEbook(emptyUserPrincipal, entity.getUuid())).withSelfRel());
 		if (!entity.isExpired()) {
-			ebookModel.add(linkTo(methodOn(EbookRestApi.class).downloadEbook(entity.getUuid()))
+			ebookModel.add(linkTo(methodOn(EbookRestApi.class).downloadEbook(emptyUserPrincipal, entity.getUuid()))
 					.withRel("download"));
 		}
 
