@@ -4,8 +4,7 @@ import static com.shacomiro.makeabook.api.global.util.ApiUtils.*;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,10 +17,9 @@ import com.shacomiro.makeabook.api.global.security.principal.UserPrincipal;
 import com.shacomiro.makeabook.api.global.security.token.JwtAuthenticationToken;
 import com.shacomiro.makeabook.api.user.dto.UpdateUserRequest;
 import com.shacomiro.makeabook.domain.user.dto.UpdateUserDto;
-import com.shacomiro.makeabook.domain.user.exception.UserNotFoundException;
 import com.shacomiro.makeabook.domain.user.service.UserService;
 
-import io.jsonwebtoken.JwtException;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -33,33 +31,21 @@ public class UserRestApi {
 	private final PasswordEncoder passwordEncoder;
 
 	@GetMapping(path = "account")
-	public ResponseEntity<?> getAccount() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (!(authentication instanceof JwtAuthenticationToken)) {
-			throw new JwtException("User authentication not found.");
-		}
-		String emailValue = ((UserPrincipal)authentication.getPrincipal()).getEmail();
-
+	public ResponseEntity<?> getAccount(@AuthenticationPrincipal @NonNull UserPrincipal userPrincipal) {
 		return success(
-				userService.findUserByEmail(emailValue)
-						.orElseThrow(() -> new UserNotFoundException("Could not find current user.")),
+				userService.findUserByEmail(userPrincipal.getEmail()),
 				userResponseModelAssembler,
 				HttpStatus.OK
 		);
 	}
 
 	@PutMapping(path = "account")
-	public ResponseEntity<?> updateAccount(@RequestBody UpdateUserRequest updateUserRequest) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (!(authentication instanceof JwtAuthenticationToken)) {
-			throw new JwtException("User authentication not found.");
-		}
-		String emailValue = ((UserPrincipal)authentication.getPrincipal()).getEmail();
-
+	public ResponseEntity<?> updateAccount(@AuthenticationPrincipal @NonNull UserPrincipal userPrincipal,
+			@RequestBody UpdateUserRequest updateUserRequest) {
 		return success(
 				userService.updateUser(
 						new UpdateUserDto(
-								emailValue,
+								userPrincipal.getEmail(),
 								updateUserRequest.getPassword() == null ?
 										null : passwordEncoder.encode(updateUserRequest.getPassword()),
 								updateUserRequest.getUsername()
