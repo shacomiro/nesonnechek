@@ -6,18 +6,22 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.fasterxml.jackson.annotation.JsonRootName;
+
 import lombok.AccessLevel;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ApiUtils {
@@ -45,12 +49,20 @@ public class ApiUtils {
 				status);
 	}
 
-	public static EntityModel<ApiError> error(Throwable throwable, HttpStatus status) {
-		return EntityModel.of(new ApiError(throwable, status), docsLink());
+	public static ApiError error(Throwable throwable, HttpStatus status) {
+		return ApiError.byThrowable()
+				.throwable(throwable)
+				.status(status)
+				.build()
+				.add(docsLink());
 	}
 
-	public static EntityModel<ApiError> error(String message, HttpStatus status) {
-		return EntityModel.of(new ApiError(message, status), docsLink());
+	public static ApiError error(String message, HttpStatus status) {
+		return ApiError.byMessage()
+				.message(message)
+				.status(status)
+				.build()
+				.add(docsLink());
 	}
 
 	public static String getCurrentApiRequest() {
@@ -61,27 +73,32 @@ public class ApiUtils {
 		return ServletUriComponentsBuilder.fromCurrentServletMapping().toUriString();
 	}
 
-	private static List<Link> errorLinks() {
+	public static List<Link> errorLinks() {
 		return Arrays.asList(Link.of(getCurrentApiRequest()).withSelfRel(), docsLink());
 	}
 
-	private static Link docsLink() {
+	public static Link docsLink() {
 		return Link.of(getCurrentApiServletMapping() + "/api/static/docs/index.html").withRel("docs");
 	}
 
-	@ToString
-	@Getter
-	public static class ApiError {
-		private final String message;
-		private final int status;
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@EqualsAndHashCode(callSuper = false)
+	@JsonRootName(value = "error")
+	@Relation(collectionRelation = "errors", itemRelation = "error")
+	public static class ApiError extends RepresentationModel<ApiError> {
+		private String message;
+		private int status;
 
+		@Builder(builderClassName = "ByThrowable", builderMethodName = "byThrowable")
 		ApiError(Throwable throwable, HttpStatus status) {
 			this(throwable.getMessage(), status);
 		}
 
+		@Builder(builderClassName = "ByMessage", builderMethodName = "byMessage")
 		ApiError(String message, HttpStatus status) {
-			this.message = message;
-			this.status = status.value();
+			this(message, status.value());
 		}
 	}
 }

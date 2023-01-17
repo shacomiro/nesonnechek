@@ -1,6 +1,11 @@
 rootProject.name = 'makeabook'
 include 'makeabook-app-api'
-include 'makeabook-ebook'
-include 'makeabook-domain-rds'
 include 'makeabook-app-batch'
+include 'makeabook-domain'
+include 'makeabook-domain-rds'
+include 'makeabook-cache'
+include 'makeabook-domain-redis'
 include 'makeabook-core'
+include 'makeabook-ebook'
+include 'java-jwt-provider'
+

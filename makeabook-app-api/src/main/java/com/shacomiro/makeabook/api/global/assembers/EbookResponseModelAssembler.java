@@ -22,10 +22,11 @@ public class EbookResponseModelAssembler extends RepresentationModelAssemblerSup
 	public EbookModel toModel(Ebook entity) {
 		EbookModel ebookModel = instantiateModel(entity);
 
-		ebookModel.add(linkTo(methodOn(EbookRestApi.class).getEbook(entity.getUuid())).withSelfRel());
+		ebookModel.add(linkTo(methodOn(EbookRestApi.class)
+				.getEbook(null, entity.getUuid())).withSelfRel());
 		if (!entity.isExpired()) {
-			ebookModel.add(linkTo(methodOn(EbookRestApi.class).downloadEbook(entity.getUuid()))
-					.withRel("download"));
+			ebookModel.add(linkTo(methodOn(EbookRestApi.class)
+					.downloadEbook(null, entity.getUuid())).withRel("download"));
 		}
 
 		ebookModel.setUuid(entity.getUuid());

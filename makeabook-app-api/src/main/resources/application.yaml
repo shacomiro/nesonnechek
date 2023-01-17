@@ -1,12 +1,12 @@
 spring:
   config:
     import:
-      - application-domain-rds.yaml
+      - application-domain.yaml
   profiles:
     group:
       local:
         - app-api-local
-        - domain-rds-local
+        - domains-local
     active: ${profile}
 ---
 spring:

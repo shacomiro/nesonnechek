@@ -31,10 +31,10 @@ import lombok.extern.slf4j.Slf4j;
 @EnableBatchProcessing
 @RequiredArgsConstructor
 public class DeleteExpiredEbookJobConfiguration {
+	private static final int CHUNK_SIZE = 10;
 	private final JobBuilderFactory jobBuilderFactory;
 	private final StepBuilderFactory stepBuilderFactory;
 	private final EntityManagerFactory emf;
-	private static final int CHUNK_SIZE = 10;
 
 	@Bean
 	public Job deleteExpiredEbookJob() {
@@ -72,7 +72,7 @@ public class DeleteExpiredEbookJobConfiguration {
 
 			if (ebook.isExpired()) {
 				Path targetPath = Paths.get("./files/ebook/", ebook.getType() + "/",
-						ebook.getOriginalFileName()).normalize().toAbsolutePath();
+						ebook.getOriginalFilename()).normalize().toAbsolutePath();
 				boolean isDeleted = Files.deleteIfExists(targetPath);
 				if (isDeleted) {
 					ebook.ceaseToExist();

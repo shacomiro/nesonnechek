@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @JsonRootName(value = "ebook")
-@Relation(collectionRelation = "ebooks")
+@Relation(collectionRelation = "ebooks", itemRelation = "ebook")
 @JsonInclude(Include.NON_NULL)
 public class EbookModel extends RepresentationModel<EbookModel> {
 	private String uuid;

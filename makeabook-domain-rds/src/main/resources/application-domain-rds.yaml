@@ -4,15 +4,11 @@ spring:
       on-profile: domain-rds-local
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${secret.database.url}?serverTimezone=${database.config.time-zone}&characterEncoding=${database.config.encoding}
-    username: ${secret.database.username}
-    password: ${secret.database.password}
+    url: jdbc:mysql://${ext-config.rds.secret.url}?serverTimezone=${ext-config.rds.config.time-zone}&characterEncoding=${ext-config.rds.config.encoding}
+    username: ${ext-config.rds.secret.username}
+    password: ${ext-config.rds.secret.password}
   jpa:
     properties:
       hibernate:
         show_sql: true
         format_sql: true
-database:
-  config:
-    time-zone: UTC
-    encoding: UTF-8
