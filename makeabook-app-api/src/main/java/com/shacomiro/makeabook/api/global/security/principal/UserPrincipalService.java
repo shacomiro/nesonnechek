@@ -40,8 +40,3 @@ public class UserPrincipalService implements UserDetailsService {
 				.build();
 	}
 }
-//TODO (API <-> 도메인) 간 통신을 통해 User 정보를 DTO로 받는다고 가정한다.
-// 따라서 UserDetails, UserDetailsService는 API에 포함되어 (Filter <-> authenticationManager <-> AuthenticationProvider) 순서의 인증을 거치도록 리팩토링 해야한다.
-// https://junhyunny.github.io/spring-boot/spring-security/make-authentication-filter/
-// https://junhyunny.github.io/spring-boot/spring-security/make-authentication-provider/
-// 위 2개 링크 참조.
