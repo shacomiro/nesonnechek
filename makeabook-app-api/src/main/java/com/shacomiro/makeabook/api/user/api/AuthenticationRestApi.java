@@ -2,10 +2,12 @@ package com.shacomiro.makeabook.api.user.api;
 
 import static com.shacomiro.makeabook.api.global.util.ApiUtils.*;
 
+import java.util.List;
+
 import javax.validation.Valid;
 
-import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,10 +49,9 @@ public class AuthenticationRestApi {
 		userService.updateLoginCount(emailValue);
 
 		return new ResponseEntity<>(
-				EntityModel.of(
+				RepresentationModel.of(
 						jwtDto,
-						Link.of(getCurrentApiServletMapping() + "/api/sign/reissue").withRel("reissue"),
-						docsLink()
+						List.of(Link.of(getCurrentApiServletMapping() + "/api/sign/reissue").withRel("reissue"), docsLink())
 				),
 				HttpStatus.OK
 		);
