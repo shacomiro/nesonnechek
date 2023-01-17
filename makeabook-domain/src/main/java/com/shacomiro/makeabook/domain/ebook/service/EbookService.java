@@ -88,14 +88,16 @@ public class EbookService {
 				.orElseThrow(() -> new UserNotFoundException("Could not find user '" + emailValue + "'."));
 
 		return ebookRdsService.findByUuidAndUser(uuid, currentUser)
-				.orElseThrow(() -> new EbookNotFoundException("Could not find Ebook with UUID '" + uuid + "'."));
+				.orElseThrow(() -> new EbookNotFoundException(
+						"Could not find Ebook for user '" + emailValue + "' with UUID '" + uuid + "'."));
 	}
 
 	public EbookResourceDto getEbookResourceByUuidAndEmail(String uuid, String emailValue) {
 		User currentUser = userRdsService.findByEmail(Email.byValue().value(emailValue).build())
 				.orElseThrow(() -> new UserNotFoundException("Could not find user '" + emailValue + "'."));
 		Ebook currentEbook = ebookRdsService.findByUuidAndUser(uuid, currentUser)
-				.orElseThrow(() -> new EbookNotFoundException("Could not find Ebook with UUID '" + uuid + "'."));
+				.orElseThrow(() -> new EbookNotFoundException(
+						"Could not find Ebook for user '" + emailValue + "' with UUID '" + uuid + "'."));
 
 		currentEbook.verifyExpiration();
 		currentEbook.addDownloadCount();
