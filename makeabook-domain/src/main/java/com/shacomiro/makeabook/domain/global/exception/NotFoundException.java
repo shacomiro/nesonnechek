@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.api.global.exception;
+package com.shacomiro.makeabook.domain.global.exception;
 
 public class NotFoundException extends RuntimeException {
 

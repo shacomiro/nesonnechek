@@ -14,8 +14,8 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import com.shacomiro.makeabook.api.global.exception.NotFoundException;
 import com.shacomiro.makeabook.core.global.exception.FileIOException;
+import com.shacomiro.makeabook.domain.global.exception.NotFoundException;
 import com.shacomiro.makeabook.domain.rds.ebook.exception.EbookExpiredException;
 import com.shacomiro.makeabook.domain.user.exception.UserConflictException;
 

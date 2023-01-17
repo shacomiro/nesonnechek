@@ -1,6 +1,8 @@
 package com.shacomiro.makeabook.domain.user.exception;
 
-public class UserNotFoundException extends RuntimeException {
+import com.shacomiro.makeabook.domain.global.exception.NotFoundException;
+
+public class UserNotFoundException extends NotFoundException {
 
 	public UserNotFoundException(String message) {
 		super(message);

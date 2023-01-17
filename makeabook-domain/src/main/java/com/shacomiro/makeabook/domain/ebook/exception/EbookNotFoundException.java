@@ -1,6 +1,8 @@
 package com.shacomiro.makeabook.domain.ebook.exception;
 
-public class EbookNotFoundException extends RuntimeException {
+import com.shacomiro.makeabook.domain.global.exception.NotFoundException;
+
+public class EbookNotFoundException extends NotFoundException {
 	public EbookNotFoundException(String message) {
 		super(message);
 	}
