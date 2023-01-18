@@ -2,6 +2,7 @@ package com.shacomiro.makeabook.api.ebook.api;
 
 import static com.shacomiro.makeabook.api.global.util.ApiUtils.*;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import org.springframework.core.io.Resource;
@@ -22,6 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.shacomiro.makeabook.api.global.assembers.EbookResponseModelAssembler;
 import com.shacomiro.makeabook.api.global.security.principal.UserPrincipal;
+import com.shacomiro.makeabook.core.global.exception.FileIOException;
+import com.shacomiro.makeabook.domain.ebook.dto.EbookRequestDto;
 import com.shacomiro.makeabook.domain.ebook.dto.EbookResourceDto;
 import com.shacomiro.makeabook.domain.ebook.service.EbookService;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
@@ -53,8 +56,16 @@ public class EbookRestApi {
 			throw new IllegalArgumentException("Invalid Content type for upload file");
 		}
 
+		EbookRequestDto ebookRequestDto;
+		try {
+			ebookRequestDto = new EbookRequestDto(file.getBytes(), file.getOriginalFilename(), userPrincipal.getEmail(),
+					ebookType);
+		} catch (IOException e) {
+			throw new FileIOException("Fail to read upload file.");
+		}
+
 		return success(
-				ebookService.createEbook(file, ebookType, userPrincipal.getEmail())
+				ebookService.createEbook(ebookRequestDto)
 						.orElseThrow(() -> new NullPointerException("Fail to create ebook")),
 				ebookResponseModelAssembler,
 				HttpStatus.CREATED
