@@ -15,9 +15,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -49,16 +49,17 @@ public class EbookRestApi {
 	public ResponseEntity<?> createTxtEbook(
 			@AuthenticationPrincipal @NonNull UserPrincipal userPrincipal,
 			@RequestParam(name = "type", defaultValue = "epub2") EbookType ebookType,
-			@RequestBody @RequestParam(name = "file") MultipartFile file) {
-		if (file.isEmpty()) {
+			@RequestPart(name = "txtFile") MultipartFile txtFile) {
+		if (txtFile.isEmpty()) {
 			throw new IllegalStateException("Upload file is empty");
-		} else if (file.getContentType() == null || !file.getContentType().equals(MediaType.TEXT_PLAIN_VALUE)) {
+		}
+		if (txtFile.getContentType() == null || !txtFile.getContentType().equals(MediaType.TEXT_PLAIN_VALUE)) {
 			throw new IllegalArgumentException("Invalid Content type for upload file");
 		}
 
 		EbookRequestDto ebookRequestDto;
 		try {
-			ebookRequestDto = new EbookRequestDto(file.getBytes(), file.getOriginalFilename(), userPrincipal.getEmail(),
+			ebookRequestDto = new EbookRequestDto(txtFile.getBytes(), txtFile.getOriginalFilename(), userPrincipal.getEmail(),
 					ebookType);
 		} catch (IOException e) {
 			throw new FileIOException("Fail to read upload file.");
