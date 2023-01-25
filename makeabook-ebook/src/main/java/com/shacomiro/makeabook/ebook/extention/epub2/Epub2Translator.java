@@ -1,6 +1,5 @@
 package com.shacomiro.makeabook.ebook.extention.epub2;
 
-import static com.shacomiro.makeabook.core.util.IOUtils.*;
 import static j2html.TagCreator.*;
 
 import java.io.BufferedWriter;
@@ -9,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -16,11 +17,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.shacomiro.makeabook.core.global.exception.FileIOException;
 import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
 import com.shacomiro.makeabook.ebook.domain.Section;
 import com.shacomiro.makeabook.ebook.grammar.EbookGrammar;
@@ -45,10 +46,10 @@ public class Epub2Translator {
 	private static Resource getResource(Path path, String href) {
 		Resource resource;
 
-		try (InputStream is = loadFileToInputStream(path)) {
+		try (InputStream is = Files.newInputStream(path)) {
 			resource = new Resource(is, href);
 		} catch (IOException e) {
-			throw new FileIOException("fail to load resource", e);
+			throw new RuntimeException("fail to load resource", e);
 		}
 
 		return resource;
@@ -57,7 +58,13 @@ public class Epub2Translator {
 	public EpubFileInfo createEpub2(String uuid, String fileName, List<String> lines) {
 		String fileNameWithoutExtension = FilenameUtils.removeExtension(fileName);
 		Path contentsPath = Paths.get(epub2ContentsBasePath, File.separatorChar + uuid);
-		createDirectory(contentsPath);
+		try {
+			if (!Files.exists(contentsPath)) {
+				Files.createDirectory(contentsPath);
+			}
+		} catch (IOException e) {
+			throw new RuntimeException("Fail to create directory '" + contentsPath.toAbsolutePath().normalize() + "'", e);
+		}
 
 		List<Section> sectionList = new ArrayList<>();
 		Map<String, String> metainfo = new HashMap<>();
@@ -90,12 +97,29 @@ public class Epub2Translator {
 				.toAbsolutePath()
 				.normalize();
 
-		try (OutputStream os = loadFileToOutputStream(bookFilePath)) {
+		try (OutputStream os = Files.newOutputStream(bookFilePath)) {
 			epubWriter.write(book, os);
 		} catch (IOException e) {
-			throw new FileIOException("Fail to write epub file", e);
+			throw new RuntimeException("Fail to write epub file", e);
 		} finally {
-			deleteDirectory(contentsPath);
+			if (Files.exists(contentsPath)) {
+				try (Stream<Path> filesPath = Files.list(contentsPath)) {
+					filesPath.forEach(path -> {
+						try {
+							Files.delete(path);
+						} catch (NoSuchFileException e) {
+							throw new RuntimeException("File '" + path + "' does not exist", e);
+						} catch (IOException e) {
+							throw new RuntimeException("Fail to delete file '" + path + "'", e);
+						}
+					});
+					Files.delete(contentsPath);
+				} catch (NotDirectoryException e) {
+					throw new RuntimeException("'" + contentsPath + "' is not a directory", e);
+				} catch (IOException e) {
+					throw new RuntimeException("I/O error occured when opening the directory '" + contentsPath + "'", e);
+				}
+			}
 		}
 
 		return EpubFileInfo.builder()
@@ -186,12 +210,23 @@ public class Epub2Translator {
 			bw.write("</html>");
 			bw.flush();
 		} catch (IOException e) {
-			throw new FileIOException("Fail to write xhtml file", e);
+			throw new RuntimeException("Fail to write xhtml file", e);
 		}
 	}
 
 	private void initEpub2BaseDirectory() {
-		createDirectory(Paths.get(epub2ContentsBasePath));
-		createDirectory(Paths.get(epub2EbookBasePath));
+		Path contentPath = Paths.get(epub2ContentsBasePath);
+		Path ebookPath = Paths.get(epub2EbookBasePath);
+
+		try {
+			if (!Files.exists(contentPath)) {
+				Files.createDirectory(contentPath);
+			}
+			if (!Files.exists(ebookPath)) {
+				Files.createDirectory(ebookPath);
+			}
+		} catch (IOException e) {
+			throw new RuntimeException("Parent directory of epub2 does not exist", e);
+		}
 	}
 }
