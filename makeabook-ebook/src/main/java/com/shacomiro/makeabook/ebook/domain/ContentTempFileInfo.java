@@ -2,17 +2,26 @@ package com.shacomiro.makeabook.ebook.domain;
 
 import java.nio.file.Path;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
-
-@Getter
-@ToString
 public class ContentTempFileInfo {
-	private final Path txtTempFilePath;
+	private final String uuid;
+	private final Path tempFilePath;
+	private final String originalTempFilename;
 
-	@Builder
-	public ContentTempFileInfo(Path txtTempFilePath) {
-		this.txtTempFilePath = txtTempFilePath;
+	public ContentTempFileInfo(String uuid, Path tempFilePath, String originalTempFilename) {
+		this.uuid = uuid;
+		this.tempFilePath = tempFilePath;
+		this.originalTempFilename = originalTempFilename;
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public Path getTempFilePath() {
+		return tempFilePath;
+	}
+
+	public String getOriginalTempFilename() {
+		return originalTempFilename;
 	}
 }

@@ -1,25 +1,28 @@
 package com.shacomiro.makeabook.domain.ebook.service;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.shacomiro.makeabook.core.global.exception.FileIOException;
 import com.shacomiro.makeabook.core.util.IOUtils;
+import com.shacomiro.makeabook.domain.ebook.dto.EbookRequestDto;
 import com.shacomiro.makeabook.domain.ebook.dto.EbookResourceDto;
+import com.shacomiro.makeabook.domain.ebook.dto.FileDto;
 import com.shacomiro.makeabook.domain.ebook.exception.EbookNotFoundException;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookType;
@@ -48,32 +51,36 @@ public class EbookService {
 		this.ebookManager = new EbookManager(RESOURCES_DIR);
 	}
 
-	public Optional<Ebook> createEbook(MultipartFile file, EbookType ebookType, String emailValue) {
+	public Optional<Ebook> createEbook(EbookRequestDto ebookRequestDto) {
 		Optional<Ebook> ebook = Optional.empty();
-		String uuid = UUID.randomUUID().toString();
 		EpubFileInfo epubFileInfo;
+		List<ContentTempFileInfo> contentTempFileInfos = saveUploadToTempFile(ebookRequestDto.getFiles());
 
-		ContentTempFileInfo contentTempFileInfo = saveUploadToTempFile(file);
-
-		if (ebookType.equals(EbookType.EPUB2)) {
-			epubFileInfo = ebookManager.translateTxtToEpub2(uuid, file.getOriginalFilename(), contentTempFileInfo);
+		if (ebookRequestDto.getEbookType().equals(EbookType.EPUB2)) {
+			ContentTempFileInfo txtTempFileInfo = contentTempFileInfos.get(0);
+			epubFileInfo = ebookManager.translateTxtToEpub2(txtTempFileInfo.getUuid(), txtTempFileInfo.getOriginalTempFilename(),
+					txtTempFileInfo);
 
 			ebook = Optional.of(ebookRdsService
 					.save(Ebook.byEbookCreationResult()
-							.uuid(uuid)
+							.uuid(txtTempFileInfo.getUuid())
 							.name(epubFileInfo.getFileName())
 							.type(EbookType.EPUB2)
-							.user(userRdsService.findByEmail(Email.byValue().value(emailValue).build())
-									.orElseThrow(() -> new UserNotFoundException("Could not find user '" + emailValue + "'."))
+							.user(userRdsService.findByEmail(Email.byValue().value(ebookRequestDto.getUploader()).build())
+									.orElseThrow(() ->
+											new UserNotFoundException(
+													"Could not find user '" + ebookRequestDto.getUploader() + "'."))
 							)
 							.build())
 			);
 		}
 
-		try {
-			Files.deleteIfExists(contentTempFileInfo.getTxtTempFilePath());
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		for (ContentTempFileInfo tempFile : contentTempFileInfos) {
+			try {
+				Files.deleteIfExists(tempFile.getTempFilePath());
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
 
 		return ebook;
@@ -118,19 +125,22 @@ public class EbookService {
 		return new EbookResourceDto(ebookResource, currentEbook.getEbookFilename());
 	}
 
-	private ContentTempFileInfo saveUploadToTempFile(MultipartFile txtFile) {
-		Path tempUploadFilePath = IOUtils.createTempFile(
-				Paths.get(ebookManager.getContentsBasePath()).normalize().toAbsolutePath(),
-				"." + FilenameUtils.getExtension(txtFile.getOriginalFilename()));
+	private List<ContentTempFileInfo> saveUploadToTempFile(List<FileDto> files) {
+		Path contentsBasePath = Paths.get(ebookManager.getContentsBasePath()).normalize().toAbsolutePath();
 
-		try {
-			txtFile.transferTo(tempUploadFilePath);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		return files.stream()
+				.map(
+						file -> {
+							Path tempUploadFilePath = IOUtils.createTempFile(contentsBasePath, file.getExtension());
+							try (OutputStream os = Files.newOutputStream(tempUploadFilePath)) {
+								os.write(file.getFileBais().readAllBytes());
+							} catch (IOException e) {
+								throw new RuntimeException(e);
+							}
 
-		return ContentTempFileInfo.builder()
-				.txtTempFilePath(tempUploadFilePath)
-				.build();
+							return new ContentTempFileInfo(UUID.randomUUID().toString(), tempUploadFilePath,
+									file.getOriginalFilename());
+						}
+				).collect(Collectors.toList());
 	}
 }
