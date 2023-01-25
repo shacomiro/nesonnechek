@@ -122,10 +122,7 @@ public class Epub2Translator {
 			}
 		}
 
-		return EpubFileInfo.builder()
-				.fileName(bookFileName)
-				.filePath(bookFilePath)
-				.build();
+		return new EpubFileInfo(bookFileName, bookFilePath);
 	}
 
 	private void convertLinesToEbookInfo(List<String> lines, List<Section> sectionList, Map<String, String> metainfo) {
@@ -160,9 +157,7 @@ public class Epub2Translator {
 				}
 
 				paragraphList = new ArrayList<>();
-				section = Section.builder()
-						.title(StringUtils.split(line, EbookGrammar.SECTION_TITLE)[0])
-						.build();
+				section = new Section(StringUtils.split(line, EbookGrammar.SECTION_TITLE)[0]);
 			}
 
 			if (isParagraph) {
