@@ -10,7 +10,7 @@ import com.shacomiro.epub.EpubManager;
 public class EbookConfiguration {
 
 	@Bean
-	public EpubManager epubManager(@Value("${ext-config.ebook.resource-dir}") String resourceDir) {
+	public EpubManager epubManager(@Value("${ext-config.ebook.resource-dir:./files}") String resourceDir) {
 		return new EpubManager(resourceDir);
 	}
 }
