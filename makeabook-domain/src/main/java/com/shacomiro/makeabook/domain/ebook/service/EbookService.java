@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 
 import org.springframework.core.io.ByteArrayResource;
@@ -41,15 +40,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional
 public class EbookService {
-	private static final String RESOURCES_DIR = "./files";
 	private final EbookRdsService ebookRdsService;
 	private final UserRdsService userRdsService;
-	private EbookManager ebookManager;
-
-	@PostConstruct
-	public void initialize() {
-		this.ebookManager = new EbookManager(RESOURCES_DIR);
-	}
+	private final EbookManager ebookManager;
 
 	public Optional<Ebook> createEbook(EbookRequestDto ebookRequestDto) {
 		Optional<Ebook> ebook = Optional.empty();
