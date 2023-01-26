@@ -16,12 +16,12 @@ import com.shacomiro.epub.domain.ContentTempFileInfo;
 import com.shacomiro.epub.domain.EpubFileInfo;
 import com.shacomiro.epub.extention.epub2.Epub2Translator;
 
-public class EbookManager {
+public class EpubManager {
 	private final String contentsBasePath;
 	private final String ebookBasePath;
 	private final Epub2Translator epub2Translator;
 
-	public EbookManager(String resourcesDir) {
+	public EpubManager(String resourcesDir) {
 		Path resourcePath = Paths.get(resourcesDir);
 		try {
 			if (!Files.exists(resourcePath)) {

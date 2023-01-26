@@ -17,7 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.shacomiro.epub.EbookManager;
+import com.shacomiro.epub.EpubManager;
 import com.shacomiro.epub.domain.ContentTempFileInfo;
 import com.shacomiro.epub.domain.EpubFileInfo;
 import com.shacomiro.makeabook.core.global.exception.FileIOException;
@@ -42,7 +42,7 @@ import lombok.RequiredArgsConstructor;
 public class EbookService {
 	private final EbookRdsService ebookRdsService;
 	private final UserRdsService userRdsService;
-	private final EbookManager ebookManager;
+	private final EpubManager epubManager;
 
 	public Optional<Ebook> createEbook(EbookRequestDto ebookRequestDto) {
 		Optional<Ebook> ebook = Optional.empty();
@@ -51,7 +51,7 @@ public class EbookService {
 
 		if (ebookRequestDto.getEbookType().equals(EbookType.EPUB2)) {
 			ContentTempFileInfo txtTempFileInfo = contentTempFileInfos.get(0);
-			epubFileInfo = ebookManager.translateTxtToEpub2(txtTempFileInfo.getUuid(), txtTempFileInfo.getOriginalTempFilename(),
+			epubFileInfo = epubManager.translateTxtToEpub2(txtTempFileInfo.getUuid(), txtTempFileInfo.getOriginalTempFilename(),
 					txtTempFileInfo);
 
 			ebook = Optional.of(ebookRdsService
@@ -103,7 +103,7 @@ public class EbookService {
 		currentEbook.addDownloadCount();
 		ebookRdsService.save(currentEbook);
 
-		Path path = ebookManager.getEpubFilePath(currentEbook.getType().getValue(), currentEbook.getOriginalFilename());
+		Path path = epubManager.getEpubFilePath(currentEbook.getType().getValue(), currentEbook.getOriginalFilename());
 		if (Files.notExists(path)) {
 			throw new FileIOException("Ebook resource not found.");
 		}
@@ -119,7 +119,7 @@ public class EbookService {
 	}
 
 	private List<ContentTempFileInfo> saveUploadToTempFile(List<FileDto> files) {
-		Path contentsBasePath = Paths.get(ebookManager.getContentsBasePath()).normalize().toAbsolutePath();
+		Path contentsBasePath = Paths.get(epubManager.getContentsBasePath()).normalize().toAbsolutePath();
 
 		return files.stream()
 				.map(

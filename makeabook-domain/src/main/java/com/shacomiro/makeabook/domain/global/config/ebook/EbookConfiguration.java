@@ -4,13 +4,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.shacomiro.epub.EbookManager;
+import com.shacomiro.epub.EpubManager;
 
 @Configuration
 public class EbookConfiguration {
 
 	@Bean
-	public EbookManager ebookManager(@Value("${ext-config.ebook.resource-path}") String resourcePath) {
-		return new EbookManager(resourcePath);
+	public EpubManager epubManager(@Value("${ext-config.ebook.resource-dir}") String resourceDir) {
+		return new EpubManager(resourceDir);
 	}
 }
