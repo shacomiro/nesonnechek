@@ -18,6 +18,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.shacomiro.epub.EbookManager;
+import com.shacomiro.epub.domain.ContentTempFileInfo;
+import com.shacomiro.epub.domain.EpubFileInfo;
 import com.shacomiro.makeabook.core.global.exception.FileIOException;
 import com.shacomiro.makeabook.core.util.IOUtils;
 import com.shacomiro.makeabook.domain.ebook.dto.EbookRequestDto;
@@ -31,9 +34,6 @@ import com.shacomiro.makeabook.domain.rds.user.entity.Email;
 import com.shacomiro.makeabook.domain.rds.user.entity.User;
 import com.shacomiro.makeabook.domain.rds.user.service.UserRdsService;
 import com.shacomiro.makeabook.domain.user.exception.UserNotFoundException;
-import com.shacomiro.makeabook.ebook.EbookManager;
-import com.shacomiro.makeabook.ebook.domain.ContentTempFileInfo;
-import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
 
 import lombok.RequiredArgsConstructor;
 

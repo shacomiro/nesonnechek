@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.ebook.grammar;
+package com.shacomiro.epub.grammar;
 
 public class EbookGrammar {
 	public static final String BOOK_TITLE = "*BT*";

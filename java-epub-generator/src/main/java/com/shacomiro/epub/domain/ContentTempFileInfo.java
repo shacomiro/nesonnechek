@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.ebook.domain;
+package com.shacomiro.epub.domain;
 
 import java.nio.file.Path;
 

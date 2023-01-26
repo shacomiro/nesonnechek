@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.ebook;
+package com.shacomiro.epub;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,9 +12,9 @@ import java.util.Optional;
 
 import org.mozilla.universalchardet.UniversalDetector;
 
-import com.shacomiro.makeabook.ebook.domain.ContentTempFileInfo;
-import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
-import com.shacomiro.makeabook.ebook.extention.epub2.Epub2Translator;
+import com.shacomiro.epub.domain.ContentTempFileInfo;
+import com.shacomiro.epub.domain.EpubFileInfo;
+import com.shacomiro.epub.extention.epub2.Epub2Translator;
 
 public class EbookManager {
 	private final String contentsBasePath;

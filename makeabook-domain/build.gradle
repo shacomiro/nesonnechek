@@ -16,5 +16,5 @@ dependencies {
     implementation 'commons-io:commons-io:2.11.0'
     api project(':makeabook-domain-rds')
     implementation project(':makeabook-core')
-    implementation project(':makeabook-ebook')
+    implementation project(':java-epub-generator')
 }

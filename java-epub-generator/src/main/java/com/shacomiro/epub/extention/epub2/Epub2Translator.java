@@ -1,4 +1,4 @@
-package com.shacomiro.makeabook.ebook.extention.epub2;
+package com.shacomiro.epub.extention.epub2;
 
 import static j2html.TagCreator.*;
 
@@ -22,9 +22,9 @@ import java.util.stream.Stream;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
-import com.shacomiro.makeabook.ebook.domain.Section;
-import com.shacomiro.makeabook.ebook.grammar.EbookGrammar;
+import com.shacomiro.epub.domain.EpubFileInfo;
+import com.shacomiro.epub.domain.Section;
+import com.shacomiro.epub.grammar.EbookGrammar;
 
 import nl.siegmann.epublib.domain.Author;
 import nl.siegmann.epublib.domain.Book;
