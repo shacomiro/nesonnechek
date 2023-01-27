@@ -24,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.shacomiro.epub.domain.EpubFileInfo;
 import com.shacomiro.epub.domain.Section;
-import com.shacomiro.epub.grammar.EbookGrammar;
+import com.shacomiro.epub.grammar.EpubGrammar;
 
 import nl.siegmann.epublib.domain.Author;
 import nl.siegmann.epublib.domain.Book;
@@ -137,17 +137,17 @@ public class Epub2Translator {
 				continue;
 			}
 
-			if (StringUtils.contains(line, EbookGrammar.BOOK_TITLE)) {
+			if (StringUtils.contains(line, EpubGrammar.BOOK_TITLE.getSymbol())) {
 				isParagraph = false;
-				metainfo.put("Title", StringUtils.split(line, EbookGrammar.BOOK_TITLE)[0]);
+				metainfo.put("Title", StringUtils.split(line, EpubGrammar.BOOK_TITLE.getSymbol())[0]);
 			}
 
-			if (StringUtils.contains(line, EbookGrammar.BOOK_AUTHOR)) {
+			if (StringUtils.contains(line, EpubGrammar.BOOK_AUTHOR.getSymbol())) {
 				isParagraph = false;
-				metainfo.put("Author", StringUtils.split(line, EbookGrammar.BOOK_AUTHOR)[0]);
+				metainfo.put("Author", StringUtils.split(line, EpubGrammar.BOOK_AUTHOR.getSymbol())[0]);
 			}
 
-			if (StringUtils.contains(line, EbookGrammar.SECTION_TITLE)) {
+			if (StringUtils.contains(line, EpubGrammar.SECTION_TITLE.getSymbol())) {
 				isParagraph = false;
 
 				if (isNonSectionEbook) {
@@ -157,7 +157,7 @@ public class Epub2Translator {
 				}
 
 				paragraphList = new ArrayList<>();
-				section = new Section(StringUtils.split(line, EbookGrammar.SECTION_TITLE)[0]);
+				section = new Section(StringUtils.split(line, EpubGrammar.SECTION_TITLE.getSymbol())[0]);
 			}
 
 			if (isParagraph) {
