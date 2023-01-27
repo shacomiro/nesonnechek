@@ -1,8 +1,8 @@
 package com.shacomiro.makeabook.ebook.extention.epub2;
 
-import static com.shacomiro.makeabook.core.util.IOUtils.*;
-
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -14,7 +14,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
-import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
+import com.shacomiro.epub.domain.EpubFileInfo;
+import com.shacomiro.epub.extention.epub2.Epub2Translator;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Epub2TranslatorTest {
@@ -39,8 +40,16 @@ class Epub2TranslatorTest {
 		lines.add("하느님이 보우하사");
 		lines.add("우리나라 만세");
 
-		createDirectory(Paths.get(testFilePath, File.separatorChar + "contents"));
-		createDirectory(Paths.get(testFilePath, File.separatorChar + "ebook"));
+		try {
+			if (!Files.exists(Paths.get(testFilePath, File.separatorChar + "contents"))) {
+				Files.createDirectory(Paths.get(testFilePath, File.separatorChar + "contents"));
+			}
+			if (!Files.exists(Paths.get(testFilePath, File.separatorChar + "ebook"))) {
+				Files.createDirectory(Paths.get(testFilePath, File.separatorChar + "ebook"));
+			}
+		} catch (IOException e) {
+			throw new RuntimeException("Fail to create directory", e);
+		}
 
 		//when
 		Epub2Translator epub2Translator = new Epub2Translator(testFilePath + "/contents", testFilePath + "/ebook");

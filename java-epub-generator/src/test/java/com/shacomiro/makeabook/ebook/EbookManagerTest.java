@@ -13,8 +13,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import com.shacomiro.makeabook.ebook.domain.ContentTempFileInfo;
-import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
+import com.shacomiro.epub.EpubManager;
+import com.shacomiro.epub.domain.ContentTempFileInfo;
+import com.shacomiro.epub.domain.EpubFileInfo;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -32,12 +33,11 @@ class EbookManagerTest {
 						File.separatorChar + "ebook" + File.separatorChar + "epub2" + File.separatorChar + uuid + ".epub")
 				.toAbsolutePath()
 				.normalize();
-		ContentTempFileInfo contentTempFileInfo = ContentTempFileInfo.builder()
-				.txtTempFilePath(Paths.get(testFilePath, File.separatorChar + fileName).normalize().toAbsolutePath())
-				.build();
+		ContentTempFileInfo contentTempFileInfo = new ContentTempFileInfo(uuid,
+				Paths.get(testFilePath, File.separatorChar + fileName).normalize().toAbsolutePath(), fileName);
 
 		//when
-		EbookManager ebookManager = new EbookManager(testFilePath);
+		EpubManager ebookManager = new EpubManager(testFilePath);
 		EpubFileInfo info = ebookManager.translateTxtToEpub2(uuid, fileName, contentTempFileInfo);
 
 		//then
@@ -48,16 +48,15 @@ class EbookManagerTest {
 	@Test
 	@Order(2)
 	@DisplayName("Ebook 파일 생성(빈 파일)")
-	void createEbookByWorngFileTest() {
+	void createEbookByEmptyFileTest() {
 		//given
 		String uuid = UUID.randomUUID().toString();
 		String fileName = "빈파일.txt";
-		ContentTempFileInfo contentTempFileInfo = ContentTempFileInfo.builder()
-				.txtTempFilePath(Paths.get(testFilePath, File.separatorChar + fileName).normalize().toAbsolutePath())
-				.build();
+		ContentTempFileInfo contentTempFileInfo = new ContentTempFileInfo(uuid,
+				Paths.get(testFilePath, File.separatorChar + fileName).normalize().toAbsolutePath(), fileName);
 
 		//when
-		EbookManager ebookManager = new EbookManager(testFilePath);
+		EpubManager ebookManager = new EpubManager(testFilePath);
 
 		//then
 		Assertions.assertThrows(NullPointerException.class,
