@@ -3,16 +3,16 @@ package com.shacomiro.epub.domain;
 import java.nio.file.Path;
 
 public class EpubFileInfo {
-	private String fileName;
+	private String filename;
 	private Path filePath;
 
-	public EpubFileInfo(String fileName, Path filePath) {
-		this.fileName = fileName;
+	public EpubFileInfo(String filename, Path filePath) {
+		this.filename = filename;
 		this.filePath = filePath;
 	}
 
-	public String getFileName() {
-		return fileName;
+	public String getFilename() {
+		return filename;
 	}
 
 	public Path getFilePath() {
@@ -22,7 +22,7 @@ public class EpubFileInfo {
 	@Override
 	public String toString() {
 		return "EpubFileInfo{" +
-				"fileName='" + fileName + '\'' +
+				"fileName='" + filename + '\'' +
 				", filePath=" + filePath +
 				'}';
 	}

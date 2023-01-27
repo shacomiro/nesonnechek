@@ -57,7 +57,7 @@ public class EbookService {
 			ebook = Optional.of(ebookRdsService
 					.save(Ebook.byEbookCreationResult()
 							.uuid(txtTempFileInfo.getUuid())
-							.name(epubFileInfo.getFileName())
+							.name(epubFileInfo.getFilename())
 							.type(EbookType.EPUB2)
 							.user(userRdsService.findByEmail(Email.byValue().value(ebookRequestDto.getUploader()).build())
 									.orElseThrow(() ->
