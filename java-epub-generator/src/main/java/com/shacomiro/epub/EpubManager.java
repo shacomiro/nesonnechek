@@ -14,6 +14,7 @@ import org.mozilla.universalchardet.UniversalDetector;
 
 import com.shacomiro.epub.domain.ContentTempFileInfo;
 import com.shacomiro.epub.domain.EpubFileInfo;
+import com.shacomiro.epub.exception.FileIOException;
 import com.shacomiro.epub.extention.epub2.Epub2Translator;
 
 public class EpubManager {
@@ -28,7 +29,8 @@ public class EpubManager {
 				Files.createDirectory(resourcePath);
 			}
 		} catch (IOException e) {
-			throw new RuntimeException("Fail to create directory '" + resourcePath.toAbsolutePath().normalize() + "'", e);
+			throw new FileIOException(
+					"I/O error occurred or fail to create directory '" + resourcePath.toAbsolutePath().normalize() + "'", e);
 		}
 		this.contentsBasePath = resourcesDir + "/contents";
 		this.ebookBasePath = resourcesDir + "/ebook";
@@ -48,7 +50,7 @@ public class EpubManager {
 		try {
 			return Files.readAllLines(path, Charset.forName(getEncoding(path)));
 		} catch (IOException e) {
-			throw new RuntimeException("Fail to read string from file", e);
+			throw new FileIOException("I/O error occurred when reading lines from file", e);
 		}
 	}
 
@@ -58,7 +60,7 @@ public class EpubManager {
 		try (InputStream is = Files.newInputStream(path)) {
 			charset = Optional.ofNullable(UniversalDetector.detectCharset(is));
 		} catch (IOException e) {
-			throw new RuntimeException("Fail to detect charset", e);
+			throw new FileIOException("I/O error occurred when detecting charset", e);
 		}
 
 		return charset
@@ -77,7 +79,7 @@ public class EpubManager {
 				Files.createDirectory(ebookPath);
 			}
 		} catch (IOException e) {
-			throw new RuntimeException("Parent directory of epub2 does not exist", e);
+			throw new FileIOException("I/O error occurred or fail to create base directory", e);
 		}
 	}
 
