@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.shacomiro.epub.domain.EpubFileInfo;
 import com.shacomiro.epub.domain.Section;
+import com.shacomiro.epub.exception.FileIOException;
 import com.shacomiro.epub.grammar.EpubGrammar;
 
 import nl.siegmann.epublib.domain.Author;
@@ -49,7 +50,7 @@ public class Epub2Translator {
 		try (InputStream is = Files.newInputStream(path)) {
 			resource = new Resource(is, href);
 		} catch (IOException e) {
-			throw new RuntimeException("fail to load resource", e);
+			throw new FileIOException("Fail to load resource", e);
 		}
 
 		return resource;
@@ -63,7 +64,8 @@ public class Epub2Translator {
 				Files.createDirectory(contentsPath);
 			}
 		} catch (IOException e) {
-			throw new RuntimeException("Fail to create directory '" + contentsPath.toAbsolutePath().normalize() + "'", e);
+			throw new FileIOException(
+					"I/O error occurred or fail to create directory '" + contentsPath.toAbsolutePath().normalize() + "'", e);
 		}
 
 		List<Section> sectionList = new ArrayList<>();
@@ -100,25 +102,25 @@ public class Epub2Translator {
 		try (OutputStream os = Files.newOutputStream(bookFilePath)) {
 			epubWriter.write(book, os);
 		} catch (IOException e) {
-			throw new RuntimeException("Fail to write epub file", e);
-		} finally {
-			if (Files.exists(contentsPath)) {
-				try (Stream<Path> filesPath = Files.list(contentsPath)) {
-					filesPath.forEach(path -> {
-						try {
-							Files.delete(path);
-						} catch (NoSuchFileException e) {
-							throw new RuntimeException("File '" + path + "' does not exist", e);
-						} catch (IOException e) {
-							throw new RuntimeException("Fail to delete file '" + path + "'", e);
-						}
-					});
-					Files.delete(contentsPath);
-				} catch (NotDirectoryException e) {
-					throw new RuntimeException("'" + contentsPath + "' is not a directory", e);
-				} catch (IOException e) {
-					throw new RuntimeException("I/O error occured when opening the directory '" + contentsPath + "'", e);
-				}
+			throw new FileIOException("Fail to write epub file", e);
+		}
+
+		if (Files.exists(contentsPath)) {
+			try (Stream<Path> filesPath = Files.list(contentsPath)) {
+				filesPath.forEach(path -> {
+					try {
+						Files.delete(path);
+					} catch (NoSuchFileException e) {
+						throw new FileIOException("File '" + path + "' does not exist", e);
+					} catch (IOException e) {
+						throw new FileIOException("I/O error occurred when deleting file '" + path + "'", e);
+					}
+				});
+				Files.delete(contentsPath);
+			} catch (NotDirectoryException e) {
+				throw new FileIOException("'" + contentsPath + "' is not a directory", e);
+			} catch (IOException e) {
+				throw new FileIOException("I/O error occurred when opening the directory '" + contentsPath + "'", e);
 			}
 		}
 
@@ -205,7 +207,7 @@ public class Epub2Translator {
 			bw.write("</html>");
 			bw.flush();
 		} catch (IOException e) {
-			throw new RuntimeException("Fail to write xhtml file", e);
+			throw new FileIOException("I/O error occurred when writing xhtml file", e);
 		}
 	}
 
@@ -221,7 +223,7 @@ public class Epub2Translator {
 				Files.createDirectory(ebookPath);
 			}
 		} catch (IOException e) {
-			throw new RuntimeException("Parent directory of epub2 does not exist", e);
+			throw new FileIOException("I/O error occurred or parent directory of epub2 does not exist", e);
 		}
 	}
 }
