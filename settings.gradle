@@ -8,5 +8,5 @@ include 'makeabook-domain-redis'
 include 'makeabook-core'
 include 'java-jwt-provider'
 include 'java-epub-generator'
-include 'java-aws-s3-manager'
+include 'java-aws-s3-client-manager'
 
