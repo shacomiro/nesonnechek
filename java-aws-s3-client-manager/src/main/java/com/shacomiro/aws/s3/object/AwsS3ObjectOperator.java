@@ -42,10 +42,14 @@ public class AwsS3ObjectOperator {
 	}
 
 	public S3Object downloadS3Object(String bucketName, String objectKey) {
-		return amazonS3.getObject(bucketName, objectKey);
+		try {
+			return amazonS3.getObject(bucketName, objectKey);
+		} catch (AmazonServiceException e) {
+			throw new AwsS3ObjectOperateException("The specified bucket and object key not exist");
+		}
 	}
 
-	public byte[] getS3ObjectBytes(String bucketName, String objectKey) {
+	public byte[] downloadS3ObjectBytes(String bucketName, String objectKey) {
 		try (
 				S3Object s3Object = downloadS3Object(bucketName, objectKey);
 				S3ObjectInputStream s3ObjectInputStream = s3Object.getObjectContent();
