@@ -38,8 +38,9 @@ public class EpubManager {
 		this.epub2Translator = new Epub2Translator(contentsBasePath, ebookBasePath);
 	}
 
-	public EpubFileInfo translateTxtToEpub2(String uuid, String fileName, ContentTempFileInfo contentTempFileInfo) {
-		return epub2Translator.createEpub2(uuid, fileName, readTxtAllLines(contentTempFileInfo.getTempFilePath()));
+	public EpubFileInfo translateTxtToEpub2(String uuid, ContentTempFileInfo contentTempFileInfo) {
+		return epub2Translator.createEpub2(uuid, contentTempFileInfo.getOriginalTempFilename(),
+				readTxtAllLines(contentTempFileInfo.getTempFilePath()));
 	}
 
 	public Path getEpubFilePath(String ebookExtension, String fileName) {
