@@ -36,13 +36,12 @@ import nl.siegmann.epublib.epub.EpubWriter;
 import nl.siegmann.epublib.service.MediatypeService;
 
 public class Epub2Translator {
-	private final String epub2ContentsBasePath;
-	private final String epub2EbookBasePath;
+	private final String contentDir;
+	private final String ebookDir;
 
-	public Epub2Translator(String contentsBasePath, String ebookBasePath) {
-		this.epub2ContentsBasePath = contentsBasePath + "/epub2";
-		this.epub2EbookBasePath = ebookBasePath + "/epub2";
-		initEpub2BaseDirectory();
+	public Epub2Translator(String contentDir, String ebookDir) {
+		this.contentDir = contentDir;
+		this.ebookDir = ebookDir;
 	}
 
 	private static Resource getResource(Path path, String href) {
@@ -59,7 +58,7 @@ public class Epub2Translator {
 
 	public EpubFileInfo createEpub2(String uuid, String fileName, List<String> lines) {
 		String fileNameWithoutExtension = FilenameUtils.removeExtension(fileName);
-		Path contentsPath = Paths.get(epub2ContentsBasePath, File.separatorChar + uuid);
+		Path contentsPath = Paths.get(contentDir, File.separatorChar + uuid);
 		try {
 			if (!Files.exists(contentsPath)) {
 				Files.createDirectory(contentsPath);
@@ -95,7 +94,7 @@ public class Epub2Translator {
 
 		EpubWriter epubWriter = new EpubWriter();
 		String bookFileName = metainfo.getOrDefault("Title", fileNameWithoutExtension);
-		Path bookFilePath = Paths.get(epub2EbookBasePath,
+		Path bookFilePath = Paths.get(ebookDir,
 						File.separatorChar + uuid + MediatypeService.EPUB.getDefaultExtension())
 				.toAbsolutePath()
 				.normalize();
@@ -216,22 +215,6 @@ public class Epub2Translator {
 			bw.flush();
 		} catch (IOException e) {
 			throw new FileIOException("I/O error occurred when writing xhtml file", e);
-		}
-	}
-
-	private void initEpub2BaseDirectory() {
-		Path contentPath = Paths.get(epub2ContentsBasePath);
-		Path ebookPath = Paths.get(epub2EbookBasePath);
-
-		try {
-			if (!Files.exists(contentPath)) {
-				Files.createDirectory(contentPath);
-			}
-			if (!Files.exists(ebookPath)) {
-				Files.createDirectory(ebookPath);
-			}
-		} catch (IOException e) {
-			throw new FileIOException("I/O error occurred or parent directory of epub2 does not exist", e);
 		}
 	}
 }

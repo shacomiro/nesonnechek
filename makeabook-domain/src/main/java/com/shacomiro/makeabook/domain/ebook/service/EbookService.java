@@ -140,12 +140,12 @@ public class EbookService {
 	}
 
 	private List<ContentTempFileInfo> saveUploadToTempFile(List<FileDto> files) {
-		Path contentsBasePath = Paths.get(epubManager.getContentsBasePath()).normalize().toAbsolutePath();
+		Path contentDir = Paths.get(epubManager.getContentDir()).normalize().toAbsolutePath();
 
 		return files.stream()
 				.map(
 						file -> {
-							Path tempUploadFilePath = IOUtils.createTempFile(contentsBasePath, file.getExtension());
+							Path tempUploadFilePath = IOUtils.createTempFile(contentDir, file.getExtension());
 							try (OutputStream os = Files.newOutputStream(tempUploadFilePath)) {
 								os.write(file.getFileBais().readAllBytes());
 							} catch (IOException e) {

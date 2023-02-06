@@ -18,24 +18,14 @@ import com.shacomiro.epub.exception.FileIOException;
 import com.shacomiro.epub.extention.epub2.Epub2Translator;
 
 public class EpubManager {
-	private final String contentsBasePath;
-	private final String ebookBasePath;
+	private final String contentDir;
+	private final String ebookDir;
 	private final Epub2Translator epub2Translator;
 
-	public EpubManager(String resourcesDir) {
-		Path resourcePath = Paths.get(resourcesDir);
-		try {
-			if (!Files.exists(resourcePath)) {
-				Files.createDirectory(resourcePath);
-			}
-		} catch (IOException e) {
-			throw new FileIOException(
-					"I/O error occurred or fail to create directory '" + resourcePath.toAbsolutePath().normalize() + "'", e);
-		}
-		this.contentsBasePath = resourcesDir + "/contents";
-		this.ebookBasePath = resourcesDir + "/ebook";
-		initBaseDirectory();
-		this.epub2Translator = new Epub2Translator(contentsBasePath, ebookBasePath);
+	public EpubManager(String contentDir, String ebookDir) {
+		this.contentDir = contentDir;
+		this.ebookDir = ebookDir;
+		this.epub2Translator = new Epub2Translator(contentDir, ebookDir);
 	}
 
 	public EpubFileInfo translateTxtToEpub2(String uuid, ContentTempFileInfo contentTempFileInfo) {
@@ -44,7 +34,7 @@ public class EpubManager {
 	}
 
 	public Path getEpubFilePath(String ebookExtension, String fileName) {
-		return Paths.get(ebookBasePath, File.separatorChar + ebookExtension + File.separatorChar + fileName);
+		return Paths.get(ebookDir, File.separatorChar + ebookExtension + File.separatorChar + fileName);
 	}
 
 	private List<String> readTxtAllLines(Path path) {
@@ -68,27 +58,11 @@ public class EpubManager {
 				.orElseThrow(() -> new NullPointerException("Could not detect charset"));
 	}
 
-	private void initBaseDirectory() {
-		Path contentPath = Paths.get(contentsBasePath);
-		Path ebookPath = Paths.get(ebookBasePath);
-
-		try {
-			if (!Files.exists(contentPath)) {
-				Files.createDirectory(contentPath);
-			}
-			if (!Files.exists(ebookPath)) {
-				Files.createDirectory(ebookPath);
-			}
-		} catch (IOException e) {
-			throw new FileIOException("I/O error occurred or fail to create base directory", e);
-		}
+	public String getContentDir() {
+		return contentDir;
 	}
 
-	public String getContentsBasePath() {
-		return contentsBasePath;
-	}
-
-	public String getEbookBasePath() {
-		return ebookBasePath;
+	public String getEbookDir() {
+		return ebookDir;
 	}
 }
