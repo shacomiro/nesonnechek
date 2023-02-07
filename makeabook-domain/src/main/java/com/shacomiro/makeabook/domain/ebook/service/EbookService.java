@@ -30,6 +30,7 @@ import com.shacomiro.makeabook.domain.ebook.dto.FileDto;
 import com.shacomiro.makeabook.domain.ebook.exception.EbookNotFoundException;
 import com.shacomiro.makeabook.domain.ebook.exception.EbookResourceNotFoundException;
 import com.shacomiro.makeabook.domain.global.config.aws.AwsS3Configuration;
+import com.shacomiro.makeabook.domain.global.exception.AwsS3ClientException;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookType;
 import com.shacomiro.makeabook.domain.rds.ebook.service.EbookRdsService;
@@ -52,24 +53,23 @@ public class EbookService {
 
 	public Optional<Ebook> createEbook(EbookRequestDto ebookRequestDto) {
 		Optional<Ebook> ebook = Optional.empty();
-		EpubFileInfo epubFileInfo;
+		EpubFileInfo epubFileInfo = null;
 		List<ContentTempFileInfo> contentTempFileInfos = saveUploadToTempFile(ebookRequestDto.getFiles());
 
 		if (ebookRequestDto.getEbookType().equals(EbookType.EPUB2)) {
 			ContentTempFileInfo txtTempFileInfo = contentTempFileInfos.get(0);
 			epubFileInfo = epubManager.translateTxtToEpub2(ebookRequestDto.getUuid(), txtTempFileInfo);
 
-			awsS3ClientManager.getAwsS3ObjectOperator()
-					.uploadS3Object(
-							awsS3Configuration.getBucketName(),
-							epubFileInfo.getUuid(),
-							epubFileInfo.getFilePath().toAbsolutePath().normalize().toString()
-					);
-
 			try {
-				Files.deleteIfExists(epubFileInfo.getFilePath());
-			} catch (IOException e) {
-				throw new RuntimeException(e);
+				awsS3ClientManager.getAwsS3ObjectOperator()
+						.uploadS3Object(
+								awsS3Configuration.getBucketName(),
+								epubFileInfo.getUuid(),
+								epubFileInfo.getFilePath().toAbsolutePath().normalize().toString()
+						);
+
+			} catch (AwsS3ObjectOperateException e) {
+				throw new AwsS3ClientException("Error occurred while saving ebook file");
 			}
 
 			ebook = Optional.of(ebookRdsService
@@ -86,12 +86,16 @@ public class EbookService {
 			);
 		}
 
-		for (ContentTempFileInfo tempFile : contentTempFileInfos) {
-			try {
-				Files.deleteIfExists(tempFile.getTempFilePath());
-			} catch (IOException e) {
-				throw new RuntimeException(e);
+		try {
+			if (epubFileInfo != null) {
+				Files.deleteIfExists(epubFileInfo.getFilePath());
 			}
+
+			for (ContentTempFileInfo tempFile : contentTempFileInfos) {
+				Files.deleteIfExists(tempFile.getTempFilePath());
+			}
+		} catch (IOException e) {
+			throw new FileIOException("I/O error occurred while deleting files");
 		}
 
 		return ebook;
