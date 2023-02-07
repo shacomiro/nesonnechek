@@ -65,7 +65,7 @@ public class Ebook {
 
 	@Builder(builderClassName = "ByEbookCreationResult", builderMethodName = "byEbookCreationResult")
 	public Ebook(String uuid, String name, EbookType type, User user) {
-		this(null, uuid, name, type, 0, now(), now().plusDays(3), true, user);
+		this(null, uuid, name, type, 0, now(), now().plusDays(30), true, user);
 	}
 
 	public Ebook(Long id, String uuid, String name, EbookType type, int downloadCount, LocalDateTime createdAt,
