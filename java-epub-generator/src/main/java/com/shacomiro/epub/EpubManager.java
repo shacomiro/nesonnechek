@@ -23,6 +23,9 @@ public class EpubManager {
 	private final Epub2Translator epub2Translator;
 
 	public EpubManager(String contentDir, String ebookDir) {
+		if (!Files.exists(Paths.get(contentDir)) || !Files.exists(Paths.get(ebookDir))) {
+			throw new FileIOException("Content directory and ebook directory must be exists");
+		}
 		this.contentDir = contentDir;
 		this.ebookDir = ebookDir;
 		this.epub2Translator = new Epub2Translator(contentDir, ebookDir);
