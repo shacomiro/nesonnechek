@@ -1,7 +1,10 @@
 package com.shacomiro.aws.s3.object;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -9,6 +12,7 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.amazonaws.services.s3.model.ListObjectsV2Result;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
@@ -27,6 +31,18 @@ public class AwsS3ObjectOperator {
 			amazonS3.putObject(bucketName, keyName, new File(filePath));
 		} catch (AmazonServiceException e) {
 			throw new AwsS3ObjectOperateException("The specified bucket and object key not exist");
+		}
+	}
+
+	public void uploadS3Object(String bucketName, String keyName, String filePath, ObjectMetadata objectMetadata) {
+		try (InputStream fis = new FileInputStream(filePath)) {
+			amazonS3.putObject(bucketName, keyName, fis, objectMetadata);
+		} catch (AmazonServiceException e) {
+			throw new AwsS3ObjectOperateException("The specified bucket and object key not exist");
+		} catch (FileNotFoundException e) {
+			throw new AwsS3ObjectOperateException("File not found");
+		} catch (IOException e) {
+			throw new AwsS3ObjectOperateException("I/O error occurred while load input stream");
 		}
 	}
 
@@ -56,7 +72,7 @@ public class AwsS3ObjectOperator {
 		) {
 			return s3ObjectInputStream.readAllBytes();
 		} catch (IOException e) {
-			throw new AwsS3ObjectIOException("I/O error occurs while read bytes from S3ObjectInputStream");
+			throw new AwsS3ObjectIOException("I/O error occurred while read bytes from S3ObjectInputStream");
 		}
 	}
 

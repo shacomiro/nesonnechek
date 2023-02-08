@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.shacomiro.aws.s3.AwsS3ClientManager;
 import com.shacomiro.aws.s3.exception.AwsS3ObjectOperateException;
 import com.shacomiro.epub.EpubManager;
@@ -61,15 +62,21 @@ public class EbookService {
 			epubFileInfo = epubManager.translateTxtToEpub2(ebookRequestDto.getUuid(), txtTempFileInfo);
 
 			try {
+				ObjectMetadata objectMetadata = new ObjectMetadata();
+				objectMetadata.setContentType(ebookRequestDto.getEbookType().getContentType());
+				objectMetadata.setContentLength(Files.size(epubFileInfo.getFilePath()));
+
 				awsS3ClientManager.getAwsS3ObjectOperator()
 						.uploadS3Object(
 								awsS3Configuration.getBucketName(),
 								epubFileInfo.getUuid(),
-								epubFileInfo.getFilePath().toAbsolutePath().normalize().toString()
+								epubFileInfo.getFilePath().toAbsolutePath().normalize().toString(),
+								objectMetadata
 						);
-
 			} catch (AwsS3ObjectOperateException e) {
 				throw new AwsS3ClientException("Error occurred while saving ebook file");
+			} catch (IOException e) {
+				throw new FileIOException("I/O error occurred while measuring ebook file length");
 			}
 
 			ebook = Optional.of(ebookRdsService
@@ -124,11 +131,6 @@ public class EbookService {
 		currentEbook.verifyExpiration();
 		currentEbook.addDownloadCount();
 		ebookRdsService.save(currentEbook);
-
-		Path path = epubManager.getEpubFilePath(currentEbook.getType().getValue(), currentEbook.getOriginalFilename());
-		if (Files.notExists(path)) {
-			throw new FileIOException("Ebook resource not found.");
-		}
 
 		try {
 			ByteArrayResource ebookResource = new ByteArrayResource(
