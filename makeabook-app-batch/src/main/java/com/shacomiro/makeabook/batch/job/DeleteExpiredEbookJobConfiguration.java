@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.shacomiro.aws.s3.AwsS3ClientManager;
-import com.shacomiro.aws.s3.exception.AwsS3ObjectOperateException;
+import com.shacomiro.aws.s3.exception.AwsS3ObjectHandleException;
 import com.shacomiro.makeabook.batch.global.config.BatchAwsS3Configuration;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
 
@@ -74,9 +74,9 @@ public class DeleteExpiredEbookJobConfiguration {
 				boolean isDeleted = true;
 
 				try {
-					awsS3ClientManager.getAwsS3ObjectOperator()
+					awsS3ClientManager.getAwsS3ObjectHandler()
 							.deleteS3Object(batchAwsS3Configuration.getBucketName(), ebook.getUuid());
-				} catch (AwsS3ObjectOperateException e) {
+				} catch (AwsS3ObjectHandleException e) {
 					log.error("Fail to delete ebook file");
 					isDeleted = false;
 				} finally {
@@ -84,7 +84,7 @@ public class DeleteExpiredEbookJobConfiguration {
 						ebook.ceaseToExist();
 					}
 				}
-				
+
 				log.info(
 						">>> EbookFile(uuid={}, filename={}, expiredAt={}) is expired! :: (isExist={}, isExpired={}, isDeleted={})",
 						ebook.getUuid(), ebook.getName(), ebook.getExpiredAt(), ebook.isExist(),

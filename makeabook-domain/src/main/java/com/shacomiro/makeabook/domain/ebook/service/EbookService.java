@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.shacomiro.aws.s3.AwsS3ClientManager;
-import com.shacomiro.aws.s3.exception.AwsS3ObjectOperateException;
+import com.shacomiro.aws.s3.exception.AwsS3ObjectHandleException;
 import com.shacomiro.epub.EpubManager;
 import com.shacomiro.epub.domain.ContentTempFileInfo;
 import com.shacomiro.epub.domain.EpubFileInfo;
@@ -66,14 +66,14 @@ public class EbookService {
 				objectMetadata.setContentType(ebookRequestDto.getEbookType().getContentType());
 				objectMetadata.setContentLength(Files.size(epubFileInfo.getFilePath()));
 
-				awsS3ClientManager.getAwsS3ObjectOperator()
+				awsS3ClientManager.getAwsS3ObjectHandler()
 						.uploadS3Object(
 								awsS3Configuration.getBucketName(),
 								epubFileInfo.getUuid(),
 								epubFileInfo.getFilePath().toAbsolutePath().normalize().toString(),
 								objectMetadata
 						);
-			} catch (AwsS3ObjectOperateException e) {
+			} catch (AwsS3ObjectHandleException e) {
 				throw new AwsS3ClientException("Error occurred while saving ebook file");
 			} catch (IOException e) {
 				throw new FileIOException("I/O error occurred while measuring ebook file length");
@@ -134,13 +134,13 @@ public class EbookService {
 
 		try {
 			ByteArrayResource ebookResource = new ByteArrayResource(
-					awsS3ClientManager.getAwsS3ObjectOperator().downloadS3ObjectBytes(
+					awsS3ClientManager.getAwsS3ObjectHandler().downloadS3ObjectBytes(
 							awsS3Configuration.getBucketName(),
 							currentEbook.getUuid()
 					));
 
 			return new EbookResourceDto(ebookResource, currentEbook.getEbookFilename());
-		} catch (AwsS3ObjectOperateException e) {
+		} catch (AwsS3ObjectHandleException e) {
 			throw new EbookResourceNotFoundException("Ebook resource not found.");
 		}
 	}

@@ -1,4 +1,4 @@
-package com.shacomiro.aws.s3.object;
+package com.shacomiro.aws.s3.handler;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -24,12 +24,12 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
-import com.shacomiro.aws.s3.exception.AwsS3ObjectOperateException;
+import com.shacomiro.aws.s3.exception.AwsS3ObjectHandleException;
 
 import io.findify.s3mock.S3Mock;
 
-class AwsS3ObjectOperatorTest {
-	private static final Logger LOG = LoggerFactory.getLogger(AwsS3ObjectOperatorTest.class);
+class AwsS3ObjectHandlerTest {
+	private static final Logger LOG = LoggerFactory.getLogger(AwsS3ObjectHandlerTest.class);
 	private static final S3Mock S3_Mock = new S3Mock.Builder().withPort(8001).withInMemoryBackend().build();
 	private static final AmazonS3 AMAZON_S3 = AmazonS3ClientBuilder.standard()
 			.withPathStyleAccessEnabled(true)
@@ -40,10 +40,10 @@ class AwsS3ObjectOperatorTest {
 			.withCredentials(new AWSStaticCredentialsProvider(new AnonymousAWSCredentials()))
 			.build();
 	private static final String BUCKET_NAME = "mock-bucket";
-	private final AwsS3ObjectOperator awsS3ObjectOperator;
+	private final AwsS3ObjectHandler awsS3ObjectHandler;
 
-	public AwsS3ObjectOperatorTest() {
-		this.awsS3ObjectOperator = new AwsS3ObjectOperator(AMAZON_S3);
+	public AwsS3ObjectHandlerTest() {
+		this.awsS3ObjectHandler = new AwsS3ObjectHandler(AMAZON_S3);
 	}
 
 	@BeforeAll
@@ -80,8 +80,8 @@ class AwsS3ObjectOperatorTest {
 		objectMetadata.setContentLength(Files.size(Paths.get(path)));
 
 		//when
-		awsS3ObjectOperator.uploadS3Object(BUCKET_NAME, keyName, path, objectMetadata);
-		S3Object s3Object = awsS3ObjectOperator.downloadS3Object(BUCKET_NAME, keyName);
+		awsS3ObjectHandler.uploadS3Object(BUCKET_NAME, keyName, path, objectMetadata);
+		S3Object s3Object = awsS3ObjectHandler.downloadS3Object(BUCKET_NAME, keyName);
 
 		//then
 		Assertions.assertEquals(contentType, s3Object.getObjectMetadata().getContentType());
@@ -101,11 +101,11 @@ class AwsS3ObjectOperatorTest {
 		objectMetadata.setContentType(contentType);
 		objectMetadata.setContentLength(Files.size(Paths.get(path)));
 		for (String keyName : keyNameList) {
-			awsS3ObjectOperator.uploadS3Object(BUCKET_NAME, keyName, path, objectMetadata);
+			awsS3ObjectHandler.uploadS3Object(BUCKET_NAME, keyName, path, objectMetadata);
 		}
 
 		//when
-		List<String> S3ObjectList = awsS3ObjectOperator.getS3ObjectList(BUCKET_NAME);
+		List<String> S3ObjectList = awsS3ObjectHandler.getS3ObjectList(BUCKET_NAME);
 
 		//then
 		Assertions.assertEquals(keyNameList.size(), S3ObjectList.size());
@@ -124,11 +124,11 @@ class AwsS3ObjectOperatorTest {
 		ObjectMetadata objectMetadata = new ObjectMetadata();
 		objectMetadata.setContentType(contentType);
 		objectMetadata.setContentLength(Files.size(Paths.get(path)));
-		awsS3ObjectOperator.uploadS3Object(BUCKET_NAME, keyName, path, objectMetadata);
+		awsS3ObjectHandler.uploadS3Object(BUCKET_NAME, keyName, path, objectMetadata);
 
 		//when
-		awsS3ObjectOperator.copyS3Object(BUCKET_NAME, keyName, BUCKET_NAME, copyKeyName);
-		S3Object copyS3Object = awsS3ObjectOperator.downloadS3Object(BUCKET_NAME, copyKeyName);
+		awsS3ObjectHandler.copyS3Object(BUCKET_NAME, keyName, BUCKET_NAME, copyKeyName);
+		S3Object copyS3Object = awsS3ObjectHandler.downloadS3Object(BUCKET_NAME, copyKeyName);
 
 		//then
 		Assertions.assertEquals(contentType, copyS3Object.getObjectMetadata().getContentType());
@@ -147,10 +147,10 @@ class AwsS3ObjectOperatorTest {
 		ObjectMetadata objectMetadata = new ObjectMetadata();
 		objectMetadata.setContentType(contentType);
 		objectMetadata.setContentLength(Files.size(Paths.get(path)));
-		awsS3ObjectOperator.uploadS3Object(BUCKET_NAME, keyName, path, objectMetadata);
+		awsS3ObjectHandler.uploadS3Object(BUCKET_NAME, keyName, path, objectMetadata);
 
 		//when
-		awsS3ObjectOperator.deleteS3Object(BUCKET_NAME, keyName);
+		awsS3ObjectHandler.deleteS3Object(BUCKET_NAME, keyName);
 
 		//then
 		Assertions.assertFalse(AMAZON_S3.doesObjectExist(BUCKET_NAME, keyName));
@@ -164,7 +164,7 @@ class AwsS3ObjectOperatorTest {
 		String keyName = "non-exist-mock-file-key";
 
 		//when, then
-		Assertions.assertThrows(AwsS3ObjectOperateException.class,
-				() -> awsS3ObjectOperator.downloadS3Object(BUCKET_NAME, keyName));
+		Assertions.assertThrows(AwsS3ObjectHandleException.class,
+				() -> awsS3ObjectHandler.downloadS3Object(BUCKET_NAME, keyName));
 	}
 }

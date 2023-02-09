@@ -1,4 +1,4 @@
-package com.shacomiro.aws.s3.object;
+package com.shacomiro.aws.s3.handler;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,13 +16,13 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.shacomiro.aws.s3.exception.AwsS3ObjectHandleException;
 import com.shacomiro.aws.s3.exception.AwsS3ObjectIOException;
-import com.shacomiro.aws.s3.exception.AwsS3ObjectOperateException;
 
-public class AwsS3ObjectOperator {
+public class AwsS3ObjectHandler {
 	private final AmazonS3 amazonS3;
 
-	public AwsS3ObjectOperator(AmazonS3 amazonS3) {
+	public AwsS3ObjectHandler(AmazonS3 amazonS3) {
 		this.amazonS3 = amazonS3;
 	}
 
@@ -30,7 +30,7 @@ public class AwsS3ObjectOperator {
 		try {
 			amazonS3.putObject(bucketName, keyName, new File(filePath));
 		} catch (AmazonServiceException e) {
-			throw new AwsS3ObjectOperateException("The specified bucket and object key not exist");
+			throw new AwsS3ObjectHandleException("The specified bucket and object key not exist");
 		}
 	}
 
@@ -38,11 +38,11 @@ public class AwsS3ObjectOperator {
 		try (InputStream fis = new FileInputStream(filePath)) {
 			amazonS3.putObject(bucketName, keyName, fis, objectMetadata);
 		} catch (AmazonServiceException e) {
-			throw new AwsS3ObjectOperateException("The specified bucket and object key not exist");
+			throw new AwsS3ObjectHandleException("The specified bucket and object key not exist");
 		} catch (FileNotFoundException e) {
-			throw new AwsS3ObjectOperateException("File not found");
+			throw new AwsS3ObjectHandleException("File not found");
 		} catch (IOException e) {
-			throw new AwsS3ObjectOperateException("I/O error occurred while load input stream");
+			throw new AwsS3ObjectHandleException("I/O error occurred while load input stream");
 		}
 	}
 
@@ -61,7 +61,7 @@ public class AwsS3ObjectOperator {
 		try {
 			return amazonS3.getObject(bucketName, objectKey);
 		} catch (AmazonServiceException e) {
-			throw new AwsS3ObjectOperateException("The specified bucket and object key not exist");
+			throw new AwsS3ObjectHandleException("The specified bucket and object key not exist");
 		}
 	}
 
@@ -80,7 +80,7 @@ public class AwsS3ObjectOperator {
 		try {
 			amazonS3.copyObject(fromBucket, fromObjectKey, toBucket, toObjectKey);
 		} catch (AmazonServiceException e) {
-			throw new AwsS3ObjectOperateException("The specified buckets or object keys not exist");
+			throw new AwsS3ObjectHandleException("The specified buckets or object keys not exist");
 		}
 	}
 
@@ -88,7 +88,7 @@ public class AwsS3ObjectOperator {
 		try {
 			amazonS3.deleteObject(bucketName, objectKey);
 		} catch (AmazonServiceException e) {
-			throw new AwsS3ObjectOperateException("The specified bucket and object key not exist");
+			throw new AwsS3ObjectHandleException("The specified bucket and object key not exist");
 		}
 	}
 
@@ -98,7 +98,7 @@ public class AwsS3ObjectOperator {
 					.withKeys(objectKeys);
 			amazonS3.deleteObjects(deleteObjectRequest);
 		} catch (AmazonServiceException e) {
-			throw new AwsS3ObjectOperateException("The specified bucket or object keys not exist");
+			throw new AwsS3ObjectHandleException("The specified bucket or object keys not exist");
 		}
 	}
 }
