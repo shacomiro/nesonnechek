@@ -2,6 +2,7 @@ package com.shacomiro.makeabook.api.ebook.api;
 
 import static com.shacomiro.makeabook.api.global.util.ApiUtils.*;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import org.springframework.core.io.Resource;
@@ -14,14 +15,16 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.shacomiro.makeabook.api.global.assembers.EbookResponseModelAssembler;
 import com.shacomiro.makeabook.api.global.security.principal.UserPrincipal;
+import com.shacomiro.makeabook.core.global.exception.FileIOException;
+import com.shacomiro.makeabook.domain.ebook.dto.EbookRequestDto;
 import com.shacomiro.makeabook.domain.ebook.dto.EbookResourceDto;
 import com.shacomiro.makeabook.domain.ebook.service.EbookService;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
@@ -46,15 +49,24 @@ public class EbookRestApi {
 	public ResponseEntity<?> createTxtEbook(
 			@AuthenticationPrincipal @NonNull UserPrincipal userPrincipal,
 			@RequestParam(name = "type", defaultValue = "epub2") EbookType ebookType,
-			@RequestBody @RequestParam(name = "file") MultipartFile file) {
-		if (file.isEmpty()) {
+			@RequestPart(name = "txtFile") MultipartFile txtFile) {
+		if (txtFile.isEmpty()) {
 			throw new IllegalStateException("Upload file is empty");
-		} else if (file.getContentType() == null || !file.getContentType().equals(MediaType.TEXT_PLAIN_VALUE)) {
+		}
+		if (txtFile.getContentType() == null || !txtFile.getContentType().equals(MediaType.TEXT_PLAIN_VALUE)) {
 			throw new IllegalArgumentException("Invalid Content type for upload file");
 		}
 
+		EbookRequestDto ebookRequestDto;
+		try {
+			ebookRequestDto = new EbookRequestDto(txtFile.getBytes(), txtFile.getOriginalFilename(), userPrincipal.getEmail(),
+					ebookType);
+		} catch (IOException e) {
+			throw new FileIOException("Fail to read upload file.");
+		}
+
 		return success(
-				ebookService.createEbook(file, ebookType, userPrincipal.getEmail())
+				ebookService.createEbook(ebookRequestDto)
 						.orElseThrow(() -> new NullPointerException("Fail to create ebook")),
 				ebookResponseModelAssembler,
 				HttpStatus.CREATED

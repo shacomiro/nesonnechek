@@ -1,4 +1,6 @@
 ### secret-config ###
+**/*external-config.yaml
+**/*ext-config.yaml
 **/*-secret.yaml
 
 HELP.md
