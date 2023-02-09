@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 
 import org.springframework.core.io.ByteArrayResource;
@@ -18,12 +17,21 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.shacomiro.aws.s3.AwsS3ClientManager;
+import com.shacomiro.aws.s3.exception.AwsS3ObjectHandleException;
+import com.shacomiro.epub.EpubManager;
+import com.shacomiro.epub.domain.ContentTempFileInfo;
+import com.shacomiro.epub.domain.EpubFileInfo;
 import com.shacomiro.makeabook.core.global.exception.FileIOException;
 import com.shacomiro.makeabook.core.util.IOUtils;
 import com.shacomiro.makeabook.domain.ebook.dto.EbookRequestDto;
 import com.shacomiro.makeabook.domain.ebook.dto.EbookResourceDto;
 import com.shacomiro.makeabook.domain.ebook.dto.FileDto;
 import com.shacomiro.makeabook.domain.ebook.exception.EbookNotFoundException;
+import com.shacomiro.makeabook.domain.ebook.exception.EbookResourceNotFoundException;
+import com.shacomiro.makeabook.domain.global.config.aws.AwsS3Configuration;
+import com.shacomiro.makeabook.domain.global.exception.AwsS3ClientException;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookType;
 import com.shacomiro.makeabook.domain.rds.ebook.service.EbookRdsService;
@@ -31,9 +39,6 @@ import com.shacomiro.makeabook.domain.rds.user.entity.Email;
 import com.shacomiro.makeabook.domain.rds.user.entity.User;
 import com.shacomiro.makeabook.domain.rds.user.service.UserRdsService;
 import com.shacomiro.makeabook.domain.user.exception.UserNotFoundException;
-import com.shacomiro.makeabook.ebook.EbookManager;
-import com.shacomiro.makeabook.ebook.domain.ContentTempFileInfo;
-import com.shacomiro.makeabook.ebook.domain.EpubFileInfo;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,30 +46,43 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional
 public class EbookService {
-	private static final String RESOURCES_DIR = "./files";
 	private final EbookRdsService ebookRdsService;
 	private final UserRdsService userRdsService;
-	private EbookManager ebookManager;
-
-	@PostConstruct
-	public void initialize() {
-		this.ebookManager = new EbookManager(RESOURCES_DIR);
-	}
+	private final EpubManager epubManager;
+	private final AwsS3ClientManager awsS3ClientManager;
+	private final AwsS3Configuration awsS3Configuration;
 
 	public Optional<Ebook> createEbook(EbookRequestDto ebookRequestDto) {
 		Optional<Ebook> ebook = Optional.empty();
-		EpubFileInfo epubFileInfo;
+		EpubFileInfo epubFileInfo = null;
 		List<ContentTempFileInfo> contentTempFileInfos = saveUploadToTempFile(ebookRequestDto.getFiles());
 
 		if (ebookRequestDto.getEbookType().equals(EbookType.EPUB2)) {
 			ContentTempFileInfo txtTempFileInfo = contentTempFileInfos.get(0);
-			epubFileInfo = ebookManager.translateTxtToEpub2(txtTempFileInfo.getUuid(), txtTempFileInfo.getOriginalTempFilename(),
-					txtTempFileInfo);
+			epubFileInfo = epubManager.translateTxtToEpub2(ebookRequestDto.getUuid(), txtTempFileInfo);
+
+			try {
+				ObjectMetadata objectMetadata = new ObjectMetadata();
+				objectMetadata.setContentType(ebookRequestDto.getEbookType().getContentType());
+				objectMetadata.setContentLength(Files.size(epubFileInfo.getFilePath()));
+
+				awsS3ClientManager.getAwsS3ObjectHandler()
+						.uploadS3Object(
+								awsS3Configuration.getBucketName(),
+								epubFileInfo.getUuid(),
+								epubFileInfo.getFilePath().toAbsolutePath().normalize().toString(),
+								objectMetadata
+						);
+			} catch (AwsS3ObjectHandleException e) {
+				throw new AwsS3ClientException("Error occurred while saving ebook file");
+			} catch (IOException e) {
+				throw new FileIOException("I/O error occurred while measuring ebook file length");
+			}
 
 			ebook = Optional.of(ebookRdsService
 					.save(Ebook.byEbookCreationResult()
-							.uuid(txtTempFileInfo.getUuid())
-							.name(epubFileInfo.getFileName())
+							.uuid(epubFileInfo.getUuid())
+							.name(epubFileInfo.getFilename())
 							.type(EbookType.EPUB2)
 							.user(userRdsService.findByEmail(Email.byValue().value(ebookRequestDto.getUploader()).build())
 									.orElseThrow(() ->
@@ -75,12 +93,16 @@ public class EbookService {
 			);
 		}
 
-		for (ContentTempFileInfo tempFile : contentTempFileInfos) {
-			try {
-				Files.deleteIfExists(tempFile.getTempFilePath());
-			} catch (IOException e) {
-				throw new RuntimeException(e);
+		try {
+			if (epubFileInfo != null) {
+				Files.deleteIfExists(epubFileInfo.getFilePath());
 			}
+
+			for (ContentTempFileInfo tempFile : contentTempFileInfos) {
+				Files.deleteIfExists(tempFile.getTempFilePath());
+			}
+		} catch (IOException e) {
+			throw new FileIOException("I/O error occurred while deleting files");
 		}
 
 		return ebook;
@@ -110,28 +132,26 @@ public class EbookService {
 		currentEbook.addDownloadCount();
 		ebookRdsService.save(currentEbook);
 
-		Path path = ebookManager.getEpubFilePath(currentEbook.getType().getValue(), currentEbook.getOriginalFilename());
-		if (Files.notExists(path)) {
-			throw new FileIOException("Ebook resource not found.");
-		}
-
-		ByteArrayResource ebookResource;
 		try {
-			ebookResource = new ByteArrayResource(Files.readAllBytes(path));
-		} catch (IOException e) {
-			throw new FileIOException("Fail to load file", e);
-		}
+			ByteArrayResource ebookResource = new ByteArrayResource(
+					awsS3ClientManager.getAwsS3ObjectHandler().downloadS3ObjectBytes(
+							awsS3Configuration.getBucketName(),
+							currentEbook.getUuid()
+					));
 
-		return new EbookResourceDto(ebookResource, currentEbook.getEbookFilename());
+			return new EbookResourceDto(ebookResource, currentEbook.getEbookFilename());
+		} catch (AwsS3ObjectHandleException e) {
+			throw new EbookResourceNotFoundException("Ebook resource not found.");
+		}
 	}
 
 	private List<ContentTempFileInfo> saveUploadToTempFile(List<FileDto> files) {
-		Path contentsBasePath = Paths.get(ebookManager.getContentsBasePath()).normalize().toAbsolutePath();
+		Path contentDir = Paths.get(epubManager.getContentDir()).normalize().toAbsolutePath();
 
 		return files.stream()
 				.map(
 						file -> {
-							Path tempUploadFilePath = IOUtils.createTempFile(contentsBasePath, file.getExtension());
+							Path tempUploadFilePath = IOUtils.createTempFile(contentDir, file.getExtension());
 							try (OutputStream os = Files.newOutputStream(tempUploadFilePath)) {
 								os.write(file.getFileBais().readAllBytes());
 							} catch (IOException e) {

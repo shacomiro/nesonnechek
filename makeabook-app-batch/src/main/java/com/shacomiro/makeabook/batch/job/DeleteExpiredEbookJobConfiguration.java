@@ -1,9 +1,5 @@
 package com.shacomiro.makeabook.batch.job;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import javax.persistence.EntityManagerFactory;
 
 import org.springframework.batch.core.Job;
@@ -21,6 +17,9 @@ import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilde
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.shacomiro.aws.s3.AwsS3ClientManager;
+import com.shacomiro.aws.s3.exception.AwsS3ObjectHandleException;
+import com.shacomiro.makeabook.batch.global.config.BatchAwsS3Configuration;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
 
 import lombok.RequiredArgsConstructor;
@@ -35,6 +34,8 @@ public class DeleteExpiredEbookJobConfiguration {
 	private final JobBuilderFactory jobBuilderFactory;
 	private final StepBuilderFactory stepBuilderFactory;
 	private final EntityManagerFactory emf;
+	private final AwsS3ClientManager awsS3ClientManager;
+	private final BatchAwsS3Configuration batchAwsS3Configuration;
 
 	@Bean
 	public Job deleteExpiredEbookJob() {
@@ -69,14 +70,21 @@ public class DeleteExpiredEbookJobConfiguration {
 	@StepScope
 	public ItemProcessor<Ebook, Ebook> deleteExpiredEbookProcessor() {
 		return ebook -> {
-
 			if (ebook.isExpired()) {
-				Path targetPath = Paths.get("./files/ebook/", ebook.getType() + "/",
-						ebook.getOriginalFilename()).normalize().toAbsolutePath();
-				boolean isDeleted = Files.deleteIfExists(targetPath);
-				if (isDeleted) {
-					ebook.ceaseToExist();
+				boolean isDeleted = true;
+
+				try {
+					awsS3ClientManager.getAwsS3ObjectHandler()
+							.deleteS3Object(batchAwsS3Configuration.getBucketName(), ebook.getUuid());
+				} catch (AwsS3ObjectHandleException e) {
+					log.error("Fail to delete ebook file");
+					isDeleted = false;
+				} finally {
+					if (isDeleted) {
+						ebook.ceaseToExist();
+					}
 				}
+
 				log.info(
 						">>> EbookFile(uuid={}, filename={}, expiredAt={}) is expired! :: (isExist={}, isExpired={}, isDeleted={})",
 						ebook.getUuid(), ebook.getName(), ebook.getExpiredAt(), ebook.isExist(),

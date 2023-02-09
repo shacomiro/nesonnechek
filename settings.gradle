@@ -6,6 +6,7 @@ include 'makeabook-domain-rds'
 include 'makeabook-cache'
 include 'makeabook-domain-redis'
 include 'makeabook-core'
-include 'makeabook-ebook'
 include 'java-jwt-provider'
+include 'java-epub-generator'
+include 'java-aws-s3-client-manager'
 
