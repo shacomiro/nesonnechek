@@ -12,7 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import com.shacomiro.makeabook.domain.rds.user.entity.Email;
 import com.shacomiro.makeabook.domain.rds.user.entity.User;
 import com.shacomiro.makeabook.domain.rds.user.entity.UserRole;
-import com.shacomiro.makeabook.domain.rds.user.service.UserRdsService;
+import com.shacomiro.makeabook.domain.rds.user.repository.UserRdsRepository;
 import com.shacomiro.makeabook.domain.user.dto.SignUpDto;
 import com.shacomiro.makeabook.domain.user.dto.UpdateUserDto;
 import com.shacomiro.makeabook.domain.user.exception.UserConflictException;
@@ -25,32 +25,32 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 @Validated
 public class UserService {
-	private final UserRdsService userRdsService;
+	private final UserRdsRepository userRdsRepository;
 
 	public User findUserByEmail(String emailValue) {
-		return userRdsService.findByEmail(Email.byValue().value(emailValue).build())
+		return userRdsRepository.findByEmail(Email.byValue().value(emailValue).build())
 				.orElseThrow(() -> new UserNotFoundException("Could not find user '" + emailValue + "'."));
 	}
 
 	public Optional<User> findUserByUsername(String username) {
-		return userRdsService.findByUsername(username);
+		return userRdsRepository.findByUsername(username);
 	}
 
 	public String getSignInUserEncryptedPassword(String emailValue) {
-		User signedInUser = userRdsService.findByEmail(Email.byValue().value(emailValue).build())
+		User signedInUser = userRdsRepository.findByEmail(Email.byValue().value(emailValue).build())
 				.orElseThrow(() -> new UserNotFoundException("User not found"));
 
 		return signedInUser.getPassword();
 	}
 
 	public User signUpUser(@Valid SignUpDto signUpDto) {
-		if (userRdsService.findByEmail(Email.byValue().value(signUpDto.getEmail()).build()).isPresent()) {
+		if (userRdsRepository.findByEmail(Email.byValue().value(signUpDto.getEmail()).build()).isPresent()) {
 			throw new UserConflictException("Duplicate email");
-		} else if (userRdsService.findByUsername(signUpDto.getUsername()).isPresent()) {
+		} else if (userRdsRepository.findByUsername(signUpDto.getUsername()).isPresent()) {
 			throw new UserConflictException("Duplicate username");
 		}
 
-		return userRdsService.save(
+		return userRdsRepository.save(
 				User.bySignUpInfos()
 						.email(Email.byValue().value(signUpDto.getEmail()).build())
 						.encryptedPassword(signUpDto.getEncryptedPassword())
@@ -61,12 +61,12 @@ public class UserService {
 	}
 
 	public User updateUser(@Valid UpdateUserDto updateUserDto) {
-		if (userRdsService.findByUsername(updateUserDto.getUsername()).isPresent()) {
+		if (userRdsRepository.findByUsername(updateUserDto.getUsername()).isPresent()) {
 			throw new UserConflictException("Duplicate username");
 		}
 
-		return userRdsService.findByEmail(Email.byValue().value(updateUserDto.getEmail()).build())
-				.map(currentUser -> userRdsService.save(User.byUpdateUserInfos()
+		return userRdsRepository.findByEmail(Email.byValue().value(updateUserDto.getEmail()).build())
+				.map(currentUser -> userRdsRepository.save(User.byUpdateUserInfos()
 						.currentUser(currentUser)
 						.encryptedPassword(updateUserDto.getEncryptedPassword())
 						.username(updateUserDto.getUsername())
@@ -76,17 +76,17 @@ public class UserService {
 	}
 
 	public void updateLoginCount(String emailValue) {
-		User currentUser = userRdsService.findByEmail(Email.byValue().value(emailValue).build())
+		User currentUser = userRdsRepository.findByEmail(Email.byValue().value(emailValue).build())
 				.orElseThrow(() -> new UserNotFoundException("Could not find user '" + emailValue + "'."));
 
 		currentUser.afterLoginSuccess();
-		userRdsService.save(currentUser);
+		userRdsRepository.save(currentUser);
 	}
 
 	public void deleteUser(String emailValue) {
-		User currentUser = userRdsService.findByEmail(Email.byValue().value(emailValue).build())
+		User currentUser = userRdsRepository.findByEmail(Email.byValue().value(emailValue).build())
 				.orElseThrow(() -> new UserNotFoundException("Could not find user '" + emailValue + "'."));
 
-		userRdsService.delete(currentUser);
+		userRdsRepository.delete(currentUser);
 	}
 }
