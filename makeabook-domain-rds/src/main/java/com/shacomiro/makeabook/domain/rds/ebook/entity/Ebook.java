@@ -28,7 +28,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "ebook")
+@Table(name = "ebook_tb")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Ebook {

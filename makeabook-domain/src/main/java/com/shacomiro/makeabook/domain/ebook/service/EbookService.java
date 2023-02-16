@@ -34,10 +34,10 @@ import com.shacomiro.makeabook.domain.global.config.aws.AwsS3Configuration;
 import com.shacomiro.makeabook.domain.global.exception.AwsS3ClientException;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
 import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookType;
-import com.shacomiro.makeabook.domain.rds.ebook.service.EbookRdsService;
+import com.shacomiro.makeabook.domain.rds.ebook.repository.EbookRdsRepository;
 import com.shacomiro.makeabook.domain.rds.user.entity.Email;
 import com.shacomiro.makeabook.domain.rds.user.entity.User;
-import com.shacomiro.makeabook.domain.rds.user.service.UserRdsService;
+import com.shacomiro.makeabook.domain.rds.user.repository.UserRdsRepository;
 import com.shacomiro.makeabook.domain.user.exception.UserNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -46,8 +46,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional
 public class EbookService {
-	private final EbookRdsService ebookRdsService;
-	private final UserRdsService userRdsService;
+	private final EbookRdsRepository ebookRdsRepository;
+	private final UserRdsRepository userRdsRepository;
 	private final EpubManager epubManager;
 	private final AwsS3ClientManager awsS3ClientManager;
 	private final AwsS3Configuration awsS3Configuration;
@@ -79,12 +79,12 @@ public class EbookService {
 				throw new FileIOException("I/O error occurred while measuring ebook file length");
 			}
 
-			ebook = Optional.of(ebookRdsService
+			ebook = Optional.of(ebookRdsRepository
 					.save(Ebook.byEbookCreationResult()
 							.uuid(epubFileInfo.getUuid())
 							.name(epubFileInfo.getFilename())
 							.type(EbookType.EPUB2)
-							.user(userRdsService.findByEmail(Email.byValue().value(ebookRequestDto.getUploader()).build())
+							.user(userRdsRepository.findByEmail(Email.byValue().value(ebookRequestDto.getUploader()).build())
 									.orElseThrow(() ->
 											new UserNotFoundException(
 													"Could not find user '" + ebookRequestDto.getUploader() + "'."))
@@ -109,28 +109,28 @@ public class EbookService {
 	}
 
 	public Page<Ebook> findEbooksByUserId(Pageable pageable, Long userId) {
-		return ebookRdsService.findAllByUserId(pageable, userId);
+		return ebookRdsRepository.findAllByUserId(pageable, userId);
 	}
 
 	public Ebook findEbookByUuidAndEmail(String uuid, String emailValue) {
-		User currentUser = userRdsService.findByEmail(Email.byValue().value(emailValue).build())
+		User currentUser = userRdsRepository.findByEmail(Email.byValue().value(emailValue).build())
 				.orElseThrow(() -> new UserNotFoundException("Could not find user '" + emailValue + "'."));
 
-		return ebookRdsService.findByUuidAndUser(uuid, currentUser)
+		return ebookRdsRepository.findByUuidAndUser(uuid, currentUser)
 				.orElseThrow(() -> new EbookNotFoundException(
 						"Could not find Ebook for user '" + emailValue + "' with UUID '" + uuid + "'."));
 	}
 
 	public EbookResourceDto getEbookResourceByUuidAndEmail(String uuid, String emailValue) {
-		User currentUser = userRdsService.findByEmail(Email.byValue().value(emailValue).build())
+		User currentUser = userRdsRepository.findByEmail(Email.byValue().value(emailValue).build())
 				.orElseThrow(() -> new UserNotFoundException("Could not find user '" + emailValue + "'."));
-		Ebook currentEbook = ebookRdsService.findByUuidAndUser(uuid, currentUser)
+		Ebook currentEbook = ebookRdsRepository.findByUuidAndUser(uuid, currentUser)
 				.orElseThrow(() -> new EbookNotFoundException(
 						"Could not find Ebook for user '" + emailValue + "' with UUID '" + uuid + "'."));
 
 		currentEbook.verifyExpiration();
 		currentEbook.addDownloadCount();
-		ebookRdsService.save(currentEbook);
+		ebookRdsRepository.save(currentEbook);
 
 		try {
 			ByteArrayResource ebookResource = new ByteArrayResource(
