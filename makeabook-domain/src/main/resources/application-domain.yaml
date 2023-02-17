@@ -5,10 +5,26 @@ spring:
       - application-domain-redis.yaml
   profiles:
     group:
+      domains-dev:
+        - domain-rds-dev
+        - domain-redis-dev
+        - domain-rds-debug
       domains-local:
         - domain-local
         - domain-rds-local
         - domain-redis-local
+        - domain-rds-debug
+---
+spring:
+  config:
+    activate:
+      on-profile: domain-dev
+jwt:
+  secret:
+    key: ${secret.jwt.key}
+    valid-milliseconds:
+      access: ${secret.jwt.valid-milliseconds.access}
+      refresh: ${secret.jwt.valid-milliseconds.refresh}
 ---
 spring:
   config:
@@ -16,7 +32,7 @@ spring:
       on-profile: domain-local
 jwt:
   secret:
-    key: ${secret.jwt.key}
+    key: It-is-strongly-recommended-that-you-use-a-string-that-is-at-least-512-bits-(64-characters)-long-for-the-secret-key
     valid-milliseconds:
-      access: ${secret.jwt.valid-milliseconds.access}
-      refresh: ${secret.jwt.valid-milliseconds.refresh}
+      access: 900000
+      refresh: 3600000

@@ -1,12 +1,41 @@
 spring:
   config:
     activate:
-      on-profile: domain-rds-local
+      on-profile: domain-rds-dev
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${ext-config.rds.secret.url}?serverTimezone=${ext-config.rds.config.time-zone}&characterEncoding=${ext-config.rds.config.encoding}
     username: ${ext-config.rds.secret.username}
     password: ${ext-config.rds.secret.password}
+---
+spring:
+  config:
+    activate:
+      on-profile: domain-rds-local
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:local;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false;MODE=MYSQL;TIME ZONE=UTC
+    username: sa
+    password:
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        globally_quoted_identifiers: true
+    database: h2
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    defer-datasource-initialization: true
+  h2:
+    console:
+      enabled: true
+---
+spring:
+  config:
+    activate:
+      on-profile: domain-rds-debug
   jpa:
     properties:
       hibernate:
