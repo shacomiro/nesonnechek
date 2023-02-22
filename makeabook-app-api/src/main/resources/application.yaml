@@ -25,6 +25,13 @@ spring:
     multipart:
       max-file-size: 50MB
       max-request-size: 50MB
+jwt:
+  secret:
+    key: ${ext-config.jwt.secret.key}
+  issuer: ${ext-config.jwt.issuer}
+  valid-milliseconds:
+    access: ${ext-config.jwt.valid-milliseconds.access}
+    refresh: ${ext-config.jwt.valid-milliseconds.refresh}
 ---
 spring:
   config:
@@ -34,3 +41,11 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+jwt:
+  secret:
+    key: It-is-strongly-recommended-that-you-use-a-string-that-is-at-least-512-bits-(64-characters)-long-for-the-secret-key
+  issuer: makeabook
+  valid-milliseconds:
+    access: 30000
+    refresh: 60000
+

@@ -50,7 +50,7 @@ public class JwtProvisionService {
 
 		JwtCacheDto jwtCacheDto = new JwtCacheDto(refreshClaims.getId(), key,
 				refreshClaims.get(ClaimName.PURPOSE.getName(), String.class), refreshToken,
-				refreshClaims.getExpiration().getTime());
+				jwtConfiguration.getRefreshTokenValidMilliseconds());
 		Jwt savedRefreshJwt = jwtCacheService.saveJwt(jwtCacheDto);
 
 		return new JwtDto(HttpHeaders.AUTHORIZATION, SecurityScheme.BEARER_AUTH.getScheme(),
