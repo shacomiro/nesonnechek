@@ -17,9 +17,9 @@ import com.shacomiro.makeabook.domain.redis.global.config.EmbeddedRedisConfigura
 import com.shacomiro.makeabook.domain.redis.token.entity.Jwt;
 
 @DataRedisTest
-@Import({EmbeddedRedisConfiguration.class})
-@TestPropertySource(locations = "classpath:application-domain-redis-test.yaml")
-@ActiveProfiles("domain-redis-test")
+@Import(value = {EmbeddedRedisConfiguration.class})
+@TestPropertySource(locations = {"classpath:application-domain-redis-test.yaml"})
+@ActiveProfiles(value = {"domain-redis-test"})
 class JwtRedisRepositoryTest {
 	private static final String EXAMPLE_EMAIL = "userB@email.com";
 	private static final String EXAMPLE_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJlMzIzZDIwNC1hZDFjLTRjODctYTI5OC1kNzI4NmQ2ZDc3Y2QiLCJpc3MiOiJtYWtlYWJvb2siLCJzdWIiOiJ1c2VyMUBlbWFpbC5jb20iLCJwdXIiOiJyZWZyZXNoIiwiaWF0IjoxNjc2OTA2OTI0LCJleHAiOjE2NzY5MDY5NTQsIm5iZiI6MTY3NjkwNjkzOX0.rnHj7OTG1QQOS2qXUAhPxrW_N-5Z0MUzzdljhz6WzLU";
