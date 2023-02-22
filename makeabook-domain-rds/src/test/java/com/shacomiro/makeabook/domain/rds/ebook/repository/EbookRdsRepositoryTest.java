@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
@@ -20,8 +21,9 @@ import com.shacomiro.makeabook.domain.rds.user.entity.User;
 import com.shacomiro.makeabook.domain.rds.user.entity.UserRole;
 
 @DataJpaTest
-@TestPropertySource(locations = "classpath:application-domain-rds-test.yaml")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@TestPropertySource(locations = {"classpath:application-domain-rds-test.yaml"})
+@ActiveProfiles(value = {"domain-rds-test"})
 class EbookRdsRepositoryTest {
 	private final static String EXIST_UUID = "550e8400-e29b-41d4-a716-446655440001";
 	private final static String NEW_UUID = "550e8400-e29b-41d4-a716-446655440008";
