@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 import com.shacomiro.makeabook.domain.rds.user.entity.Email;
@@ -18,8 +19,9 @@ import com.shacomiro.makeabook.domain.rds.user.entity.User;
 import com.shacomiro.makeabook.domain.rds.user.entity.UserRole;
 
 @DataJpaTest
-@TestPropertySource(locations = "classpath:application-domain-rds-test.yaml")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@TestPropertySource(locations = {"classpath:application-domain-rds-test.yaml"})
+@ActiveProfiles(value = {"domain-rds-test"})
 class UserRdsRepositoryTest {
 	private static final String EXIST_USER_EMAIL = "user1@email.com";
 	private static final String EXIST_NON_EBOOK_USER_EMAIL = "user5@email.com";
@@ -106,7 +108,7 @@ class UserRdsRepositoryTest {
 
 		//when
 		userRdsRepository.delete(user);
-		
+
 		//then
 		Assertions.assertThrows(DataIntegrityViolationException.class, userRdsRepository::flush);
 	}
