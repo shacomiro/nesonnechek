@@ -4,9 +4,11 @@ spring:
       - application-domain-rds.yaml
   profiles:
     group:
+      dev:
+        - domain-rds-dev
       local:
         - domain-rds-local
-    active: local
+    active: ${profile}
   batch:
     job:
       names: ${job.name:NONE}
