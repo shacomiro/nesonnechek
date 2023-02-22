@@ -32,7 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "user")
+@Table(name = "user_tb")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
@@ -60,7 +60,7 @@ public class User {
 	@NotNull(message = "Created Date must be provided")
 	private LocalDateTime createdAt;
 	@ElementCollection(fetch = FetchType.EAGER)
-	@CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+	@CollectionTable(name = "user_roles_tb", joinColumns = @JoinColumn(name = "user_id"))
 	@Enumerated(EnumType.STRING)
 	@Column(name = "role")
 	@ValidEnumCollection(enumClass = UserRole.class, message = "User role value is invalid")

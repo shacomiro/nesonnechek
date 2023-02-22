@@ -43,16 +43,14 @@ public class JwtProvisionService {
 	public JwtDto issueJwt(String key) throws JwtException {
 		jwtCacheService.deleteRefreshJwtIfKeyExist(key, TokenPurpose.REFRESH.getValue());
 		Date now = new Date();
-		Claims accessClaims = createClaims(key, TokenPurpose.ACCESS.getValue(), now,
-				jwtConfiguration.getAccessTokenValidMilliseconds());
-		Claims refreshClaims = createClaims(key, TokenPurpose.REFRESH.getValue(), now,
-				jwtConfiguration.getRefreshTokenValidMilliseconds());
+		Claims accessClaims = createClaims(key, TokenPurpose.ACCESS, now, jwtConfiguration.getAccessTokenValidMilliseconds());
+		Claims refreshClaims = createClaims(key, TokenPurpose.REFRESH, now, jwtConfiguration.getRefreshTokenValidMilliseconds());
 		String accessToken = jwtProvider.buildToken(jwtProvider.initializeJwtBuilder(accessClaims));
 		String refreshToken = jwtProvider.buildToken(jwtProvider.initializeJwtBuilder(refreshClaims));
 
 		JwtCacheDto jwtCacheDto = new JwtCacheDto(refreshClaims.getId(), key,
 				refreshClaims.get(ClaimName.PURPOSE.getName(), String.class), refreshToken,
-				refreshClaims.getExpiration().getTime());
+				jwtConfiguration.getRefreshTokenValidMilliseconds());
 		Jwt savedRefreshJwt = jwtCacheService.saveJwt(jwtCacheDto);
 
 		return new JwtDto(HttpHeaders.AUTHORIZATION, SecurityScheme.BEARER_AUTH.getScheme(),
@@ -64,15 +62,15 @@ public class JwtProvisionService {
 		return issueJwt(key);
 	}
 
-	private Claims createClaims(String subject, String type, Date now, long validTime) {
+	private Claims createClaims(String subject, TokenPurpose purpose, Date now, long validTime) {
 		Map<String, Object> map = new LinkedHashMap<>();
 		map.put(ClaimName.ID.getName(), UUID.randomUUID().toString());
 		map.put(ClaimName.ISSUER.getName(), jwtConfiguration.getJwtIssuer());
 		map.put(ClaimName.SUBJECT.getName(), subject);
-		map.put(ClaimName.PURPOSE.getName(), type);
+		map.put(ClaimName.PURPOSE.getName(), purpose.getValue());
 		map.put(ClaimName.ISSUED_AT.getName(), jwtProvider.getSecondsFromDate(now));
 		map.put(ClaimName.EXPIRATION.getName(), jwtProvider.getSecondsFromDate(new Date(now.getTime() + validTime)));
-		if (type.equals(TokenPurpose.REFRESH.getValue())) {
+		if (purpose.equals(TokenPurpose.REFRESH)) {
 			map.put(ClaimName.NOT_BEFORE.getName(),
 					jwtProvider.getSecondsFromDate(
 							new Date(now.getTime() + jwtConfiguration.getAccessTokenValidMilliseconds())));
