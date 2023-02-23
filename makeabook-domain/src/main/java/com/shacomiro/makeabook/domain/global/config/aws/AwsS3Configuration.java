@@ -18,9 +18,10 @@ public class AwsS3Configuration {
 	public AwsS3ClientManager awsS3ClientManager(
 			@Value("${aws.s3.key.access}") String accessKey,
 			@Value("${aws.s3.key.secret}") String secretKey,
+			@Value("${aws.s3.service-endpoint}") String serviceEndpoint,
 			@Value("${aws.s3.region}") String region
 	) {
-		return new AwsS3ClientManager(accessKey, secretKey, region);
+		return new AwsS3ClientManager(accessKey, secretKey, serviceEndpoint, region);
 	}
 
 	public String getBucketName() {
