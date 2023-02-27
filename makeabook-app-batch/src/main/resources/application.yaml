@@ -5,14 +5,49 @@ spring:
   profiles:
     group:
       dev:
+        - batch-app-dev
         - domain-rds-dev
+        - domain-rds-debug
       local:
+        - batch-app-local
         - domain-rds-local
+        - domain-rds-debug
     active: ${profile}
   batch:
     job:
       names: ${job.name:NONE}
-    jdbc:
-      initialize-schema: always
   main:
     web-application-type: none
+---
+spring:
+  config:
+    activate:
+      on-profile: batch-app-dev
+  batch:
+    jdbc:
+      initialize-schema: always
+aws:
+  s3:
+    service-endpoint: ${ext-config.aws.s3.service-endpoint}
+    key:
+      access: ${ext-config.aws.s3.access-key}
+      secret: ${ext-config.aws.s3.secret-key}
+    region: ${ext-config.aws.s3.region}
+    bucket: ${ext-config.aws.s3.bucket}
+---
+spring:
+  config:
+    activate:
+      on-profile: batch-app-local
+  batch:
+    jdbc:
+      initialize-schema: embedded
+aws:
+  s3:
+    port: 8033
+    service-endpoint: http://127.0.0.1:8033
+    key:
+      access: null
+      secret: null
+    region: ap-northeast-2
+    bucket: local-bucket

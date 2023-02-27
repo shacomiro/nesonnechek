@@ -1,0 +1,37 @@
+spring:
+  config:
+    activate:
+      on-profile: batch-app-test
+  batch:
+    jdbc:
+      initialize-schema: always
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false;MODE=MySQL
+    username: sa
+    password:
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        globally_quoted_identifiers: true
+        format_sql: true
+        show_sql: true
+    database: h2
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    defer-datasource-initialization: true
+  h2:
+    console:
+      enabled: true
+aws:
+  s3:
+    port: 8033
+    service-endpoint: http://127.0.0.1:8033
+    key:
+      access: null
+      secret: null
+    region: ap-northeast-2
+    bucket: local-bucket
