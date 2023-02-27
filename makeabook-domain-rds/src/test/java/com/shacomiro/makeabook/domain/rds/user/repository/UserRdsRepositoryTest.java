@@ -20,7 +20,7 @@ import com.shacomiro.makeabook.domain.rds.user.entity.UserRole;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@TestPropertySource(locations = {"classpath:application-domain-rds-test.yaml"})
+@TestPropertySource(properties = {"spring.config.location = classpath:application-domain-rds-test.yaml"})
 @ActiveProfiles(value = {"domain-rds-test"})
 class UserRdsRepositoryTest {
 	private static final String EXIST_USER_EMAIL = "user1@email.com";

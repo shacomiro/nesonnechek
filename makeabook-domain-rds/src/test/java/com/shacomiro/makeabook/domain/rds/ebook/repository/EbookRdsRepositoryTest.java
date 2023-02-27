@@ -22,7 +22,7 @@ import com.shacomiro.makeabook.domain.rds.user.entity.UserRole;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@TestPropertySource(locations = {"classpath:application-domain-rds-test.yaml"})
+@TestPropertySource(properties = {"spring.config.location = classpath:application-domain-rds-test.yaml"})
 @ActiveProfiles(value = {"domain-rds-test"})
 class EbookRdsRepositoryTest {
 	private final static String EXIST_UUID = "550e8400-e29b-41d4-a716-446655440001";
