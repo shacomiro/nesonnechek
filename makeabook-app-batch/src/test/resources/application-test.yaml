@@ -5,6 +5,10 @@ spring:
   batch:
     jdbc:
       initialize-schema: always
+    job:
+      names: NONE
+  main:
+    web-application-type: none
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false;MODE=MySQL
@@ -34,4 +38,4 @@ aws:
       access: null
       secret: null
     region: ap-northeast-2
-    bucket: local-bucket
+    bucket: test-bucket
