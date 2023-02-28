@@ -70,7 +70,7 @@ public class DeleteExpiredEbookJobConfiguration {
 	@StepScope
 	public ItemProcessor<Ebook, Ebook> deleteExpiredEbookProcessor() {
 		return ebook -> {
-			if (ebook.isExpired()) {
+			if (ebook.isExpired() && ebook.isExist()) {
 				boolean isDeleted = true;
 
 				try {
@@ -84,12 +84,8 @@ public class DeleteExpiredEbookJobConfiguration {
 						ebook.ceaseToExist();
 					}
 				}
-
-				log.info(
-						">>> EbookFile(uuid={}, filename={}, expiredAt={}) is expired! :: (isExist={}, isExpired={}, isDeleted={})",
-						ebook.getUuid(), ebook.getName(), ebook.getExpiredAt(), ebook.isExist(),
-						ebook.isExpired(),
-						isDeleted);
+				log.info("Ebook {}({}) is deleted. current statuses are (isExist={}, isExpired={}, isDeleted={})",
+						ebook.getName(), ebook.getUuid(), ebook.isExist(), ebook.isExpired(), isDeleted);
 
 				return ebook;
 			} else {

@@ -1,11 +1,6 @@
 package com.shacomiro.makeabook.batch.job;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -19,12 +14,16 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.shacomiro.aws.s3.AwsS3ClientManager;
 import com.shacomiro.makeabook.batch.config.TestBatchConfig;
-import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
-import com.shacomiro.makeabook.domain.rds.ebook.entity.EbookType;
+import com.shacomiro.makeabook.batch.global.config.BatchAwsS3Configuration;
+import com.shacomiro.makeabook.batch.global.config.BatchS3MockConfiguration;
 import com.shacomiro.makeabook.domain.rds.ebook.repository.EbookRdsRepository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -32,31 +31,28 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RunWith(SpringRunner.class)
 @SpringBatchTest
-@SpringBootTest(classes = {DeleteExpiredEbookJobConfiguration.class, TestBatchConfig.class})
+@SpringBootTest(classes = {DeleteExpiredEbookJobConfiguration.class, TestBatchConfig.class, BatchAwsS3Configuration.class,
+		BatchS3MockConfiguration.class})
+@TestPropertySource(properties = {"spring.config.location = classpath:application-test.yaml"})
+@ActiveProfiles(value = {"batch-app-test"})
 public class DeleteExpiredEbookJobConfigurationTest {
-	private static final List<Ebook> TEST_EBOOKS = new ArrayList<>() {{
-		for (int i = 1; i <= 3; i++) {
-			String uuid = UUID.randomUUID().toString();
-			add(new Ebook(null,
-					uuid,
-					"test_file" + i,
-					EbookType.EPUB2,
-					0,
-					LocalDateTime.now().minusDays(i * 4),
-					LocalDateTime.now().minusDays(i * 4).plusDays(7),
-					true,
-					null)
-			);
-		}
-	}};
+	private static final String EMPTY_EBOOK_FILE_PATH = "./src/test/resources/test_ebook.epub";
 	@Autowired
 	private JobLauncherTestUtils jobLauncherTestUtils;
 	@Autowired
 	private EbookRdsRepository ebookRdsRepository;
+	@Autowired
+	private AwsS3ClientManager awsS3ClientManager;
+	@Value("${aws.s3.bucket}")
+	private String testBucketName;
 
-	@After
-	public void tearDown() {
-		ebookRdsRepository.deleteAllInBatch(TEST_EBOOKS);
+	@Before
+	public void setUp() throws Exception {
+		ebookRdsRepository.findAll().forEach(ebook -> {
+			if (ebook.isExist()) {
+				awsS3ClientManager.getAwsS3ObjectHandler().uploadS3Object(testBucketName, ebook.getUuid(), EMPTY_EBOOK_FILE_PATH);
+			}
+		});
 	}
 
 	@Test
@@ -64,8 +60,6 @@ public class DeleteExpiredEbookJobConfigurationTest {
 	@DisplayName("만료된 전자책 파일 삭제 성공")
 	public void deleteExpiredEbookJobSuccess() throws Exception {
 		//given
-		ebookRdsRepository.saveAll(TEST_EBOOKS);
-
 		JobParameters jobParameters = new JobParametersBuilder()
 				.addLong("date", System.currentTimeMillis())
 				.toJobParameters();

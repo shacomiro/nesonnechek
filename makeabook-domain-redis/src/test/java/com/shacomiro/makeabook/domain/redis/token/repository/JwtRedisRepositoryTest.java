@@ -18,7 +18,7 @@ import com.shacomiro.makeabook.domain.redis.token.entity.Jwt;
 
 @DataRedisTest
 @Import(value = {EmbeddedRedisConfiguration.class})
-@TestPropertySource(locations = {"classpath:application-domain-redis-test.yaml"})
+@TestPropertySource(properties = {"spring.config.location = classpath:application-domain-redis-test.yaml"})
 @ActiveProfiles(value = {"domain-redis-test"})
 class JwtRedisRepositoryTest {
 	private static final String EXAMPLE_EMAIL = "userB@email.com";
