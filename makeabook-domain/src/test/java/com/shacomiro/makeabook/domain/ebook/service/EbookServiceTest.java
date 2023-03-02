@@ -20,15 +20,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.shacomiro.aws.s3.AwsS3ClientManager;
 import com.shacomiro.aws.s3.handler.AwsS3ObjectHandler;
@@ -46,10 +43,7 @@ import com.shacomiro.makeabook.domain.rds.user.entity.User;
 import com.shacomiro.makeabook.domain.rds.user.entity.UserRole;
 import com.shacomiro.makeabook.domain.rds.user.repository.UserRdsRepository;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
-@TestPropertySource(properties = {"spring.config.location = classpath:application-domain-test.yaml"})
-@ActiveProfiles(value = {"domain-test"})
+@ExtendWith(MockitoExtension.class)
 class EbookServiceTest {
 	private static final String TEST_RESOURCE_PATH = "./src/test/resources";
 	private static final String TEST_TXT_FILENAME = "애국가.txt";
@@ -57,19 +51,19 @@ class EbookServiceTest {
 	private static final String TEST_EPUB_FILENAME = "애국가.epub";
 	private static final String UPLOADER_EMAIL = "user@email.com";
 	private static final LocalDateTime NOW = LocalDateTime.now();
-	@Autowired
+	@InjectMocks
 	private EbookService ebookService;
-	@MockBean
+	@Mock
 	private EbookRdsRepository ebookRdsRepository;
-	@MockBean
+	@Mock
 	private UserRdsRepository userRdsRepository;
-	@MockBean
+	@Mock
 	private EpubManager epubManager;
-	@MockBean
+	@Mock
 	private AwsS3Configuration awsS3Configuration;
-	@MockBean
+	@Mock
 	private AwsS3ClientManager awsS3ClientManager;
-	@MockBean
+	@Mock
 	private AwsS3ObjectHandler awsS3ObjectHandler;
 
 	@BeforeEach
