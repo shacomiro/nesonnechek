@@ -1,0 +1,7 @@
+spring:
+  config:
+    activate:
+      on-profile: domain-test
+  sql:
+    init:
+      mode: never
