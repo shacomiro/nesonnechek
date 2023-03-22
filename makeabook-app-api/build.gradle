@@ -1,11 +1,15 @@
 plugins {
-    id "org.asciidoctor.convert" version "1.5.9.2"
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
 }
 
 version '1.0.0-SNAPSHOT'
 
 ext {
     snippetsDir = file('build/generated-snippets')
+}
+
+test {
+    outputs.dir snippetsDir
 }
 
 asciidoctor {
@@ -15,20 +19,20 @@ asciidoctor {
 
 bootJar {
     dependsOn asciidoctor
-    from("${asciidoctor.outputDir}/html5") {
-        into 'static/docs'
+    copy {
+        from "${asciidoctor.outputDir}"
+        into 'src/main/resources/static/docs'
     }
 }
 
 dependencies {
-    asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-hateoas'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
-    testCompileOnly 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
     implementation project(':makeabook-domain')
