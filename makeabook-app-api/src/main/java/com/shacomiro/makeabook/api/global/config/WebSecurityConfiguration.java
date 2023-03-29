@@ -57,6 +57,7 @@ public class WebSecurityConfiguration {
 				.authorizeRequests()
 				.antMatchers("/api/v1/auth/sign-in").permitAll()
 				.antMatchers("/api/v1/auth/sign-up").permitAll()
+				.antMatchers("/docs/**").permitAll()
 				.anyRequest().authenticated()
 				.and()
 				.exceptionHandling()
