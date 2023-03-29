@@ -1,8 +1,11 @@
 package com.shacomiro.makeabook.api.user.api;
 
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -18,12 +21,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.filter.CharacterEncodingFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shacomiro.makeabook.api.global.security.dto.JwtDto;
@@ -42,17 +47,16 @@ class UserRestApiTest {
 
 	@BeforeEach
 	void setUp(
-			RestDocumentationContextProvider restDocumentation, @Autowired WebApplicationContext context,
+			final RestDocumentationContextProvider restDocumentation, final WebApplicationContext context,
 			@Autowired AuthenticationManager authenticationManager, @Autowired ObjectMapper objectMapper,
 			@Autowired JwtProvisionService jwtProvisionService
 	) {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
 				.apply(documentationConfiguration(restDocumentation))
-				.alwaysDo(document("{class-name}/{method-name}",
-						preprocessRequest(prettyPrint()),
-						preprocessResponse(prettyPrint())))
+				.apply(springSecurity())
 				.addFilter(new JwtAuthenticationFilter(authenticationManager, objectMapper))
 				.addFilter(new JwtReissueFilter(jwtProvisionService, objectMapper))
+				.addFilters(new CharacterEncodingFilter("UTF-8", true))
 				.build();
 		jwtDto = jwtProvisionService.issueJwt(USER_EMAIL);
 	}
@@ -77,6 +81,22 @@ class UserRestApiTest {
 
 		//then
 		result.andExpect(status().isOk())
-				.andDo(print());
+				.andDo(print())
+				.andDo(document("{class-name}/{method-name}",
+						preprocessRequest(prettyPrint()),
+						preprocessResponse(prettyPrint()),
+						links(
+								linkWithRel("self").description("Link to self"),
+								linkWithRel("docs").description("Link to API documentation")
+						),
+						responseFields(
+								fieldWithPath("email").description("User's email").type(JsonFieldType.STRING),
+								fieldWithPath("username").description("User's name").type(JsonFieldType.STRING),
+								fieldWithPath("loginCount").description("User's login count number").type(JsonFieldType.NUMBER),
+								fieldWithPath("lastLoginAt").description("Last login date").type(JsonFieldType.STRING),
+								fieldWithPath("createdAt").description("Account creation date").type(JsonFieldType.STRING),
+								subsectionWithPath("_links").description("HATEOAS link").type(JsonFieldType.OBJECT)
+						))
+				);
 	}
 }
