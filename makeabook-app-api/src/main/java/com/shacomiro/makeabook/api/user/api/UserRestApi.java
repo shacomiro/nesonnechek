@@ -90,7 +90,7 @@ public class UserRestApi {
 			Pageable pageable, PagedResourcesAssembler<Ebook> assembler) {
 
 		return success(
-				ebookService.findEbooksByUserId(pageable, userService.findUserByEmail(userPrincipal.getEmail()).getId()),
+				ebookService.findEbooksByUser(pageable, userService.findUserByEmail(userPrincipal.getEmail())),
 				ebookResponseModelAssembler,
 				assembler,
 				HttpStatus.OK
