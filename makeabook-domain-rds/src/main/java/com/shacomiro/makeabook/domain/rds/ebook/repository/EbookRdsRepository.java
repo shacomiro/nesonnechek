@@ -1,5 +1,6 @@
 package com.shacomiro.makeabook.domain.rds.ebook.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -14,5 +15,9 @@ public interface EbookRdsRepository extends JpaRepository<Ebook, Long> {
 
 	Optional<Ebook> findByUuidAndUser(String uuid, User user);
 
-	Page<Ebook> findAllByUserId(Pageable pageable, Long userId);
+	List<Ebook> findAllByUser(User user);
+
+	Page<Ebook> findAllByUser(Pageable pageable, User user);
+
+	void deleteAllByUser(User user);
 }
