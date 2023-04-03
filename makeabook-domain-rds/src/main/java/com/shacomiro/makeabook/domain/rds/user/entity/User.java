@@ -30,6 +30,7 @@ import org.hibernate.annotations.BatchSize;
 
 import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
 import com.shacomiro.makeabook.domain.rds.global.validation.annotation.ValidEnumCollection;
+import com.shacomiro.makeabook.domain.rds.user.exception.UserDeleteException;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -104,5 +105,11 @@ public class User {
 	public void afterLoginSuccess() {
 		loginCount++;
 		lastLoginAt = now();
+	}
+
+	public void verifyDelete() {
+		if (!ebooks.isEmpty()) {
+			throw new UserDeleteException("Current user's ebooks are still existing");
+		}
 	}
 }
