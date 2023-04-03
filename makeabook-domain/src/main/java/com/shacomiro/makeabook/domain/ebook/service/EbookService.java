@@ -145,6 +145,10 @@ public class EbookService {
 		}
 	}
 
+	public void deleteAllEbooks(User user) {
+		ebookRdsRepository.deleteAllByUser(user);
+	}
+
 	private List<ContentTempFileInfo> saveUploadToTempFile(List<FileDto> files) {
 		Path contentDir = Paths.get(epubManager.getContentDir()).normalize().toAbsolutePath();
 
