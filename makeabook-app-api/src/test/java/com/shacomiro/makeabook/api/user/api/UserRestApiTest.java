@@ -1,9 +1,10 @@
 package com.shacomiro.makeabook.api.user.api;
 
+import static com.shacomiro.makeabook.api.global.config.mock.doc.descriptor.ReusableFieldDescriptor.*;
+import static com.shacomiro.makeabook.api.global.config.mock.doc.descriptor.ReusableLinkDescriptor.*;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -22,10 +23,10 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
-import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -40,6 +41,8 @@ import com.shacomiro.makeabook.api.global.security.dto.JwtDto;
 import com.shacomiro.makeabook.api.global.security.filter.JwtAuthenticationFilter;
 import com.shacomiro.makeabook.api.global.security.filter.JwtReissueFilter;
 import com.shacomiro.makeabook.api.global.security.service.JwtProvisionService;
+import com.shacomiro.makeabook.api.user.dto.DeleteUserRequest;
+import com.shacomiro.makeabook.api.user.dto.UpdateUserRequest;
 
 @SpringBootTest
 @Import(RestDocsConfiguration.class)
@@ -94,22 +97,109 @@ class UserRestApiTest {
 
 		//then
 		result.andExpect(status().isOk())
-				.andDo(print())
-				.andDo(document("{class-name}/{method-name}",
-						preprocessRequest(prettyPrint()),
-						preprocessResponse(prettyPrint()),
-						links(
-								linkWithRel("self").description("Link to self"),
-								linkWithRel("docs").description("Link to API documentation")
-						),
-						responseFields(
-								fieldWithPath("email").description("User's email").type(JsonFieldType.STRING),
-								fieldWithPath("username").description("User's name").type(JsonFieldType.STRING),
-								fieldWithPath("loginCount").description("User's login count number").type(JsonFieldType.NUMBER),
-								fieldWithPath("lastLoginAt").description("Last login date").type(JsonFieldType.STRING),
-								fieldWithPath("createdAt").description("Account creation date").type(JsonFieldType.STRING),
-								subsectionWithPath("_links").description("HATEOAS link").type(JsonFieldType.OBJECT)
-						))
-				);
+				.andDo(restDocs.document(
+						links(CommonModelLinkDescriptor.SELF_LINK_DESCR)
+								.and(UserModelLinkDescriptor.USER_MODEL_LINKS_DESCR_LIST)
+								.and(CommonModelLinkDescriptor.DOCS_LINK_DESCR),
+						responseFields(UserModelFieldDescriptor.USER_MODEL_RES_FIELD_DESCR_LIST)
+				));
+	}
+
+	@Test
+	@Order(2)
+	@DisplayName("유저 정보 수정")
+	void updateAccountInfo() throws Exception {
+		//given
+		String url = "/api/v1/users/account";
+		String bearerToken = "Bearer " + jwtDto.getAccessToken();
+		String content = objectMapper.writeValueAsString(new UpdateUserRequest("user1_new_password", "USER1_NEW_USERNAME"));
+
+		//when
+		ResultActions result = mockMvc.perform(
+				put(url).header(HttpHeaders.AUTHORIZATION, bearerToken)
+						.content(content)
+						.contentType(MediaType.APPLICATION_JSON)
+		);
+
+		//then
+		result.andExpect(status().isOk())
+				.andDo(restDocs.document(
+						links(CommonModelLinkDescriptor.SELF_LINK_DESCR)
+								.and(UserModelLinkDescriptor.USER_MODEL_LINKS_DESCR_LIST)
+								.and(CommonModelLinkDescriptor.DOCS_LINK_DESCR),
+						responseFields(UserModelFieldDescriptor.USER_MODEL_RES_FIELD_DESCR_LIST)
+				));
+		;
+	}
+
+	@Test
+	@Order(3)
+	@DisplayName("유저 삭제")
+	void deleteAccount() throws Exception {
+		//given
+		String url = "/api/v1/users/account";
+		JwtDto nonEbookUserjwtDto = jwtProvisionService.issueJwt("user5@email.com");
+		String bearerToken = "Bearer " + nonEbookUserjwtDto.getAccessToken();
+		String content = objectMapper.writeValueAsString(new DeleteUserRequest("user5_password"));
+
+		//when
+		ResultActions result = mockMvc.perform(
+				delete(url).header(HttpHeaders.AUTHORIZATION, bearerToken)
+						.content(content)
+						.contentType(MediaType.APPLICATION_JSON)
+		);
+
+		//then
+		result.andExpect(status().isOk())
+				.andDo(restDocs.document());
+	}
+
+	@Test
+	@Order(4)
+	@DisplayName("현재 유저 전자책 조회")
+	void getAccountEbooks() throws Exception {
+		//given
+		String url = "/api/v1/users/account/ebooks";
+		String bearerToken = "Bearer " + jwtDto.getAccessToken();
+
+		//when
+		ResultActions result = mockMvc.perform(
+				get(url).header(HttpHeaders.AUTHORIZATION, bearerToken)
+		);
+
+		//then
+		result.andExpect(status().isOk())
+				.andDo(restDocs.document(
+						links(CommonModelLinkDescriptor.SELF_LINK_DESCR)
+								.and(EbookModelLinkDescriptor.EBOOK_MODEL_LINKS_DESCR_LIST)
+								.and(UserModelLinkDescriptor.USER_MODEL_LINKS_DESCR_LIST)
+								.and(CommonModelLinkDescriptor.DOCS_LINK_DESCR)
+								.and(CommonModelLinkDescriptor.PAGE_LINKS_DESCR_LIST),
+						responseFields(EbookModelFieldDescriptor.EBOOK_COL_MODEL_RES_FIELD_DESCR_LIST)
+								.and(CommonFieldDescriptor.LINKS_FIELD_DESCR)
+								.and(CommonFieldDescriptor.PAGE_FIELD_DESCR)
+				));
+	}
+
+	@Test
+	@Order(5)
+	@DisplayName("현재 유저 전자책 삭제")
+	void deleteAllAccountEbooks() throws Exception {
+		//given
+		String url = "/api/v1/users/account/ebooks";
+		JwtDto nonEbookUserjwtDto = jwtProvisionService.issueJwt("user2@email.com");
+		String bearerToken = "Bearer " + nonEbookUserjwtDto.getAccessToken();
+		String content = objectMapper.writeValueAsString(new DeleteUserRequest("user2_password"));
+
+		//when
+		ResultActions result = mockMvc.perform(
+				delete(url).header(HttpHeaders.AUTHORIZATION, bearerToken)
+						.content(content)
+						.contentType(MediaType.APPLICATION_JSON)
+		);
+
+		//then
+		result.andExpect(status().isOk())
+				.andDo(restDocs.document());
 	}
 }
