@@ -96,4 +96,18 @@ public class UserRestApi {
 				HttpStatus.OK
 		);
 	}
+
+	@DeleteMapping(path = "account/ebooks")
+	public ResponseEntity<?> deleteAllAccountEbooks(
+			@AuthenticationPrincipal @NonNull UserPrincipal userPrincipal,
+			@RequestBody @Valid DeleteUserRequest deleteUserRequest) {
+		if (!passwordEncoder.matches(deleteUserRequest.getPassword(),
+				userService.getSignInUserEncryptedPassword(userPrincipal.getEmail()))) {
+			throw new IllegalArgumentException("Password is incorrect");
+		}
+
+		ebookService.deleteAllEbooks(userService.findUserByEmail(userPrincipal.getEmail()));
+
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 }
