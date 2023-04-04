@@ -11,7 +11,7 @@ public class ReusableLinkDescriptor {
 		public static final LinkDescriptor SELF_LINK_DESCR = linkWithRel("self").description("Link to self");
 		public static final LinkDescriptor DOCS_LINK_DESCR = linkWithRel("docs").description("Link to API documentation");
 
-		public static final List<LinkDescriptor> PAGING_LINKS_DESCR_LIST = List.of(
+		public static final List<LinkDescriptor> PAGE_LINKS_DESCR_LIST = List.of(
 				linkWithRel("first").optional().description("The first page of results"),
 				linkWithRel("last").optional().description("The last page of results"),
 				linkWithRel("next").optional().description("The next page of results"),
