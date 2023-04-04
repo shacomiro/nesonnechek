@@ -98,10 +98,10 @@ class UserRestApiTest {
 		//then
 		result.andExpect(status().isOk())
 				.andDo(restDocs.document(
-						links(CommonModelLinkDescriptor.SELF_LINK_DESCR)
-								.and(UserModelLinkDescriptor.USER_MODEL_LINKS_DESCR_LIST)
-								.and(CommonModelLinkDescriptor.DOCS_LINK_DESCR),
-						responseFields(UserModelFieldDescriptor.USER_MODEL_RES_FIELD_DESCR_LIST)
+						links(CommonLinkDescriptor.SELF_LINK_DESCR)
+								.and(UserLinkDescriptor.USER_MODEL_LINKS_DESCR_LIST)
+								.and(CommonLinkDescriptor.DOCS_LINK_DESCR),
+						responseFields(UserFieldDescriptor.USER_MODEL_RES_FIELD_DESCR_LIST)
 				));
 	}
 
@@ -124,12 +124,11 @@ class UserRestApiTest {
 		//then
 		result.andExpect(status().isOk())
 				.andDo(restDocs.document(
-						links(CommonModelLinkDescriptor.SELF_LINK_DESCR)
-								.and(UserModelLinkDescriptor.USER_MODEL_LINKS_DESCR_LIST)
-								.and(CommonModelLinkDescriptor.DOCS_LINK_DESCR),
-						responseFields(UserModelFieldDescriptor.USER_MODEL_RES_FIELD_DESCR_LIST)
+						links(CommonLinkDescriptor.SELF_LINK_DESCR)
+								.and(UserLinkDescriptor.USER_MODEL_LINKS_DESCR_LIST)
+								.and(CommonLinkDescriptor.DOCS_LINK_DESCR),
+						responseFields(UserFieldDescriptor.USER_MODEL_RES_FIELD_DESCR_LIST)
 				));
-		;
 	}
 
 	@Test
@@ -170,12 +169,12 @@ class UserRestApiTest {
 		//then
 		result.andExpect(status().isOk())
 				.andDo(restDocs.document(
-						links(CommonModelLinkDescriptor.SELF_LINK_DESCR)
-								.and(EbookModelLinkDescriptor.EBOOK_MODEL_LINKS_DESCR_LIST)
-								.and(UserModelLinkDescriptor.USER_MODEL_LINKS_DESCR_LIST)
-								.and(CommonModelLinkDescriptor.DOCS_LINK_DESCR)
-								.and(CommonModelLinkDescriptor.PAGE_LINKS_DESCR_LIST),
-						responseFields(EbookModelFieldDescriptor.EBOOK_COL_MODEL_RES_FIELD_DESCR_LIST)
+						links(CommonLinkDescriptor.SELF_LINK_DESCR)
+								.and(EbookLinkDescriptor.EBOOK_MODEL_LINKS_DESCR_LIST)
+								.and(UserLinkDescriptor.USER_MODEL_LINKS_DESCR_LIST)
+								.and(CommonLinkDescriptor.DOCS_LINK_DESCR)
+								.and(CommonLinkDescriptor.PAGE_LINKS_DESCR_LIST),
+						responseFields(EbookFieldDescriptor.EBOOK_COL_MODEL_RES_FIELD_DESCR_LIST)
 								.and(CommonFieldDescriptor.LINKS_FIELD_DESCR)
 								.and(CommonFieldDescriptor.PAGE_FIELD_DESCR)
 				));

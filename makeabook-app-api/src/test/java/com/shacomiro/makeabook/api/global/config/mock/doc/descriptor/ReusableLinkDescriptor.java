@@ -7,7 +7,7 @@ import java.util.List;
 import org.springframework.restdocs.hypermedia.LinkDescriptor;
 
 public class ReusableLinkDescriptor {
-	public static class CommonModelLinkDescriptor {
+	public static class CommonLinkDescriptor {
 		public static final LinkDescriptor SELF_LINK_DESCR = linkWithRel("self").description("Link to self");
 		public static final LinkDescriptor DOCS_LINK_DESCR = linkWithRel("docs").description("Link to API documentation");
 
@@ -19,13 +19,13 @@ public class ReusableLinkDescriptor {
 		);
 	}
 
-	public static class UserModelLinkDescriptor {
+	public static class UserLinkDescriptor {
 		public static final List<LinkDescriptor> USER_MODEL_LINKS_DESCR_LIST = List.of(
 				linkWithRel("sign-in").optional().description("Link to sign in")
 		);
 	}
 
-	public static class EbookModelLinkDescriptor {
+	public static class EbookLinkDescriptor {
 		public static final List<LinkDescriptor> EBOOK_MODEL_LINKS_DESCR_LIST = List.of(
 				linkWithRel("download").optional().description("Link to download ebook file")
 		);

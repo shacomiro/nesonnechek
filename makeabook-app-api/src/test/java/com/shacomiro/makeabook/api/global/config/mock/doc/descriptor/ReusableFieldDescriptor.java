@@ -15,7 +15,7 @@ public class ReusableFieldDescriptor {
 				.type(JsonFieldType.OBJECT);
 	}
 
-	public static class UserModelFieldDescriptor {
+	public static class UserFieldDescriptor {
 		public static final List<FieldDescriptor> USER_MODEL_RES_FIELD_DESCR_LIST = List.of(
 				fieldWithPath("email").description("User's email").type(JsonFieldType.STRING),
 				fieldWithPath("username").description("User's name").type(JsonFieldType.STRING),
@@ -35,7 +35,7 @@ public class ReusableFieldDescriptor {
 		);
 	}
 
-	public static class EbookModelFieldDescriptor {
+	public static class EbookFieldDescriptor {
 		public static final List<FieldDescriptor> EBOOK_MODEL_RES_FIELD_DESCR_LIST = List.of(
 				fieldWithPath("uuid").description("Ebook UUID").type(JsonFieldType.STRING),
 				fieldWithPath("name").description("Ebook title").type(JsonFieldType.STRING),
