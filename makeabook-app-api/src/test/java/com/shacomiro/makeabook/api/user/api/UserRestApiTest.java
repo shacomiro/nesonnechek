@@ -10,8 +10,6 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.nio.charset.StandardCharsets;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,19 +25,15 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.filter.CharacterEncodingFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shacomiro.makeabook.api.global.config.mock.doc.RestDocsConfiguration;
 import com.shacomiro.makeabook.api.global.security.dto.JwtDto;
-import com.shacomiro.makeabook.api.global.security.filter.JwtAuthenticationFilter;
-import com.shacomiro.makeabook.api.global.security.filter.JwtReissueFilter;
 import com.shacomiro.makeabook.api.global.security.service.JwtProvisionService;
 import com.shacomiro.makeabook.api.user.dto.DeleteUserRequest;
 import com.shacomiro.makeabook.api.user.dto.UpdateUserRequest;
@@ -61,18 +55,12 @@ class UserRestApiTest {
 	private JwtDto jwtDto;
 
 	@BeforeEach
-	void setUp(
-			final RestDocumentationContextProvider provider, final WebApplicationContext context,
-			@Autowired AuthenticationManager authenticationManager
-	) {
+	void setUp(final RestDocumentationContextProvider provider, final WebApplicationContext context) {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
 				.apply(documentationConfiguration(provider))
 				.apply(springSecurity())
 				.alwaysDo(print())
 				.alwaysDo(restDocs)
-				.addFilter(new JwtAuthenticationFilter(authenticationManager, objectMapper))
-				.addFilter(new JwtReissueFilter(jwtProvisionService, objectMapper))
-				.addFilters(new CharacterEncodingFilter(StandardCharsets.UTF_8.name(), true))
 				.build();
 		jwtDto = jwtProvisionService.issueJwt(USER_EMAIL);
 	}
