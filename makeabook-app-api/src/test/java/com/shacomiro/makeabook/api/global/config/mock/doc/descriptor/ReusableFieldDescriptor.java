@@ -17,20 +17,20 @@ public class ReusableFieldDescriptor {
 
 	public static class UserFieldDescriptor {
 		public static final List<FieldDescriptor> USER_MODEL_RES_FIELD_DESCR_LIST = List.of(
-				fieldWithPath("email").description("User's email").type(JsonFieldType.STRING),
-				fieldWithPath("username").description("User's name").type(JsonFieldType.STRING),
-				fieldWithPath("loginCount").description("User's login count number").type(JsonFieldType.NUMBER),
+				fieldWithPath("email").description("User email").type(JsonFieldType.STRING),
+				fieldWithPath("username").description("User name").type(JsonFieldType.STRING),
+				fieldWithPath("loginCount").description("User login count number").type(JsonFieldType.NUMBER),
 				fieldWithPath("lastLoginAt").description("Last login date").type(JsonFieldType.STRING),
 				fieldWithPath("createdAt").description("Account creation date").type(JsonFieldType.STRING),
 				subsectionWithPath("_links").description("HATEOAS link").type(JsonFieldType.OBJECT)
 		);
 
 		public static final List<FieldDescriptor> USER_COL_MODEL_RES_FIELD_DESCR_LIST = List.of(
-				fieldWithPath("_embedded.users.[].email").description("User's email").type(JsonFieldType.STRING),
-				fieldWithPath("_embedded.users.[].username").description("User's name").type(JsonFieldType.STRING),
-				fieldWithPath("_embedded.users.[].loginCount").description("User's login count number").type(JsonFieldType.NUMBER),
+				fieldWithPath("_embedded.users.[].email").description("User email").type(JsonFieldType.STRING),
+				fieldWithPath("_embedded.users.[].username").description("User name").type(JsonFieldType.STRING),
+				fieldWithPath("_embedded.users.[].loginCount").description("User login count number").type(JsonFieldType.NUMBER),
 				fieldWithPath("_embedded.users.[].lastLoginAt").description("Last login date").type(JsonFieldType.STRING),
-				fieldWithPath("_embedded.users.[].createdAt").description("Account creation date").type(JsonFieldType.STRING),
+				fieldWithPath("_embedded.users.[].createdAt").description("User creation date").type(JsonFieldType.STRING),
 				subsectionWithPath("_embedded.users.[]._links").description("HATEOAS link").type(JsonFieldType.OBJECT)
 		);
 	}
