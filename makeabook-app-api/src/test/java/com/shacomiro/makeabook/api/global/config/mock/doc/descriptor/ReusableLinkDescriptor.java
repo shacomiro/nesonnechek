@@ -30,4 +30,10 @@ public class ReusableLinkDescriptor {
 				linkWithRel("download").optional().description("Link to download ebook file")
 		);
 	}
+
+	public static class JwtLinkDescriptor {
+		public static final List<LinkDescriptor> JWT_MODEL_LINKS_DESCR_LIST = List.of(
+				linkWithRel("reissue").optional().description("Link to reissue JWT")
+		);
+	}
 }

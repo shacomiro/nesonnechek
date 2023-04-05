@@ -33,6 +33,14 @@ public class ReusableFieldDescriptor {
 				fieldWithPath("_embedded.users.[].createdAt").description("User creation date").type(JsonFieldType.STRING),
 				subsectionWithPath("_embedded.users.[]._links").description("HATEOAS link").type(JsonFieldType.OBJECT)
 		);
+
+		public static final List<FieldDescriptor> USER_SIGNUP_MODEL_RES_FIELD_DESCR_LIST = List.of(
+				fieldWithPath("email").description("Signed up user email").type(JsonFieldType.STRING),
+				fieldWithPath("username").description("Signed up user name").type(JsonFieldType.STRING),
+				fieldWithPath("loginCount").description("Signed up user login count number").type(JsonFieldType.NUMBER),
+				fieldWithPath("createdAt").description("Signed up user creation date").type(JsonFieldType.STRING),
+				subsectionWithPath("_links").description("HATEOAS link").type(JsonFieldType.OBJECT)
+		);
 	}
 
 	public static class EbookFieldDescriptor {
@@ -58,6 +66,16 @@ public class ReusableFieldDescriptor {
 				fieldWithPath("_embedded.ebooks.[].expiredAt").description("Expire date of Ebook file").type(JsonFieldType.STRING),
 				fieldWithPath("_embedded.ebooks.[].owner").description("Ebook owner").type(JsonFieldType.STRING),
 				subsectionWithPath("_embedded.ebooks.[]._links").description("HATEOAS link").type(JsonFieldType.OBJECT)
+		);
+	}
+
+	public static class JwtFieldDescriptor {
+		public static final List<FieldDescriptor> JWT_MODEL_RES_FIELD_DESCR_LIST = List.of(
+				fieldWithPath("reqHeaders").description("Request headers required for API calls").type(JsonFieldType.STRING),
+				fieldWithPath("authScheme").description("Authentication scheme required for API calls").type(JsonFieldType.STRING),
+				fieldWithPath("accessToken").description("JWT used for API calls").type(JsonFieldType.STRING),
+				fieldWithPath("refreshToken").description("JWT used for reissuing JWT").type(JsonFieldType.STRING),
+				subsectionWithPath("_links").description("HATEOAS link").type(JsonFieldType.OBJECT)
 		);
 	}
 }
