@@ -10,6 +10,8 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.nio.charset.StandardCharsets;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -44,7 +46,7 @@ import com.shacomiro.makeabook.api.user.dto.UpdateUserRequest;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @TestPropertySource(properties = {"spring.config.location = classpath:application-test.yaml"})
 class UserRestApiTest {
-	private static final String USER_EMAIL = "user1@email.com";
+	private static final String USER1_EMAIL = "user1@email.com";
 	@Autowired
 	private RestDocumentationResultHandler restDocs;
 	@Autowired
@@ -59,10 +61,9 @@ class UserRestApiTest {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
 				.apply(documentationConfiguration(provider))
 				.apply(springSecurity())
-				.alwaysDo(print())
 				.alwaysDo(restDocs)
 				.build();
-		jwtDto = jwtProvisionService.issueJwt(USER_EMAIL);
+		jwtDto = jwtProvisionService.issueJwt(USER1_EMAIL);
 	}
 
 	@AfterEach
@@ -85,6 +86,7 @@ class UserRestApiTest {
 
 		//then
 		result.andExpect(status().isOk())
+				.andDo(print())
 				.andDo(restDocs.document(
 						links(CommonLinkDescriptor.SELF_LINK_DESCR)
 								.and(UserLinkDescriptor.USER_MODEL_LINKS_DESCR_LIST)
@@ -107,10 +109,12 @@ class UserRestApiTest {
 				put(url).header(HttpHeaders.AUTHORIZATION, bearerToken)
 						.content(content)
 						.contentType(MediaType.APPLICATION_JSON)
+						.characterEncoding(StandardCharsets.UTF_8)
 		);
 
 		//then
 		result.andExpect(status().isOk())
+				.andDo(print())
 				.andDo(restDocs.document(
 						links(CommonLinkDescriptor.SELF_LINK_DESCR)
 								.and(UserLinkDescriptor.USER_MODEL_LINKS_DESCR_LIST)
@@ -134,10 +138,12 @@ class UserRestApiTest {
 				delete(url).header(HttpHeaders.AUTHORIZATION, bearerToken)
 						.content(content)
 						.contentType(MediaType.APPLICATION_JSON)
+						.characterEncoding(StandardCharsets.UTF_8)
 		);
 
 		//then
 		result.andExpect(status().isOk())
+				.andDo(print())
 				.andDo(restDocs.document());
 	}
 
@@ -156,6 +162,7 @@ class UserRestApiTest {
 
 		//then
 		result.andExpect(status().isOk())
+				.andDo(print())
 				.andDo(restDocs.document(
 						links(CommonLinkDescriptor.SELF_LINK_DESCR)
 								.and(EbookLinkDescriptor.EBOOK_MODEL_LINKS_DESCR_LIST)
@@ -183,10 +190,12 @@ class UserRestApiTest {
 				delete(url).header(HttpHeaders.AUTHORIZATION, bearerToken)
 						.content(content)
 						.contentType(MediaType.APPLICATION_JSON)
+						.characterEncoding(StandardCharsets.UTF_8)
 		);
 
 		//then
 		result.andExpect(status().isOk())
+				.andDo(print())
 				.andDo(restDocs.document());
 	}
 }
