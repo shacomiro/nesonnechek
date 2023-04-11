@@ -72,8 +72,8 @@ class EbookRestApiTest {
 		String url = "/api/v1/ebooks/txt-ebook";
 		String bearerToken = "Bearer " + jwtDto.getAccessToken();
 		String ebookType = "epub2";
-		MockMultipartFile file = new MockMultipartFile("txtFile", "애국가.txt",
-				MimeTypeUtils.TEXT_PLAIN_VALUE, new FileInputStream("./src/test/resources/애국가.txt"));
+		MockMultipartFile file = new MockMultipartFile("txtFile", "lorem-ipsum.txt",
+				MimeTypeUtils.TEXT_PLAIN_VALUE, new FileInputStream("./src/test/resources/lorem-ipsum.txt"));
 
 		//when
 		ResultActions result = mockMvc.perform(
@@ -126,8 +126,8 @@ class EbookRestApiTest {
 		String url1 = "/api/v1/ebooks/txt-ebook";
 		String bearerToken = "Bearer " + jwtDto.getAccessToken();
 		String ebookType = "epub2";
-		MockMultipartFile file = new MockMultipartFile("txtFile", "애국가.txt",
-				MimeTypeUtils.TEXT_PLAIN_VALUE, new FileInputStream("./src/test/resources/애국가.txt"));
+		MockMultipartFile file = new MockMultipartFile("txtFile", "lorem-ipsum.txt",
+				MimeTypeUtils.TEXT_PLAIN_VALUE, new FileInputStream("./src/test/resources/lorem-ipsum.txt"));
 
 		String ebookContent = mockMvc.perform(
 				multipart(url1).file(file)
