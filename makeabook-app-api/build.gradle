@@ -19,9 +19,10 @@ asciidoctor {
 
 bootJar {
     dependsOn asciidoctor
+    delete(file('src/main/resources/static/docs'))
     copy {
-        from "${asciidoctor.outputDir}"
-        into 'src/main/resources/static/docs'
+        from file('build/docs/asciidoc')
+        into file('src/main/resources/static/docs')
     }
 }
 
