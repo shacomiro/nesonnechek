@@ -27,8 +27,7 @@ class Epub2TranslatorTest {
 		//given
 		String uuid = UUID.randomUUID().toString();
 		String fileName = "애국가.txt";
-		Path expectTestResultPath = Paths.get(testFilePath,
-						File.separatorChar + "ebook" + File.separatorChar + "epub2" + File.separatorChar + uuid + ".epub")
+		Path expectTestResultPath = Paths.get(testFilePath, File.separatorChar + "ebook" + File.separatorChar + uuid + ".epub")
 				.toAbsolutePath()
 				.normalize();
 		List<String> lines = new ArrayList<>();

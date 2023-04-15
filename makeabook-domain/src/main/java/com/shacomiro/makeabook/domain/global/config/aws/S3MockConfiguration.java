@@ -13,7 +13,7 @@ import com.shacomiro.aws.s3.exception.AwsS3BucketHandleException;
 import io.findify.s3mock.S3Mock;
 
 @Configuration
-@Profile(value = {"domain-local"})
+@Profile(value = {"domain-local", "domain-test"})
 public class S3MockConfiguration {
 	private final S3Mock s3Mock;
 	private final AwsS3ClientManager awsS3ClientManager;

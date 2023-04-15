@@ -108,8 +108,8 @@ public class EbookService {
 		return ebook;
 	}
 
-	public Page<Ebook> findEbooksByUserId(Pageable pageable, Long userId) {
-		return ebookRdsRepository.findAllByUserId(pageable, userId);
+	public Page<Ebook> findEbooksByUser(Pageable pageable, User user) {
+		return ebookRdsRepository.findAllByUser(pageable, user);
 	}
 
 	public Ebook findEbookByUuidAndEmail(String uuid, String emailValue) {
@@ -143,6 +143,10 @@ public class EbookService {
 		} catch (AwsS3ObjectHandleException e) {
 			throw new EbookResourceNotFoundException("Ebook resource not found.");
 		}
+	}
+
+	public void deleteAllEbooks(User user) {
+		ebookRdsRepository.deleteAllByUser(user);
 	}
 
 	private List<ContentTempFileInfo> saveUploadToTempFile(List<FileDto> files) {

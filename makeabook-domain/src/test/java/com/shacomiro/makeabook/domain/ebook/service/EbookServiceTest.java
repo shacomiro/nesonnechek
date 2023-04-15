@@ -130,11 +130,11 @@ class EbookServiceTest {
 					0, NOW, NOW.plusDays(30), true, user));
 		}
 
-		given(ebookRdsRepository.findAllByUserId(eq(pageRequest), anyLong()))
+		given(ebookRdsRepository.findAllByUser(eq(pageRequest), any(User.class)))
 				.willReturn(new PageImpl<>(ebooks, pageRequest, ebooks.size()));
 
 		//when
-		Page<Ebook> result = ebookService.findEbooksByUserId(pageRequest, user.getId());
+		Page<Ebook> result = ebookService.findEbooksByUser(pageRequest, user);
 
 		//then
 		assertTrue(result.hasContent());

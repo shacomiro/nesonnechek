@@ -102,5 +102,20 @@ class EbookRdsRepositoryTest {
 		//then
 		Assertions.assertEquals(ebookCount - 1, afterDeleteEbookCount);
 	}
-}
 
+	@Test
+	@Order(5)
+	@DisplayName("특정 유저 전자책 삭제")
+	void deleteAllUserEbooks() {
+		//given
+		Email email = new Email("email@example.com");
+		User user = new User(1L, email, "password", "user", 0, null, LocalDateTime.now(), List.of(UserRole.USER));
+
+		//when
+		ebookRdsRepository.deleteAllByUser(user);
+		long afterDeleteAllUserEbooksCount = ebookRdsRepository.findAllByUser(user).size();
+
+		//then
+		Assertions.assertEquals(0, afterDeleteAllUserEbooksCount);
+	}
+}
