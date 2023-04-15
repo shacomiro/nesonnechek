@@ -1,5 +1,7 @@
 package com.shacomiro.makeabook.api.global.config;
 
+import java.nio.charset.StandardCharsets;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,6 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.web.filter.CharacterEncodingFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shacomiro.makeabook.api.global.security.filter.JwtAuthenticationFilter;
@@ -57,12 +61,14 @@ public class WebSecurityConfiguration {
 				.authorizeRequests()
 				.antMatchers("/api/v1/auth/sign-in").permitAll()
 				.antMatchers("/api/v1/auth/sign-up").permitAll()
+				.antMatchers("/api/docs/**").permitAll()
 				.anyRequest().authenticated()
 				.and()
 				.exceptionHandling()
 				.authenticationEntryPoint(new JwtAuthenticationEntryPoint(objectMapper))
 				.accessDeniedHandler(new JwtAccessDeniedHandler(objectMapper))
 				.and()
+				.addFilterBefore(new CharacterEncodingFilter(StandardCharsets.UTF_8.name(), true), CsrfFilter.class)
 				.addFilterBefore(new JwtAuthenticationFilter(authenticationManager, objectMapper),
 						UsernamePasswordAuthenticationFilter.class)
 				.addFilterAfter(new JwtReissueFilter(jwtProvisionService, objectMapper), FilterSecurityInterceptor.class);

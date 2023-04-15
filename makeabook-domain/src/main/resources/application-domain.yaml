@@ -28,6 +28,10 @@ aws:
       secret: ${ext-config.aws.s3.secret-key}
     region: ${ext-config.aws.s3.region}
     bucket: ${ext-config.aws.s3.bucket}
+java-epub-generator:
+  directory:
+    content: ${ext-config.ebook.content-directory}
+    ebook: ${ext-config.ebook.ebook-directory}
 ---
 spring:
   config:
@@ -42,3 +46,7 @@ aws:
       secret: null
     region: ap-northeast-2
     bucket: local-bucket
+java-epub-generator:
+  directory:
+    content: ./files/local/content
+    ebook: ./files/local/ebook
