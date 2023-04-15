@@ -33,7 +33,7 @@ jobs:
 
     steps:
       - name: Checkout code
-      - uses: actions/checkout@v3
+        uses: actions/checkout@v3
         with:
           token: ${{ secrets.ACTIONS_TOKEN_2023 }}
       - name: Set up JDK 11
