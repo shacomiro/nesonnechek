@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.UUID;
 
 import org.apache.commons.io.FilenameUtils;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
@@ -66,16 +68,27 @@ class EbookServiceTest {
 	@Mock
 	private AwsS3ObjectHandler awsS3ObjectHandler;
 
+	@BeforeAll
+	static void beforeAll() throws IOException {
+		Files.createDirectories(Paths.get(TEST_RESOURCE_PATH + File.separatorChar + "files" + File.separatorChar + "ebook"));
+		Files.createDirectories(Paths.get(TEST_RESOURCE_PATH + File.separatorChar + "files" + File.separatorChar + "content"));
+	}
+
 	@BeforeEach
 	void setUp() throws IOException {
-		Files.copy(Path.of(TEST_RESOURCE_PATH, File.separatorChar + EPUB_FILENAME),
-				Path.of(TEST_RESOURCE_PATH, File.separatorChar + "files" + File.separatorChar + "ebook" + TEST_EPUB_FILENAME));
+		Files.copy(
+				Path.of(TEST_RESOURCE_PATH, File.separatorChar + EPUB_FILENAME),
+				Path.of(TEST_RESOURCE_PATH,
+						File.separatorChar + "files" + File.separatorChar + "ebook" + File.separatorChar + TEST_EPUB_FILENAME)
+		);
 	}
 
 	@AfterEach
 	void tearDown() throws IOException {
 		Files.deleteIfExists(
-				Path.of(TEST_RESOURCE_PATH, File.separatorChar + "files" + File.separatorChar + "ebook" + TEST_EPUB_FILENAME));
+				Path.of(TEST_RESOURCE_PATH,
+						File.separatorChar + "files" + File.separatorChar + "ebook" + File.separatorChar + TEST_EPUB_FILENAME)
+		);
 	}
 
 	@Test
@@ -86,7 +99,7 @@ class EbookServiceTest {
 		User user = new User(1L, new Email(UPLOADER_EMAIL), "password", "user",
 				0, null, NOW, List.of(UserRole.USER));
 		Path testEpubPath = Path.of(TEST_RESOURCE_PATH,
-				File.separatorChar + "files" + File.separatorChar + "ebook" + TEST_EPUB_FILENAME);
+				File.separatorChar + "files" + File.separatorChar + "ebook" + File.separatorChar + TEST_EPUB_FILENAME);
 		EbookRequestDto ebookRequestDto = new EbookRequestDto(
 				Files.readAllBytes(testEpubPath), TEST_TXT_FILENAME, UPLOADER_EMAIL, EbookType.EPUB2
 		);
@@ -182,7 +195,7 @@ class EbookServiceTest {
 		given(awsS3ClientManager.getAwsS3ObjectHandler()).willReturn(awsS3ObjectHandler);
 		given(awsS3ObjectHandler.downloadS3ObjectBytes(anyString(), eq(ebook.getUuid())))
 				.willReturn(Files.readAllBytes(Path.of(TEST_RESOURCE_PATH,
-						File.separatorChar + "files" + File.separatorChar + "ebook" + TEST_EPUB_FILENAME)));
+						File.separatorChar + "files" + File.separatorChar + "ebook" + File.separatorChar + TEST_EPUB_FILENAME)));
 
 		//when
 		EbookResourceDto result = ebookService.getEbookResourceByUuidAndEmail(uuid, UPLOADER_EMAIL);
