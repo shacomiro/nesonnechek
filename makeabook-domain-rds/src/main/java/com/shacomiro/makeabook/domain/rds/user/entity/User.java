@@ -3,7 +3,6 @@ package com.shacomiro.makeabook.domain.rds.user.entity;
 import static java.time.LocalDateTime.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.AttributeOverride;
@@ -19,18 +18,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.hibernate.annotations.BatchSize;
-
-import com.shacomiro.makeabook.domain.rds.ebook.entity.Ebook;
 import com.shacomiro.makeabook.domain.rds.global.validation.annotation.ValidEnumCollection;
-import com.shacomiro.makeabook.domain.rds.user.exception.UserDeleteException;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -71,9 +65,6 @@ public class User {
 	@Column(name = "role")
 	@ValidEnumCollection(enumClass = UserRole.class, message = "User role value is invalid")
 	private List<UserRole> roles;
-	@BatchSize(size = 100)
-	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-	private List<Ebook> ebooks;
 
 	@Builder(builderClassName = "BySignUpInfos", builderMethodName = "bySignUpInfos")
 	public User(Email email, String encryptedPassword, String username, List<UserRole> roles) {
@@ -99,17 +90,10 @@ public class User {
 		this.lastLoginAt = lastLoginAt;
 		this.createdAt = createdAt;
 		this.roles = roles;
-		this.ebooks = new ArrayList<>();
 	}
 
 	public void afterLoginSuccess() {
 		loginCount++;
 		lastLoginAt = now();
-	}
-
-	public void verifyDelete() {
-		if (!ebooks.isEmpty()) {
-			throw new UserDeleteException("Current user's ebooks are still existing");
-		}
 	}
 }

@@ -87,8 +87,6 @@ public class UserService {
 		User currentUser = userRdsRepository.findByEmail(Email.byValue().value(emailValue).build())
 				.orElseThrow(() -> new UserNotFoundException("Could not find user '" + emailValue + "'."));
 
-		currentUser.verifyDelete();
-
 		userRdsRepository.delete(currentUser);
 	}
 }

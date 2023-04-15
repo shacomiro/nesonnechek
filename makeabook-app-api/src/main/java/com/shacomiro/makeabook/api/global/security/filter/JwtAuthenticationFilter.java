@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.core.log.LogMessage;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,9 +18,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.util.Assert;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,27 +25,18 @@ import com.shacomiro.jwt.policy.SecurityScheme;
 import com.shacomiro.makeabook.api.global.security.token.JwtAuthenticationToken;
 
 import io.jsonwebtoken.JwtException;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private final AuthenticationManager authenticationManager;
 	private final ObjectMapper objectMapper;
-	private RequestMatcher docsRequestMatcher;
-
-	public JwtAuthenticationFilter(AuthenticationManager authenticationManager, ObjectMapper objectMapper) {
-		this.authenticationManager = authenticationManager;
-		this.objectMapper = objectMapper;
-		setFilterProcessesUrl("/docs/**");
-	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws
 			ServletException,
 			IOException {
 		String token = resolveToken(request);
-
-		if (docsReissue(request, response)) {
-			token = null;
-		}
 
 		if (token != null) {
 			try {
@@ -97,24 +84,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		if ((isRefreshToken && !isReissueUrl) || (!isRefreshToken && isReissueUrl)) {
 			throw new JwtException("Unacceptable JWT token");
 		}
-	}
-
-	protected boolean docsReissue(HttpServletRequest request, HttpServletResponse response) {
-		if (this.docsRequestMatcher.matches(request)) {
-			return true;
-		}
-		if (this.logger.isTraceEnabled()) {
-			this.logger.trace(LogMessage.format("Did not match request to %s", this.docsRequestMatcher));
-		}
-		return false;
-	}
-
-	public void setDocsRequestMatcher(RequestMatcher reissueRequestMatcher) {
-		Assert.notNull(reissueRequestMatcher, "reissueRequestMatcher cannot be null");
-		this.docsRequestMatcher = reissueRequestMatcher;
-	}
-
-	public void setFilterProcessesUrl(String filterProcessesUrl) {
-		this.docsRequestMatcher = new AntPathRequestMatcher(filterProcessesUrl);
 	}
 }

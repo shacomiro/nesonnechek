@@ -1,29 +1,7 @@
 spring:
   config:
-    import:
-      - application-domain-rds-test.yaml
-      - application-domain-redis-test.yaml
-  profiles:
-    group:
-      domain-test:
-        - domain-test
-        - domain-rds-test
-        - domain-redis-test
----
-spring:
-  config:
     activate:
       on-profile: domain-test
-aws:
-  s3:
-    port: 8033
-    service-endpoint: http://127.0.0.1:8033
-    key:
-      access: null
-      secret: null
-    region: ap-northeast-2
-    bucket: local-bucket
-java-epub-generator:
-  directory:
-    content: ./files/test/content
-    ebook: ./files/test/ebook
+  sql:
+    init:
+      mode: never

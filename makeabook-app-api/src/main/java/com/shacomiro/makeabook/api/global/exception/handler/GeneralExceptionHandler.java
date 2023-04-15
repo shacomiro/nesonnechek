@@ -17,7 +17,6 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import com.shacomiro.makeabook.core.global.exception.FileIOException;
 import com.shacomiro.makeabook.domain.global.exception.NotFoundException;
 import com.shacomiro.makeabook.domain.rds.ebook.exception.EbookExpiredException;
-import com.shacomiro.makeabook.domain.rds.user.exception.UserDeleteException;
 import com.shacomiro.makeabook.domain.user.exception.UserConflictException;
 
 import io.jsonwebtoken.JwtException;
@@ -58,8 +57,7 @@ public class GeneralExceptionHandler {
 			MethodArgumentTypeMismatchException.class,
 			MultipartException.class,
 			HttpRequestMethodNotSupportedException.class,
-			EbookExpiredException.class,
-			UserDeleteException.class
+			EbookExpiredException.class
 	})
 	public ResponseEntity<?> handleBadRequestException(Exception e) {
 		log.debug("Bad request exception occurred: {}", e.getMessage(), e);

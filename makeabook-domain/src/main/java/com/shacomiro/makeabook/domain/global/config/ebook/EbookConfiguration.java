@@ -14,8 +14,8 @@ import com.shacomiro.epub.EpubManager;
 public class EbookConfiguration {
 
 	@Bean
-	public EpubManager epubManager(@Value("${java-epub-generator.directory.content}") String contentDir,
-			@Value("${java-epub-generator.directory.ebook}") String ebookDir) throws IOException {
+	public EpubManager epubManager(@Value("${ext-config.ebook.content-directory}") String contentDir,
+			@Value("${ext-config.ebook.ebook-directory}") String ebookDir) throws IOException {
 		Files.createDirectories(Paths.get(contentDir));
 		Files.createDirectories(Paths.get(ebookDir));
 
