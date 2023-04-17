@@ -7,11 +7,6 @@ on:
     paths:
       - '**/src/**'
   workflow_dispatch:
-    inputs:
-      isDryRun:
-        description: 'Enable dry run'
-        required: true
-        type: boolean
 
 jobs:
   release:
@@ -26,7 +21,6 @@ jobs:
         uses: mathieudutour/github-tag-action@v6.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          dry_run: ${{ github.event.inputs.isDryRun }}
       - name: Create Release
         id: create_release
         uses: ncipollo/release-action@v1
