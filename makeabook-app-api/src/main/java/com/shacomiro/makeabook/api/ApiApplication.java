@@ -8,5 +8,6 @@ public class ApiApplication {
 		//feat1
 		//feat2
 		//fix1
+		//docs1
 	}
 }
