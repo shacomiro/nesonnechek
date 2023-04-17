@@ -4,7 +4,14 @@ on:
   push:
     branches:
       - main
+    paths:
+      - '**/src/**'
   workflow_dispatch:
+    inputs:
+      isDryRun:
+        description: 'Enable dry run'
+        required: true
+        type: boolean
 
 jobs:
   release:
