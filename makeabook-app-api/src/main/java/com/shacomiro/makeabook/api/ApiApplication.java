@@ -12,5 +12,6 @@ public class ApiApplication {
 		//style1
 		//refactor1
 		//test1
+		//chore1
 	}
 }
