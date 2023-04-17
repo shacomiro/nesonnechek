@@ -1,3 +1,13 @@
+### secret config ###
+**/external-config.yaml
+**/ext-config.yaml
+**/external-*-config.yaml
+**/ext-*-config.yaml
+**/*-secret.yaml
+
+### Docs ###
+**/static/docs/*.html
+
 HELP.md
 .gradle
 build/
