@@ -18,7 +18,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/docs/**")
+		registry.addResourceHandler("/api/docs/**")
 				.addResourceLocations("classpath:/static/docs/");
 	}
 
