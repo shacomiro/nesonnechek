@@ -19,10 +19,8 @@ asciidoctor {
 
 bootJar {
     dependsOn asciidoctor
-    delete(file('src/main/resources/static/docs'))
-    copy {
-        from file('build/docs/asciidoc')
-        into file('src/main/resources/static/docs')
+    from('build/docs/asciidoc') {
+        into 'BOOT-INF/classes/static/docs'
     }
 }
 
