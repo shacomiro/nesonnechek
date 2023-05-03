@@ -46,8 +46,8 @@ aws:
     bucket: test-bucket
 java-epub-generator:
   directory:
-    content: ./files/test/content
-    ebook: ./files/test/ebook
+    content: ./src/test/resources/files/content
+    ebook: ./src/test/resources/files/ebook
 ---
 spring:
   config:
