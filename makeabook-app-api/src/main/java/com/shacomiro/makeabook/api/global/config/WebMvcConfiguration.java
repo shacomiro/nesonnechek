@@ -21,9 +21,4 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 		registry.addResourceHandler("/api/docs/**")
 				.addResourceLocations("classpath:/static/docs/");
 	}
-
-	// @Bean
-	// ForwardedHeaderTransformer forwardedHeaderFilter() {
-	// 	return new ForwardedHeaderTransformer();
-	// }
 }
