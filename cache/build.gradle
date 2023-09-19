@@ -13,5 +13,5 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'org.springframework.boot:spring-boot-starter-json'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    api project(':makeabook-domain-redis')
+    api project(':domain-redis')
 }

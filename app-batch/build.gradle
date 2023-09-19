@@ -6,6 +6,6 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.batch:spring-batch-test'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    implementation project(':makeabook-domain-rds')
+    implementation project(':domain-rds')
     implementation project(':java-aws-s3-client-manager')
 }
