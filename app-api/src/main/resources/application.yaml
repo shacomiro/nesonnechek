@@ -44,7 +44,7 @@ spring:
 jwt:
   secret:
     key: It-is-strongly-recommended-that-you-use-a-string-that-is-at-least-512-bits-(64-characters)-long-for-the-secret-key
-  issuer: makeabook
+  issuer: nesonnechek
   valid-milliseconds:
     access: 30000
     refresh: 60000
