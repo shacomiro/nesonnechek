@@ -19,7 +19,11 @@ public class RestDocsConfiguration {
 	public RestDocumentationResultHandler write() {
 		return MockMvcRestDocumentation.document(
 				"{class-name}/{method-name}",
-				preprocessRequest(prettyPrint()),
+				preprocessRequest(modifyUris()
+								.scheme("http")
+								.host("api.nesonnechek.com")
+								.removePort(),
+						prettyPrint()),
 				preprocessResponse(prettyPrint())
 		);
 	}
