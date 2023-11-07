@@ -69,7 +69,7 @@ class EbookRestApiTest {
 	@DisplayName("txt 전자책 생성")
 	void createTxtEbook() throws Exception {
 		//given
-		String url = "/api/v1/ebooks/txt-ebook";
+		String url = "/ebooks/txt-ebook";
 		String bearerToken = "Bearer " + jwtDto.getAccessToken();
 		String ebookType = "epub2";
 		MockMultipartFile file = new MockMultipartFile("txtFile", "lorem-ipsum.txt",
@@ -99,7 +99,7 @@ class EbookRestApiTest {
 	void getEbook() throws Exception {
 		//given
 		String uuid = "550e8400-e29b-41d4-a716-446655440001";
-		String url = "/api/v1/ebooks/" + uuid;
+		String url = "/ebooks/" + uuid;
 		String bearerToken = "Bearer " + jwtDto.getAccessToken();
 
 		//when
@@ -123,7 +123,7 @@ class EbookRestApiTest {
 	@DisplayName("txt 전자책 생성 후 다운로드")
 	void downloadEbook() throws Exception {
 		//given
-		String url1 = "/api/v1/ebooks/txt-ebook";
+		String url1 = "/ebooks/txt-ebook";
 		String bearerToken = "Bearer " + jwtDto.getAccessToken();
 		String ebookType = "epub2";
 		MockMultipartFile file = new MockMultipartFile("txtFile", "lorem-ipsum.txt",
@@ -136,7 +136,7 @@ class EbookRestApiTest {
 		).andReturn().getResponse().getContentAsString();
 		EbookModel ebookModel = objectMapper.readValue(ebookContent, EbookModel.class);
 
-		String url2 = "/api/v1/ebooks/" + ebookModel.getUuid() + "/file";
+		String url2 = "/ebooks/" + ebookModel.getUuid() + "/file";
 
 		//when
 		ResultActions result = mockMvc.perform(

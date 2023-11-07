@@ -28,7 +28,7 @@ import com.shacomiro.nesonnechek.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping(path = "api/v1/auth")
+@RequestMapping(path = "auth")
 @RequiredArgsConstructor
 public class AuthenticationRestApi {
 	private final UserService userService;

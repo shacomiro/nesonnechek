@@ -37,7 +37,7 @@ public class JwtReissueFilter extends OncePerRequestFilter {
 	public JwtReissueFilter(JwtProvisionService jwtProvisionService, ObjectMapper objectMapper) {
 		this.jwtProvisionService = jwtProvisionService;
 		this.objectMapper = objectMapper;
-		setFilterProcessesUrl("/api/v1/auth/reissue");
+		setFilterProcessesUrl("/auth/reissue");
 	}
 
 	@Override

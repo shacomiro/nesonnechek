@@ -76,7 +76,7 @@ class UserRestApiTest {
 	@DisplayName("유저 정보 조회")
 	void getAccountInfo() throws Exception {
 		//given
-		String url = "/api/v1/users/account";
+		String url = "/users/account";
 		String bearerToken = "Bearer " + jwtDto.getAccessToken();
 
 		//when
@@ -100,7 +100,7 @@ class UserRestApiTest {
 	@DisplayName("유저 정보 수정")
 	void updateAccountInfo() throws Exception {
 		//given
-		String url = "/api/v1/users/account";
+		String url = "/users/account";
 		String bearerToken = "Bearer " + jwtDto.getAccessToken();
 		String content = objectMapper.writeValueAsString(new UpdateUserRequest("user1_new_password", "USER1_NEW_USERNAME"));
 
@@ -128,7 +128,7 @@ class UserRestApiTest {
 	@DisplayName("유저 삭제")
 	void deleteAccount() throws Exception {
 		//given
-		String url = "/api/v1/users/account";
+		String url = "/users/account";
 		JwtDto nonEbookUserjwtDto = jwtProvisionService.issueJwt("user5@email.com");
 		String bearerToken = "Bearer " + nonEbookUserjwtDto.getAccessToken();
 		String content = objectMapper.writeValueAsString(new DeleteUserRequest("user5_password"));
@@ -152,7 +152,7 @@ class UserRestApiTest {
 	@DisplayName("현재 유저 전자책 조회")
 	void getAccountEbooks() throws Exception {
 		//given
-		String url = "/api/v1/users/account/ebooks";
+		String url = "/users/account/ebooks";
 		String bearerToken = "Bearer " + jwtDto.getAccessToken();
 
 		//when
@@ -180,7 +180,7 @@ class UserRestApiTest {
 	@DisplayName("현재 유저 전자책 삭제")
 	void deleteAllAccountEbooks() throws Exception {
 		//given
-		String url = "/api/v1/users/account/ebooks";
+		String url = "/users/account/ebooks";
 		JwtDto nonEbookUserjwtDto = jwtProvisionService.issueJwt("user2@email.com");
 		String bearerToken = "Bearer " + nonEbookUserjwtDto.getAccessToken();
 		String content = objectMapper.writeValueAsString(new DeleteUserRequest("user2_password"));

@@ -62,7 +62,7 @@ class AuthenticationRestApiTest {
 	@DisplayName("유저 로그인")
 	void singIn() throws Exception {
 		//given
-		String url = "/api/v1/auth/sign-in";
+		String url = "/auth/sign-in";
 		String email = "user1@email.com";
 		String password = "user1_password";
 		String content = objectMapper.writeValueAsString(new SignInRequest(email, password));
@@ -89,7 +89,7 @@ class AuthenticationRestApiTest {
 	@DisplayName("유저 회원가입")
 	void signUp() throws Exception {
 		//given
-		String url = "/api/v1/auth/sign-up";
+		String url = "/auth/sign-up";
 		String email = "new_user@email.com";
 		String password = "new_user_password";
 		String username = "NEW_USER";

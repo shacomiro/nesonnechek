@@ -92,7 +92,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private void verifyJwtTokenRequest(String type, String requestUri) {
 		boolean isRefreshToken = type.equals("refresh");
-		boolean isReissueUrl = requestUri.equals("/api/v1/auth/reissue");
+		boolean isReissueUrl = requestUri.equals("/auth/reissue");
 
 		if ((isRefreshToken && !isReissueUrl) || (!isRefreshToken && isReissueUrl)) {
 			throw new JwtException("Unacceptable JWT token");

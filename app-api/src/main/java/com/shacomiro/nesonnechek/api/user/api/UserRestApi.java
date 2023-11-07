@@ -33,7 +33,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping(path = "api/v1/users")
+@RequestMapping(path = "users")
 @RequiredArgsConstructor
 public class UserRestApi {
 	private final UserService userService;
