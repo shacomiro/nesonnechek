@@ -78,7 +78,7 @@ public class ApiUtils {
 	}
 
 	public static Link docsLink() {
-		return Link.of(getCurrentApiServletMapping() + "/api/docs/index.html").withRel("docs");
+		return Link.of(getCurrentApiServletMapping() + "/docs/index.html").withRel("docs");
 	}
 
 	@Data
