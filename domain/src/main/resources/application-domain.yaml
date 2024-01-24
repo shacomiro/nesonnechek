@@ -5,6 +5,10 @@ spring:
       - application-domain-redis.yaml
   profiles:
     group:
+      domains-prod:
+        - domain-prod
+        - domain-rds-prod
+        - domain-redis-prod
       domains-dev:
         - domain-dev
         - domain-rds-dev
@@ -19,19 +23,36 @@ spring:
 spring:
   config:
     activate:
+      on-profile: domain-prod
+aws:
+  s3:
+    service-endpoint: ${prod-config.aws.s3.service-endpoint}
+    key:
+      access: ${prod-config.aws.s3.access-key}
+      secret: ${prod-config.aws.s3.secret-key}
+    region: ${prod-config.aws.s3.region}
+    bucket: ${prod-config.aws.s3.bucket}
+java-epub-generator:
+  directory:
+    content: ${prod-config.ebook.content-directory}
+    ebook: ${prod-config.ebook.ebook-directory}
+---
+spring:
+  config:
+    activate:
       on-profile: domain-dev
 aws:
   s3:
-    service-endpoint: ${ext-config.aws.s3.service-endpoint}
+    service-endpoint: ${dev-config.aws.s3.service-endpoint}
     key:
-      access: ${ext-config.aws.s3.access-key}
-      secret: ${ext-config.aws.s3.secret-key}
-    region: ${ext-config.aws.s3.region}
-    bucket: ${ext-config.aws.s3.bucket}
+      access: ${dev-config.aws.s3.access-key}
+      secret: ${dev-config.aws.s3.secret-key}
+    region: ${dev-config.aws.s3.region}
+    bucket: ${dev-config.aws.s3.bucket}
 java-epub-generator:
   directory:
-    content: ${ext-config.ebook.content-directory}
-    ebook: ${ext-config.ebook.ebook-directory}
+    content: ${dev-config.ebook.content-directory}
+    ebook: ${dev-config.ebook.ebook-directory}
 ---
 spring:
   config:

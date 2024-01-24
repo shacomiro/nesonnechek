@@ -1,4 +1,5 @@
 ### secret config ###
+config/*-config.yaml
 **/external-config.yaml
 **/ext-config.yaml
 **/external-*-config.yaml

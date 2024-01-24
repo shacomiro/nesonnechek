@@ -4,6 +4,9 @@ spring:
       - application-domain-rds.yaml
   profiles:
     group:
+      prod:
+        - batch-app-prod
+        - domains-rds-prod
       dev:
         - batch-app-dev
         - domain-rds-dev
@@ -22,18 +25,34 @@ spring:
 spring:
   config:
     activate:
+      on-profile: batch-app-prod
+  batch:
+    jdbc:
+      initialize-schema: always
+aws:
+  s3:
+    service-endpoint: ${prod-config.aws.s3.service-endpoint}
+    key:
+      access: ${prod-config.aws.s3.access-key}
+      secret: ${prod-config.aws.s3.secret-key}
+    region: ${prod-config.aws.s3.region}
+    bucket: ${prod-config.aws.s3.bucket}
+---
+spring:
+  config:
+    activate:
       on-profile: batch-app-dev
   batch:
     jdbc:
       initialize-schema: always
 aws:
   s3:
-    service-endpoint: ${ext-config.aws.s3.service-endpoint}
+    service-endpoint: ${dev-config.aws.s3.service-endpoint}
     key:
-      access: ${ext-config.aws.s3.access-key}
-      secret: ${ext-config.aws.s3.secret-key}
-    region: ${ext-config.aws.s3.region}
-    bucket: ${ext-config.aws.s3.bucket}
+      access: ${dev-config.aws.s3.access-key}
+      secret: ${dev-config.aws.s3.secret-key}
+    region: ${dev-config.aws.s3.region}
+    bucket: ${dev-config.aws.s3.bucket}
 ---
 spring:
   config:

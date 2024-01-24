@@ -1,10 +1,18 @@
 spring:
   config:
     activate:
+      on-profile: domain-redis-prod
+  redis:
+    port: ${prod-config.redis.secret.port}
+    host: ${prod-config.redis.secret.host}
+---
+spring:
+  config:
+    activate:
       on-profile: domain-redis-dev
   redis:
-    port: ${ext-config.redis.secret.port}
-    host: ${ext-config.redis.secret.host}
+    port: ${dev-config.redis.secret.port}
+    host: ${dev-config.redis.secret.host}
 ---
 spring:
   config:

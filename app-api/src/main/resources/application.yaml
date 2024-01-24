@@ -4,6 +4,9 @@ spring:
       - application-domain.yaml
   profiles:
     group:
+      prod:
+        - app-api-prod
+        - domains-prod
       dev:
         - app-api-dev
         - domains-dev
@@ -20,6 +23,22 @@ spring:
 spring:
   config:
     activate:
+      on-profile: app-api-prod
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+jwt:
+  secret:
+    key: ${prod-config.jwt.secret.key}
+  issuer: ${prod-config.jwt.issuer}
+  valid-milliseconds:
+    access: ${prod-config.jwt.valid-milliseconds.access}
+    refresh: ${prod-config.jwt.valid-milliseconds.refresh}
+---
+spring:
+  config:
+    activate:
       on-profile: app-api-dev
   servlet:
     multipart:
@@ -27,11 +46,11 @@ spring:
       max-request-size: 50MB
 jwt:
   secret:
-    key: ${ext-config.jwt.secret.key}
-  issuer: ${ext-config.jwt.issuer}
+    key: ${dev-config.jwt.secret.key}
+  issuer: ${dev-config.jwt.issuer}
   valid-milliseconds:
-    access: ${ext-config.jwt.valid-milliseconds.access}
-    refresh: ${ext-config.jwt.valid-milliseconds.refresh}
+    access: ${dev-config.jwt.valid-milliseconds.access}
+    refresh: ${dev-config.jwt.valid-milliseconds.refresh}
 ---
 spring:
   config:
@@ -48,4 +67,3 @@ jwt:
   valid-milliseconds:
     access: 30000
     refresh: 60000
-

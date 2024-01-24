@@ -1,12 +1,22 @@
 spring:
   config:
     activate:
+      on-profile: domain-rds-prod
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${prod-config.rds.secret.url}?serverTimezone=${prod-config.rds.config.time-zone}&characterEncoding=${prod-config.rds.config.encoding}
+    username: ${prod-config.rds.secret.username}
+    password: ${prod-config.rds.secret.password}
+---
+spring:
+  config:
+    activate:
       on-profile: domain-rds-dev
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${ext-config.rds.secret.url}?serverTimezone=${ext-config.rds.config.time-zone}&characterEncoding=${ext-config.rds.config.encoding}
-    username: ${ext-config.rds.secret.username}
-    password: ${ext-config.rds.secret.password}
+    url: jdbc:mysql://${dev-config.rds.secret.url}?serverTimezone=${dev-config.rds.config.time-zone}&characterEncoding=${dev-config.rds.config.encoding}
+    username: ${dev-config.rds.secret.username}
+    password: ${dev-config.rds.secret.password}
 ---
 spring:
   config:
