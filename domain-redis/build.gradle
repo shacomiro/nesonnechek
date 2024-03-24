@@ -1,0 +1,18 @@
+version '1.0.0-SNAPSHOT'
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
+    api 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation('it.ozimov:embedded-redis:0.7.3') {
+        exclude group: 'org.slf4j', module: 'slf4j-simple'
+    }
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}

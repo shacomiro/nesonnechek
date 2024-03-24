@@ -1,0 +1,210 @@
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+= Nesonnechek API Document
+:doctype: book
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+[[auth]]
+== Authentication Rest API
+
+=== Sign in
+
+==== Request
+
+CURL::
+include::{snippets}/authentication-rest-api-test/sing-in/curl-request.adoc[]
+
+Request HTTP Example::
+include::{snippets}/authentication-rest-api-test/sing-in/http-request.adoc[]
+
+==== Response
+
+IMPORTANT: It is not possible to request the same response as this, and it is not stored in a separate storage space.
+
+Response Fields::
+include::{snippets}/authentication-rest-api-test/sing-in/response-fields.adoc[]
+
+Response HATEOAS Links::
+include::{snippets}/authentication-rest-api-test/sing-in/links.adoc[]
+
+Response HTTP Example::
+include::{snippets}/authentication-rest-api-test/sing-in/http-response.adoc[]
+
+=== Sign up
+
+==== Request
+
+CURL::
+include::{snippets}/authentication-rest-api-test/sign-up/curl-request.adoc[]
+
+Request HTTP Example::
+include::{snippets}/authentication-rest-api-test/sign-up/http-request.adoc[]
+
+==== Response
+
+Response Fields::
+include::{snippets}/authentication-rest-api-test/sign-up/response-fields.adoc[]
+
+Response HATEOAS Links::
+include::{snippets}/authentication-rest-api-test/sign-up/links.adoc[]
+
+Response HTTP Example::
+include::{snippets}/authentication-rest-api-test/sign-up/http-response.adoc[]
+
+[[user]]
+== User Rest API
+
+=== Get account info
+
+==== Request
+
+CURL::
+include::{snippets}/user-rest-api-test/get-account-info/curl-request.adoc[]
+
+Request HTTP Example::
+include::{snippets}/user-rest-api-test/get-account-info/http-request.adoc[]
+
+==== Response
+
+Response Fields::
+include::{snippets}/user-rest-api-test/get-account-info/response-fields.adoc[]
+
+Response HATEOAS Links::
+include::{snippets}/user-rest-api-test/get-account-info/links.adoc[]
+
+Response HTTP Example::
+include::{snippets}/user-rest-api-test/get-account-info/http-response.adoc[]
+
+=== Update account info
+
+==== Request
+
+CURL::
+include::{snippets}/user-rest-api-test/update-account-info/curl-request.adoc[]
+
+Request HTTP Example::
+include::{snippets}/user-rest-api-test/update-account-info/http-request.adoc[]
+
+==== Response
+
+Response Fields::
+include::{snippets}/user-rest-api-test/update-account-info/response-fields.adoc[]
+
+Response HATEOAS Links::
+include::{snippets}/user-rest-api-test/update-account-info/links.adoc[]
+
+Response HTTP Example::
+include::{snippets}/user-rest-api-test/update-account-info/http-response.adoc[]
+
+=== Delete account
+
+==== Request
+
+CURL::
+include::{snippets}/user-rest-api-test/delete-account/curl-request.adoc[]
+
+Request HTTP Example::
+include::{snippets}/user-rest-api-test/delete-account/http-request.adoc[]
+
+==== Response
+
+Response HTTP Example::
+include::{snippets}/user-rest-api-test/delete-account/http-response.adoc[]
+
+=== Get account's ebook infos
+
+CURL::
+include::{snippets}/user-rest-api-test/get-account-ebooks/curl-request.adoc[]
+
+Request HTTP Example::
+include::{snippets}/user-rest-api-test/get-account-ebooks/http-request.adoc[]
+
+==== Response
+
+Response Fields::
+include::{snippets}/user-rest-api-test/get-account-ebooks/response-fields.adoc[]
+
+Response HATEOAS Links::
+include::{snippets}/user-rest-api-test/get-account-ebooks/links.adoc[]
+
+Response HTTP Example::
+include::{snippets}/user-rest-api-test/get-account-ebooks/http-response.adoc[]
+
+=== Delete account's ebook infos
+
+==== Request
+
+CURL::
+include::{snippets}/user-rest-api-test/delete-all-account-ebooks/curl-request.adoc[]
+
+Request HTTP Example::
+include::{snippets}/user-rest-api-test/delete-all-account-ebooks/http-request.adoc[]
+
+==== Response
+
+Response HTTP Example::
+include::{snippets}/user-rest-api-test/delete-all-account-ebooks/http-response.adoc[]
+
+[[ebook]]
+== Ebook Rest API
+
+=== Create txt ebook
+
+==== Request
+
+CURL::
+include::{snippets}/ebook-rest-api-test/create-txt-ebook/curl-request.adoc[]
+
+Request HTTP Example::
+include::{snippets}/ebook-rest-api-test/create-txt-ebook/http-request.adoc[]
+
+==== Response
+
+Response Fields::
+include::{snippets}/ebook-rest-api-test/create-txt-ebook/response-fields.adoc[]
+
+Response HATEOAS Links::
+include::{snippets}/ebook-rest-api-test/create-txt-ebook/links.adoc[]
+
+Response HTTP Example::
+include::{snippets}/ebook-rest-api-test/create-txt-ebook/http-response.adoc[]
+
+=== Get ebook info
+
+==== Request
+
+CURL::
+include::{snippets}/ebook-rest-api-test/get-ebook/curl-request.adoc[]
+
+Request HTTP Example::
+include::{snippets}/ebook-rest-api-test/get-ebook/http-request.adoc[]
+
+==== Response
+
+Response Fields::
+include::{snippets}/ebook-rest-api-test/get-ebook/response-fields.adoc[]
+
+Response HATEOAS Links::
+include::{snippets}/ebook-rest-api-test/get-ebook/links.adoc[]
+
+Response HTTP Example::
+include::{snippets}/ebook-rest-api-test/get-ebook/http-response.adoc[]
+
+=== Download Ebook file
+
+==== Request
+
+CURL::
+include::{snippets}/ebook-rest-api-test/download-ebook/curl-request.adoc[]
+
+Request HTTP Example::
+include::{snippets}/ebook-rest-api-test/download-ebook/http-request.adoc[]
+
+==== Response
+
+Response HTTP Example::
+include::{snippets}/ebook-rest-api-test/download-ebook/http-response.adoc[]

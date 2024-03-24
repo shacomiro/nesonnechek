@@ -1,0 +1,11 @@
+version '1.0.0-SNAPSHOT'
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    implementation 'io.findify:s3mock_2.12:0.2.4'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.batch:spring-batch-test'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    implementation project(':domain-rds')
+    implementation project(':java-aws-s3-client-manager')
+}

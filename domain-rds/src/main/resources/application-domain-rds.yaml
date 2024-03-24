@@ -1,0 +1,53 @@
+spring:
+  config:
+    activate:
+      on-profile: domain-rds-prod
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${prod-config.rds.secret.url}?serverTimezone=${prod-config.rds.config.time-zone}&characterEncoding=${prod-config.rds.config.encoding}
+    username: ${prod-config.rds.secret.username}
+    password: ${prod-config.rds.secret.password}
+---
+spring:
+  config:
+    activate:
+      on-profile: domain-rds-dev
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${dev-config.rds.secret.url}?serverTimezone=${dev-config.rds.config.time-zone}&characterEncoding=${dev-config.rds.config.encoding}
+    username: ${dev-config.rds.secret.username}
+    password: ${dev-config.rds.secret.password}
+---
+spring:
+  config:
+    activate:
+      on-profile: domain-rds-local
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:local;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false;MODE=MYSQL;TIME ZONE=UTC
+    username: sa
+    password:
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        globally_quoted_identifiers: true
+    database: h2
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    defer-datasource-initialization: true
+  h2:
+    console:
+      enabled: true
+---
+spring:
+  config:
+    activate:
+      on-profile: domain-rds-debug
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true

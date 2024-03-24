@@ -1,9 +1,11 @@
 plugins {
     id 'org.springframework.boot' version '2.7.3'
-    id 'io.spring.dependency-management' version '1.0.13.RELEASE'
+    id 'io.spring.dependency-management' version '1.1.0'
     id 'io.freefair.lombok' version '6.5.1'
     id 'java'
 }
+
+version '1.0.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -15,7 +17,6 @@ bootJar {
 
 allprojects {
     group 'com.shacomiro'
-    version '1.0-SNAPSHOT'
 }
 
 subprojects {
@@ -32,11 +33,6 @@ subprojects {
         maven {
             url 'https://github.com/psiegman/mvn-repo/raw/master/releases'
         }
-    }
-
-    dependencies {
-        testImplementation 'org.springframework.boot:spring-boot-starter-test'
-        developmentOnly 'org.springframework.boot:spring-boot-devtools'
     }
 
     test {

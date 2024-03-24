@@ -1,0 +1,23 @@
+spring:
+  config:
+    activate:
+      on-profile: domain-redis-prod
+  redis:
+    port: ${prod-config.redis.secret.port}
+    host: ${prod-config.redis.secret.host}
+---
+spring:
+  config:
+    activate:
+      on-profile: domain-redis-dev
+  redis:
+    port: ${dev-config.redis.secret.port}
+    host: ${dev-config.redis.secret.host}
+---
+spring:
+  config:
+    activate:
+      on-profile: domain-redis-local
+  redis:
+    port: 6370
+    host: localhost
