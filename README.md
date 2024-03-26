@@ -39,7 +39,7 @@ gradlew build
 java -jar ./app-api/build/libs/app-api-1.0.0-SNAPSHOT.jar --spring.config.additional-location=./config/ext-config.yaml --spring.profiles.active={profile-name}
 ```
 
-[API document](./docs/index.html)
+[API document](./docs/index.md)
 
 #### txt-epub conversion syntax
 

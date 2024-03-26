@@ -37,7 +37,7 @@ gradlew build
 java -jar ./app-api/build/libs/app-api-X.X.X.jar --spring.config.additional-location=./config/ext-config.yaml --spring.profiles.active={프로파일명}
 ```
 
-[API 문서](./index.html)
+[API 문서](./index.md)
 
 #### txt-epub 변환 문법
 
