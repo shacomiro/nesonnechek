@@ -15,7 +15,7 @@
 <span id="revnumber">version 1.0.0-SNAPSHOT</span>
 </div>
 <div id="toc" class="toc2">
-<div id="toctitle">Table of Contents</div>
+<h2><div id="toctitle">Table of Contents</div></h2>
 <ul class="sectlevel1">
 <li><a href="#auth">Authentication Rest API</a>
 <ul class="sectlevel2">
