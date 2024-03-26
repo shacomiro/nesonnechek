@@ -39,7 +39,7 @@ java -jar ./app-api/build/libs/app-api-X.X.X.jar --spring.config.additional-loca
 
 [API 문서](./index.md)
 
-#### txt-epub 변환 문법
+#### txt-epub 변환 구문
 
 ```
 *BT*책-제목   //'책-제목'을 전자책의 제목으로 설정

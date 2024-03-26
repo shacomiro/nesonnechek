@@ -47,7 +47,7 @@ java -jar ./app-api/build/libs/app-api-X.X.X.jar --spring.config.additional-loca
 *BT*book-title    //set 'book-title' to the title of the ebook
 *BA*book-author   //set 'book-author' to the author of the ebook
 *ST*section-title //set 'section-title' to the title of the section
-body-content      //set 'body-content' to a paragraph if there is no grammar
+body-content      //set 'body-content' to a paragraph if there is no syntax
 ```
 
 ### api-batch
@@ -106,7 +106,7 @@ ext-config:
 ## Roadmap
 
 -   [ ] New features
-    -   [ ] More ebook grammar elements
+    -   [ ] More ebook syntax elements
     -   [ ] Add an image
     -   [ ] Add API key authentication
     -   [ ] Add the ability to limit the frequency of API calls
