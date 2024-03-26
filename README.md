@@ -6,7 +6,7 @@ Read this document in: [한국어](./docs/README.KR.md)
 
 ## About The Project
 
-This is a REST API that provides the ability to convert user-created txt files to epub files. The specific grammar specified for the API to recognize must be contained within the txt file to be converted in order for the conversion to succeed.
+This is a REST API that provides the ability to convert user-created txt files to epub files.
 
 ## Built With
 
