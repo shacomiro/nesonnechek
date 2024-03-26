@@ -36,7 +36,7 @@ gradlew build
 ### api-app
 
 ```
-java -jar ./app-api/build/libs/app-api-1.0.0-SNAPSHOT.jar --spring.config.additional-location=./config/ext-config.yaml --spring.profiles.active={profile-name}
+java -jar ./app-api/build/libs/app-api-X.X.X.jar --spring.config.additional-location=./config/ext-config.yaml --spring.profiles.active={profile-name}
 ```
 
 [API document](./docs/index.md)
@@ -53,7 +53,7 @@ body-content      //set 'body-content' to a paragraph if there is no grammar
 ### api-batch
 
 ```
-java -jar ./app-api/build/libs/app-batch-1.0.0-SNAPSHOT.jar --spring.config.additional-location=./config/ext-config.yaml --spring.profiles.active={profile-name} --job.name=deleteExpiredEbookJob time(long)={current-time}
+java -jar ./app-api/build/libs/app-batch-X.X.X.jar --spring.config.additional-location=./config/ext-config.yaml --spring.profiles.active={profile-name} --job.name=deleteExpiredEbookJob time(long)={current-time}
 ```
 
 > Note: `current-time` is in the format `YYYYMMDDHHmm` and must be numeric.
