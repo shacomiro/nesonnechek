@@ -55,7 +55,7 @@ public class UserRestApi {
 	@CacheEvict(value = CacheKey.SIGN_IN_USER, key = "#userPrincipal.email")
 	public ResponseEntity<?> updateAccount(
 			@AuthenticationPrincipal @NonNull UserPrincipal userPrincipal,
-			@RequestBody UpdateUserRequest updateUserRequest) {
+			@RequestBody @Valid UpdateUserRequest updateUserRequest) {
 		return success(
 				userService.updateUser(
 						new UpdateUserDto(
