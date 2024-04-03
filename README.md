@@ -10,12 +10,21 @@ This is a REST API that provides the ability to convert user-created txt files t
 
 ## Built With
 
--   Java 11
--   Spring Boot 2.7.3
--   Lombok 6.5.1
--   Junit 5.8.2
--   [epublib](https://github.com/psiegman/epublib)
--   [embedded-redis](https://github.com/ozimov/embedded-redis)
+-   Language
+    -   Java 11
+-   Framework
+    -   Spring Boot 2.7.3
+-   Database
+    -   MySQL
+    -   Redis
+-   Library
+    -   Lombok 6.5.1
+    -   Junit 5.8.2
+    -   Spring Data JPA
+    -   Spring Rest Docs
+    -   [epublib](https://github.com/psiegman/epublib)
+-   Infra
+    -   AWS S3
 
 ## Installation
 
@@ -68,7 +77,7 @@ The profiles provided by the application by default are listed below.
 
 Some settings require additional external configuration to protect sensitive information used to access databases and external storage.
 
-Use the `local` profile if you want to run the application in your local environment without any additional configuration. This profile uses H2 Database and Embedded Redis.
+Use the `local` profile if you want to run the application in your local environment without any additional configuration. This profile uses H2 Database and [Embedded Redis](https://github.com/ozimov/embedded-redis).
 
 ```
 ext-config:
@@ -112,7 +121,7 @@ ext-config:
     -   [ ] Add the ability to limit the frequency of API calls
 -   [ ] Structure improvements
     -   [x] Apply modularization
-    -   [ ] Remove common module
+    -   [ ] Remove core module
 -   [ ] Performance improvements
     -   [ ] Optimize file I/O
 -   [ ] CI

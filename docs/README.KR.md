@@ -8,12 +8,21 @@
 
 ## 사용 기술
 
--   Java 11
--   Spring Boot 2.7.3
--   Lombok 6.5.1
--   Junit 5.8.2
--   [epublib](https://github.com/psiegman/epublib)
--   [embedded-redis](https://github.com/ozimov/embedded-redis)
+-   프로그래밍 언어
+    -   Java 11
+-   프레임워크
+    -   Spring Boot 2.7.3
+-   데이터베이스
+    -   MySQL
+    -   Redis
+-   라이브러리
+    -   Lombok 6.5.1
+    -   Junit 5.8.2
+    -   Spring Data JPA
+    -   Spring Rest Docs
+    -   [epublib](https://github.com/psiegman/epublib)
+-   인프라
+    -   AWS S3
 
 ## 설치
 
@@ -66,7 +75,7 @@ java -jar ./app-api/build/libs/app-batch-X.X.X.jar --spring.config.additional-lo
 
 데이터베이스와 외부 저장소 접근에 사용되는 민감 정보를 보호하기 위해 일부 설정은 추가적인 외부 설정을 요구합니다.
 
-별도의 추가 설정 없이 로컬 환경에서 애플리케이션을 구동하고 싶다면 `local` 프로파일을 사용하세요. 해당 프로파일에서는 H2 Database와 Embedded Redis가 사용됩니다.
+별도의 추가 설정 없이 로컬 환경에서 애플리케이션을 구동하고 싶다면 `local` 프로파일을 사용하세요. 해당 프로파일에서는 H2 Database와 [Embedded Redis](https://github.com/ozimov/embedded-redis)가 사용됩니다.
 
 ```
 ext-config:
@@ -110,7 +119,7 @@ ext-config:
     -   [ ] API 호출 빈도 제한 기능 추가
 -   [ ] 구조 개선
     -   [x] 모듈화 적용
-    -   [ ] 공통(common) 모듈 제거
+    -   [ ] 공통(core) 모듈 제거
 -   [ ] 성능 개선
     -   [ ] 파일 I/O 최적화
 -   [ ] 지속적 통합(CI)
