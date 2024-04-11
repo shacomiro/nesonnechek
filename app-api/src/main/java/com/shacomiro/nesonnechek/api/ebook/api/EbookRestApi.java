@@ -27,7 +27,6 @@ import com.shacomiro.nesonnechek.core.global.exception.FileIOException;
 import com.shacomiro.nesonnechek.domain.ebook.dto.EbookRequestDto;
 import com.shacomiro.nesonnechek.domain.ebook.dto.EbookResourceDto;
 import com.shacomiro.nesonnechek.domain.ebook.service.EbookService;
-import com.shacomiro.nesonnechek.domain.rds.ebook.entity.Ebook;
 import com.shacomiro.nesonnechek.domain.rds.ebook.entity.EbookType;
 
 import lombok.NonNull;
@@ -68,16 +67,6 @@ public class EbookRestApi {
 		return success(
 				ebookService.createEbook(ebookRequestDto)
 						.orElseThrow(() -> new NullPointerException("Fail to create ebook")),
-				ebookResponseModelAssembler,
-				HttpStatus.CREATED
-		);
-	}
-
-	@PostMapping(path = "files-ebook")
-	public ResponseEntity<?> createFilesEbook() {
-
-		return success(
-				(Ebook)null,
 				ebookResponseModelAssembler,
 				HttpStatus.CREATED
 		);

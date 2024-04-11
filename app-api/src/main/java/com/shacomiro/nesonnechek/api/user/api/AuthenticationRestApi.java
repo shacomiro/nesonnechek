@@ -51,7 +51,7 @@ public class AuthenticationRestApi {
 		return new ResponseEntity<>(
 				RepresentationModel.of(
 						jwtDto,
-						List.of(Link.of(getCurrentApiServletMapping() + "/api/sign/reissue").withRel("reissue"), docsLink())
+						List.of(Link.of(getCurrentApiServletMapping() + "/auth/reissue").withRel("reissue"), docsLink())
 				),
 				HttpStatus.OK
 		);

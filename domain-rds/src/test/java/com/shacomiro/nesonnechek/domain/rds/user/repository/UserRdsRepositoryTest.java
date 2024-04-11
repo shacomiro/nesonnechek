@@ -3,6 +3,8 @@ package com.shacomiro.nesonnechek.domain.rds.user.repository;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.ConstraintViolationException;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
@@ -111,5 +113,21 @@ class UserRdsRepositoryTest {
 
 		//then
 		Assertions.assertThrows(DataIntegrityViolationException.class, userRdsRepository::flush);
+	}
+
+	@Test
+	@Order(6)
+	@DisplayName("잘못된 유저 엔티티 생성시 제약 조건 위반")
+	void tryCreateWorngUser() {
+		//given
+		User user = User.bySignUpInfos()
+				.email(Email.byValue().value("adsdf").build())
+				.encryptedPassword("notEncryptedPassword")
+				.username("over20over20over20over20")
+				.roles(List.of(UserRole.USER))
+				.build();
+
+		//then
+		Assertions.assertThrows(ConstraintViolationException.class, () -> userRdsRepository.save(user));
 	}
 }
