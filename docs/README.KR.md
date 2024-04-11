@@ -40,7 +40,7 @@ gradlew build
 
 ## 사용법
 
-### api-app
+### app-api
 
 ```
 java -jar ./app-api/build/libs/app-api-X.X.X.jar --spring.config.additional-location=./config/ext-config.yaml --spring.profiles.active={프로파일명}
@@ -57,10 +57,10 @@ java -jar ./app-api/build/libs/app-api-X.X.X.jar --spring.config.additional-loca
 본문-내용     //아무런 문법이 없는 경우 '본문-내용'을 문단으로 설정
 ```
 
-### api-batch
+### app-batch
 
 ```
-java -jar ./app-api/build/libs/app-batch-X.X.X.jar --spring.config.additional-location=./config/ext-config.yaml --spring.profiles.active={프로파일명} --job.name=deleteExpiredEbookJob time(long)={작업시작시간}
+java -jar ./app-batch/build/libs/app-batch-X.X.X.jar --spring.config.additional-location=./config/ext-config.yaml --spring.profiles.active={프로파일명} --job.name=deleteExpiredEbookJob time(long)={작업시작시간}
 ```
 
 > 주의사항 : `작업시작시간`은 `YYYYMMDDHHmm` 형식이며, 숫자여야만 합니다.
