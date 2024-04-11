@@ -18,5 +18,6 @@ public class UpdateUserDto {
 	private String email;
 	@Size(min = 60, max = 60, message = "Encrypted password must be 60 characters")
 	private String encryptedPassword;
+	@Size(min = 1, max = 20, message = "Username length must be between 1 and 10 characters")
 	private String username;
 }

@@ -21,8 +21,7 @@ public class RestDocsConfiguration {
 				"{class-name}/{method-name}",
 				preprocessRequest(modifyUris()
 								.scheme("http")
-								.host("api.nesonnechek.com")
-								.removePort(),
+								.host("localhost"),
 						prettyPrint()),
 				preprocessResponse(prettyPrint())
 		);

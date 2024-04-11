@@ -2,6 +2,9 @@ package com.shacomiro.nesonnechek.api.global.exception.handler;
 
 import static com.shacomiro.nesonnechek.api.global.util.ApiUtils.*;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -56,6 +59,8 @@ public class GeneralExceptionHandler {
 			IllegalArgumentException.class,
 			IllegalStateException.class,
 			MethodArgumentTypeMismatchException.class,
+			MethodArgumentNotValidException.class,
+			ConstraintViolationException.class,
 			MultipartException.class,
 			HttpRequestMethodNotSupportedException.class,
 			EbookExpiredException.class,
@@ -68,6 +73,12 @@ public class GeneralExceptionHandler {
 					((MethodArgumentNotValidException)e).getBindingResult().getAllErrors().get(0).getDefaultMessage(),
 					HttpStatus.BAD_REQUEST
 			);
+		} else if (e instanceof ConstraintViolationException) {
+			StringBuilder message = new StringBuilder();
+			for (ConstraintViolation<?> violation : ((ConstraintViolationException)e).getConstraintViolations()) {
+				message.append(violation.getMessage().concat(";"));
+			}
+			return newResponse(message.toString(), HttpStatus.BAD_REQUEST);
 		} else if (e instanceof MethodArgumentTypeMismatchException) {
 			return newResponse(
 					((MethodArgumentTypeMismatchException)e).getValue() + " is not supported argument value",
