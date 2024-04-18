@@ -6,7 +6,7 @@ spring:
     group:
       prod:
         - batch-app-prod
-        - domains-rds-prod
+        - domain-rds-prod
       dev:
         - batch-app-dev
         - domain-rds-dev
@@ -18,9 +18,7 @@ spring:
     active: ${profile}
   batch:
     job:
-      names: ${job.name:NONE}
-  main:
-    web-application-type: none
+      enabled: false
 ---
 spring:
   config:

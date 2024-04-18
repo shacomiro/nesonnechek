@@ -4,7 +4,6 @@ import javax.persistence.EntityManagerFactory;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -27,7 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration
-@EnableBatchProcessing
 @RequiredArgsConstructor
 public class DeleteExpiredEbookJobConfiguration {
 	private static final int CHUNK_SIZE = 10;
@@ -62,7 +60,7 @@ public class DeleteExpiredEbookJobConfiguration {
 				.name("expiredEbookReader")
 				.entityManagerFactory(emf)
 				.pageSize(CHUNK_SIZE)
-				.queryString("SELECT ef FROM Ebook ef")
+				.queryString("SELECT e FROM Ebook e")
 				.build();
 	}
 
@@ -88,9 +86,9 @@ public class DeleteExpiredEbookJobConfiguration {
 						ebook.getName(), ebook.getUuid(), ebook.isExist(), ebook.isExpired(), isDeleted);
 
 				return ebook;
-			} else {
-				return null;
 			}
+
+			return null;
 		};
 	}
 
